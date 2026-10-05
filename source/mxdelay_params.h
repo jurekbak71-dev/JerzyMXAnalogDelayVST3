@@ -22,7 +22,8 @@ enum MXGlobalParamIds : unsigned {
     kMXRoutingId,
     kMXBypassId,
     kMXSpillId,
-    kMXTempoMeterId
+    kMXTempoMeterId,
+    kMXMachineConditionId = kMXGlobalBase + 7
 };
 
 enum SlotOffsets : unsigned {
@@ -67,6 +68,7 @@ struct MXDelayParams {
     double routing=0.0;
     double bypass=0.0;
     double spill=1.0;
+    double machineCondition=0.0;
     SlotParams slot[2];
     MXDelayParams(){
         slot[0].algorithm=0.0;
