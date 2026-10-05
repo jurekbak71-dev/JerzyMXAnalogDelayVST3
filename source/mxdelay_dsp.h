@@ -151,7 +151,10 @@ template<class T> class MXDelayDSP {
             fbs.r=(T)(double(fbs.r)*m.gain-0.41*m.impulse+0.49*m.noise);
         }
 
-        Stereo process(T inL,T inR,const SlotParams& p,double bpm){
+        Stereo process(T inL,T inR,const SlotParams& p,double bpm,double machineCondition){
+            const double condition=std::clamp(machineCondition,0.0,1.0);
+            const double damage=condition*condition*(0.82+0.18*condition);
+            auto aged=[&](double local,double amount){return std::clamp(local+damage*amount*(1.0-0.28*local),0.0,1.0);};
             if(l.empty())return{};
             if(p.enable<.5){
                 if(enabledLast)clearAudio();
@@ -176,7 +179,8 @@ template<class T> class MXDelayDSP {
             if(algo==(int)DelayAlgorithm::Volante){
                 ms=std::clamp(ms,100.0,4000.0);
                 const double mechanics=c[0],wear=c[1],spread=c[4],drive=c[5];
-                auto mech=transport.tick(mechanics,0.32*mechanics+0.22*wear,wear,std::max(mechanics,wear),0.30*wear);
+                const double globalWear=aged(wear,0.92),globalMechanics=aged(mechanics,0.78);
+                auto mech=transport.tick(globalMechanics,aged(0.32*mechanics+0.22*wear,0.72),globalWear,aged(std::max(mechanics,wear),0.94),aged(0.30*wear,0.48));
                 auto ratios=volanteRatios(c[2]);double sp=0,sf=0;Stereo feedback{};
                 for(int h=0;h<4;++h){
                     if(c[6+h]<0.5&&c[10+h]<0.5)continue;
@@ -190,17 +194,18 @@ template<class T> class MXDelayDSP {
                 }
                 if(sp>0){wet.l=(T)(double(wet.l)/std::sqrt(sp));wet.r=(T)(double(wet.r)/std::sqrt(sp));}
                 if(sf>0){feedback.l=(T)(double(feedback.l)/sf);feedback.r=(T)(double(feedback.r)/sf);}
-                const double cutoff=11000-7600*wear;
-                fbs.l=lowpass(tapeSat(feedback.l,drive,.58,wear,tapeMemL),lpL,cutoff);
-                fbs.r=lowpass(tapeSat(feedback.r,drive,.43,wear,tapeMemR),lpR,cutoff*.97);
+                const double cutoff=11000-7600*globalWear;
+                fbs.l=lowpass(tapeSat(feedback.l,drive,.58,globalWear,tapeMemL),lpL,cutoff);
+                fbs.r=lowpass(tapeSat(feedback.r,drive,.43,globalWear,tapeMemR),lpR,cutoff*.97);
                 const double lc=35+450*c[3];
                 fbs.l=highpass(fbs.l,hpMemL,lc);fbs.r=highpass(fbs.r,hpMemR,lc);
-                applyPhysicalFrame(wet,fbs,mech,15000-9000*wear);
+                applyPhysicalFrame(wet,fbs,mech,15000-9000*globalWear);
             }else if(algo==(int)DelayAlgorithm::ElCapistan){
                 ms=std::clamp(ms,35.0,2500.0);
                 const double age=c[0],wow=c[1],flutter=c[2],crinkle=c[3],bias=c[4],lowContour=c[5],spring=c[6];
-                const double wear=std::clamp(0.52*age+0.78*crinkle,0.0,1.0);
-                auto mech=transport.tick(wow,flutter,wear,std::clamp(0.28*wow+0.30*flutter+0.95*crinkle,0.0,1.0),0.22*age+0.38*crinkle);
+                const double effectiveAge=aged(age,0.78),effectiveCrinkle=aged(crinkle,0.96);
+                const double wear=std::clamp(0.52*effectiveAge+0.78*effectiveCrinkle,0.0,1.0);
+                auto mech=transport.tick(aged(wow,0.66),aged(flutter,0.74),wear,aged(std::clamp(0.28*wow+0.30*flutter+0.95*crinkle,0.0,1.0),0.92),aged(0.22*age+0.38*crinkle,0.62));
                 const double base=sr*ms/1000.0*(1.0+mech.pitch);
                 const int mode=normIndex(c[7],3);
                 auto tap=[&](double rr){return Stereo{read(l,base*rr),read(r,base*rr)};};
@@ -212,15 +217,16 @@ template<class T> class MXDelayDSP {
                     wet.l+=(T)(spring*(.19*double(s1.r)-.13*double(s2.l)+.08*double(s3.r)));
                     wet.r+=(T)(spring*(.19*double(s1.l)-.13*double(s2.r)+.08*double(s3.l)));
                 }
-                const double cutoff=12500-8600*age;
-                fbs.l=lowpass(tapeSat(wet.l,.30+.78*bias,bias,age,tapeMemL),lpL,cutoff);
-                fbs.r=lowpass(tapeSat(wet.r,.30+.78*bias,bias*.94,age,tapeMemR),lpR,cutoff*.98);
+                const double cutoff=12500-8600*effectiveAge;
+                fbs.l=lowpass(tapeSat(wet.l,.30+.78*bias,bias,effectiveAge,tapeMemL),lpL,cutoff);
+                fbs.r=lowpass(tapeSat(wet.r,.30+.78*bias,bias*.94,effectiveAge,tapeMemR),lpR,cutoff*.98);
                 fbs.l=highpass(fbs.l,hpMemL,45+350*lowContour);fbs.r=highpass(fbs.r,hpMemR,45+350*lowContour);
-                applyPhysicalFrame(wet,fbs,mech,14500-9300*age);
+                applyPhysicalFrame(wet,fbs,mech,14500-9300*effectiveAge);
             }else if(algo==(int)DelayAlgorithm::Olivera){
                 ms=std::clamp(ms,155.0,620.0);
                 const double wear=c[0],visc=c[1],statik=c[2],hm=c[3],tone=c[4],dr=c[5];
-                auto mech=transport.tick(dr*(1.0-0.48*visc),0.16*dr,wear,std::clamp(dr+0.42*wear,0.0,1.0),statik);
+                const double effectiveWear=aged(wear,0.88),effectiveStatic=aged(statik,0.80),effectiveDrift=aged(dr,0.74);
+                auto mech=transport.tick(effectiveDrift*(1.0-0.48*visc),0.16*effectiveDrift,effectiveWear,aged(std::clamp(dr+0.42*wear,0.0,1.0),0.90),effectiveStatic);
                 const double base=sr*ms/1000.0*(1.0+mech.pitch*(0.55+0.45*(1.0-visc)));
                 auto sh=Stereo{read(l,base*.47),read(r,base*.47)};
                 auto lh=Stereo{read(l,base),read(r,base)};
@@ -229,27 +235,29 @@ template<class T> class MXDelayDSP {
                 auto smearB=Stereo{read(l,base*(1.014+.012*visc)),read(r,base*(1.010+.009*visc))};
                 wet.l=(T)((1-hm)*double(sh.l)+hm*double(lh.l)+.18*double(disc.l)+.16*visc*(double(smearA.l)+double(smearB.l)));
                 wet.r=(T)((1-hm)*double(sh.r)+hm*double(lh.r)+.18*double(disc.r)+.16*visc*(double(smearA.r)+double(smearB.r)));
-                const double cutoff=1800+5200*tone-900*wear;
-                fbs.l=lowpass(tapeSat(wet.l,.35+.65*wear,.54,wear,tapeMemL),lpL,cutoff);
-                fbs.r=lowpass(tapeSat(wet.r,.35+.65*wear,.46,wear,tapeMemR),lpR,cutoff*.96);
-                applyPhysicalFrame(wet,fbs,mech,4200+2900*tone-1200*wear);
+                const double cutoff=1800+5200*tone-900*effectiveWear;
+                fbs.l=lowpass(tapeSat(wet.l,.35+.65*effectiveWear,.54,effectiveWear,tapeMemL),lpL,cutoff);
+                fbs.r=lowpass(tapeSat(wet.r,.35+.65*effectiveWear,.46,effectiveWear,tapeMemR),lpR,cutoff*.96);
+                applyPhysicalFrame(wet,fbs,mech,4200+2900*tone-1200*effectiveWear);
             }else if(algo==(int)DelayAlgorithm::EC1){
                 ms=std::clamp(ms,40.0,2500.0);
                 const double mechAmt=c[0],age=c[1],bias=c[2],pre=c[3],rec=c[4],st=c[5];
-                auto mech=transport.tick(mechAmt,0.34*mechAmt,age,std::clamp(mechAmt+0.34*age,0.0,1.0),0.12*age);
+                const double effectiveAge=aged(age,0.76),effectiveMech=aged(mechAmt,0.78);
+                auto mech=transport.tick(effectiveMech,0.34*effectiveMech,effectiveAge,aged(std::clamp(mechAmt+0.34*age,0.0,1.0),0.90),aged(0.12*age,0.42));
                 const double base=sr*ms/1000.0*(1.0+mech.pitch);
                 wet={read(l,base*(1-.0025*st)),read(r,base*(1+.0025*st))};
-                const double cutoff=13000-8200*age;
+                const double cutoff=13000-8200*effectiveAge;
                 fbs.l=lowpass(tubeStage(wet.l,pre,rec,bias,tubeEnvL),lpL,cutoff);
                 fbs.r=lowpass(tubeStage(wet.r,pre,rec,1.0-bias,tubeEnvR),lpR,cutoff*.985);
-                applyPhysicalFrame(wet,fbs,mech,15500-9000*age);
+                applyPhysicalFrame(wet,fbs,mech,15500-9000*effectiveAge);
             }else if(algo==(int)DelayAlgorithm::Brig){
                 const int voice=normIndex(c[0],3);
                 const bool sync=p.sync>=.5;
                 const double maxMs=sync?2000.0:(voice==0?300.0:1000.0),minMs=voice==0?30.0:100.0;
                 ms=std::clamp(ms,minMs,maxMs);
                 const double filter=c[1],md=c[2],mr=c[3],comp=c[4],noise=c[5];
-                const double jitter=periodicMod((.00025+.0065*md)*(voice==0?1.20:1.0),.22+3.4*mr)+noiseRng.bipolar()*.00022*md;
+                const double effectiveNoise=aged(noise,0.72),effectiveMod=aged(md,0.38);
+                const double jitter=periodicMod((.00025+.0065*effectiveMod)*(voice==0?1.20:1.0),.22+3.4*mr)+noiseRng.bipolar()*(.00022*effectiveMod+.00035*damage);
                 const double base=sr*ms/1000.0*(1.0+jitter);
                 if(voice==2){auto a=Stereo{read(l,base),read(r,base*.618)};wet=a;fbs={(T)((1-c[1]*.25)*double(a.r)),(T)((1-c[1]*.25)*double(a.l))};}
                 else{wet={read(l,base),read(r,base)};fbs=wet;}
@@ -261,32 +269,33 @@ template<class T> class MXDelayDSP {
                 fbs.r=lowpass(compandCompress(sat(fbs.r,voice==0?2.2:1.55,-.03),comp),lpR,cutoff*.97);
                 const double clockHz=std::clamp(stages*500.0/ms,1800.0,0.44*sr);
                 clockPhase+=2*pi*clockHz/sr;if(clockPhase>2*pi)clockPhase-=2*pi;
-                const double clockBleed=std::sin(clockPhase)*(0.000015+0.00022*noise);
-                const double n=noiseRng.bipolar()*noise*(voice==0?.0010:.00048);
+                const double clockBleed=std::sin(clockPhase)*(0.000015+0.00022*effectiveNoise+0.00012*damage);
+                const double n=noiseRng.bipolar()*effectiveNoise*(voice==0?.0010:.00048);
                 wet.l=(T)(double(wet.l)+.22*n+.22*clockBleed);wet.r=(T)(double(wet.r)-.18*n+.17*clockBleed);
                 fbs.l=(T)(double(fbs.l)+n+clockBleed);fbs.r=(T)(double(fbs.r)-.79*n+.71*clockBleed);
             }else if(algo==(int)DelayAlgorithm::Deco){
                 ms=std::clamp(ms,.3,500.0);
                 const double saturation=c[0],wobble=c[1],blend=c[2],width=c[4],flange=c[5];
-                auto mech=transport.tick(wobble,.22*wobble,.16*saturation,.42*wobble,.06*saturation);
+                const double effectiveWobble=aged(wobble,0.72),effectiveWear=aged(.16*saturation,0.56);
+                auto mech=transport.tick(effectiveWobble,.22*effectiveWobble,effectiveWear,aged(.42*wobble,0.78),aged(.06*saturation,0.30));
                 double d=sr*ms/1000.0*(1.0+mech.pitch);
                 const int type=normIndex(c[3],3);
                 const double flangeSweep=periodicMod(1.0,.055+.20*wobble);
                 if(flange>0&&ms<20)d=std::max(2.0,d+sr*.0035*flange*flangeSweep);
                 auto lag=Stereo{read(l,d*(1-.002*width)),read(r,d*(1+.002*width))};
-                lag.l=tapeSat(lag.l,saturation,.56,.18+.28*wobble,tapeMemL);
-                lag.r=tapeSat(lag.r,saturation,.44,.18+.28*wobble,tapeMemR);
+                lag.l=tapeSat(lag.l,saturation,.56,aged(.18+.28*wobble,.48),tapeMemL);
+                lag.r=tapeSat(lag.r,saturation,.44,aged(.18+.28*wobble,.48),tapeMemR);
                 if(type==1){lag.l=(T)-lag.l;lag.r=(T)-lag.r;}
                 if(type==2){T x=lag.r;lag.r=(T)(.25*double(lag.l));lag.l=x;}
                 wet.l=(T)((1-blend)*double(inL)+blend*double(lag.l));
                 wet.r=(T)((1-blend)*double(inR)+blend*double(lag.r));
                 fbs={};fb=0;
-                applyPhysicalFrame(wet,fbs,mech,16500-4200*saturation);
+                applyPhysicalFrame(wet,fbs,mech,16500-4200*saturation-2800*damage);
             }else{
                 ms=std::clamp(ms,20.0,3200.0);
                 const int type=normIndex(c[0],3);
                 const double ratio=.5+c[1],md=c[2],cross=c[3],dyn=c[4],tone=c[5];
-                const double mod=periodicMod(.0002+.004*md,.25+2.2*md);
+                const double mod=periodicMod(.0002+.004*md+.0012*damage,.25+2.2*md)+noiseRng.bipolar()*.00012*damage;
                 const double d1=sr*ms/1000.0*(1+mod),d2=std::clamp(d1*ratio,2.0,double(l.size()-4));
                 Stereo a{read(l,d1),read(r,d1)},b{read(l,d2),read(r,d2)};
                 a=digitalColor(a,type);b=digitalColor(b,type);
@@ -295,7 +304,7 @@ template<class T> class MXDelayDSP {
                 fbs.l=(T)(dg*((1-cross)*double(wet.l)+cross*double(wet.r)));
                 fbs.r=(T)(dg*((1-cross)*double(wet.r)+cross*double(wet.l)));
                 const double cutoff=5500+12500*tone;
-                fbs.l=lowpass(fbs.l,lpL,cutoff);fbs.r=lowpass(fbs.r,lpR,cutoff);
+                fbs.l=lowpass((T)(double(fbs.l)+noiseRng.bipolar()*.00012*damage),lpL,cutoff*(1.0-.24*damage));fbs.r=lowpass((T)(double(fbs.r)+noiseRng.bipolar()*.00010*damage),lpR,cutoff*(1.0-.22*damage));
             }
 
             T recL=sat((T)(double(inL)+fb*double(fbs.l)),1.05,.01);
@@ -347,16 +356,16 @@ public:
             Stereo a{},b{},wet{};
 
             if(routing==(int)DelayRouting::Parallel){
-                a=s[0].process(inL,inR,p.slot[0],bpm);
-                b=s[1].process(inL,inR,p.slot[1],bpm);
+                a=s[0].process(inL,inR,p.slot[0],bpm,p.machineCondition);
+                b=s[1].process(inL,inR,p.slot[1],bpm,p.machineCondition);
                 wet={(T)(double(a.l)+double(b.l)),(T)(double(a.r)+double(b.r))};
             }else if(routing==(int)DelayRouting::Series){
-                a=s[0].process(inL,inR,p.slot[0],bpm);
-                b=s[1].process((T)(double(inL)+.72*double(a.l)),(T)(double(inR)+.72*double(a.r)),p.slot[1],bpm);
+                a=s[0].process(inL,inR,p.slot[0],bpm,p.machineCondition);
+                b=s[1].process((T)(double(inL)+.72*double(a.l)),(T)(double(inR)+.72*double(a.r)),p.slot[1],bpm,p.machineCondition);
                 wet={(T)(.48*double(a.l)+double(b.l)),(T)(.48*double(a.r)+double(b.r))};
             }else{
-                a=s[0].process(inL,inL,p.slot[0],bpm);
-                b=s[1].process(inR,inR,p.slot[1],bpm);
+                a=s[0].process(inL,inL,p.slot[0],bpm,p.machineCondition);
+                b=s[1].process(inR,inR,p.slot[1],bpm,p.machineCondition);
                 wet={a.l,b.r};
             }
 
