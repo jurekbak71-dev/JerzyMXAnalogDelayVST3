@@ -111,5 +111,25 @@ int main(){
     assert(std::abs(bL[17]-aL[17])<1e-7);
     assert(std::abs(bR[17]-aR[17])<1e-7);
 
+    // Global Machine Condition must materially change an otherwise identical tape render.
+    constexpr int C=48000;
+    std::vector<float> cInL(C),cInR(C),servL(C),servR(C),damL(C),damR(C);
+    cInL[0]=cInR[0]=1.0f;
+    float* cIn[2]={cInL.data(),cInR.data()};
+    float* cServ[2]={servL.data(),servR.data()};
+    float* cDam[2]={damL.data(),damR.data()};
+    p=MXDelayParams{};
+    p.mix=1.0;p.slot[1].enable=0.0;p.slot[0].sync=0.0;p.slot[0].time=0.055;p.slot[0].feedback=0.66;
+    p.slot[0].algorithm=double((int)DelayAlgorithm::ElCapistan)/double(kAlgorithmCount-1);
+    auto& tc=p.slot[0].c[(int)DelayAlgorithm::ElCapistan];
+    tc[0]=0.35;tc[1]=0.28;tc[2]=0.22;tc[3]=0.20;tc[4]=0.55;
+    p.machineCondition=0.0;
+    dsp.reset();dsp.process(cIn,cServ,2,C,p,120.0,peak);
+    p.machineCondition=1.0;
+    dsp.reset();dsp.process(cIn,cDam,2,C,p,120.0,peak);
+    double conditionDifference=0.0;
+    for(int i=1;i<C;++i)conditionDifference+=std::abs(servL[i]-damL[i])+std::abs(servR[i]-damR[i]);
+    assert(conditionDifference>0.05);
+
     return 0;
 }
