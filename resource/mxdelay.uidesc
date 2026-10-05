@@ -412,7 +412,8 @@
 <view class="CTextButton" origin="720, 67" size="50, 24" title="100%" font="Value" control-tag="9102" text-color="Cream" text-color-highlighted="Amber" frame-color="Border" frame-width="1" round-radius="4" kick-style="true" transparent="true"/>
 <view class="CTextButton" origin="775, 67" size="50, 24" title="125%" font="Value" control-tag="9103" text-color="Cream" text-color-highlighted="Amber" frame-color="Border" frame-width="1" round-radius="4" kick-style="true" transparent="true"/>
 <view class="CTextButton" origin="830, 67" size="50, 24" title="150%" font="Value" control-tag="9104" text-color="Cream" text-color-highlighted="Amber" frame-color="Border" frame-width="1" round-radius="4" kick-style="true" transparent="true"/>
-<view class="CTextLabel" origin="900, 50" size="350, 18" title="A/B: SERIES · PARALLEL · SPLIT L/R" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="CTextLabel" origin="900, 43" size="350, 18" title="MACHINE CONDITION" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="COptionMenu" origin="975, 67" size="200, 25" control-tag="MachineCondition" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
 <view class="CViewContainer" origin="10, 148" size="620, 562" back-color="PanelGlass" transparent="false"/>
 <view class="CTextLabel" origin="20, 154" size="600, 18" title="ENGINE A" font="Section" font-color="Amber" transparent="true" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="28, 181" size="138, 18" title="ALGORITHM" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
@@ -475,6 +476,7 @@
 <control-tag name="Bypass" tag="1004"/>
 <control-tag name="Spill" tag="1005"/>
 <control-tag name="Tempo" tag="1006"/>
+<control-tag name="MachineCondition" tag="1007"/>
 <control-tag name="AAlgo" tag="1100"/>
 <control-tag name="AEnable" tag="1101"/>
 <control-tag name="ASync" tag="1102"/>
