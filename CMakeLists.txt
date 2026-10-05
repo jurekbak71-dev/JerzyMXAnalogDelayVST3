@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(JerzyMXAnalogDelay VERSION 0.5.0.0 DESCRIPTION "Jerzy MX Analog Delay VST3")
+project(JerzyMXAnalogDelay VERSION 0.6.0.0 DESCRIPTION "Jerzy MX Analog Delay VST3")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
