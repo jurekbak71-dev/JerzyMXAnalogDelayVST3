@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(JerzyMXAnalogDelay VERSION 0.4.1.0 DESCRIPTION "Jerzy MX Analog Delay VST3")
+project(JerzyMXAnalogDelay VERSION 0.5.0.0 DESCRIPTION "Jerzy MX Analog Delay VST3")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,7 +22,7 @@ endif()
 smtg_enable_vst3_sdk()
 
 smtg_add_vst3plugin(JerzyMXAnalogDelay
-    source/mxdelay_version.h source/mxdelay_ids.h source/mxdelay_params.h source/mxdelay_state.h
+    source/mxdelay_version.h source/mxdelay_ids.h source/mxdelay_params.h source/mxdelay_mechanics.h source/mxdelay_state.h
     source/mxdelay_dsp.h source/mxdelay_processor.h source/mxdelay_processor.cpp
     source/mxdelay_editor_geometry.h source/mxdelay_editor.h source/mxdelay_editor.cpp
     source/mxdelay_gui_views.h source/mxdelay_gui_views.cpp
