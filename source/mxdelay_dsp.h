@@ -271,7 +271,8 @@ template<class T> class MXDelayDSP {
                 auto mech=transport.tick(wobble,.22*wobble,.16*saturation,.42*wobble,.06*saturation);
                 double d=sr*ms/1000.0*(1.0+mech.pitch);
                 const int type=normIndex(c[3],3);
-                if(flange>0&&ms<20)d=std::max(2.0,d+sr*.0035*flange*std::sin(phase1*.37));
+                const double flangeSweep=periodicMod(1.0,.055+.20*wobble);
+                if(flange>0&&ms<20)d=std::max(2.0,d+sr*.0035*flange*flangeSweep);
                 auto lag=Stereo{read(l,d*(1-.002*width)),read(r,d*(1+.002*width))};
                 lag.l=tapeSat(lag.l,saturation,.56,.18+.28*wobble,tapeMemL);
                 lag.r=tapeSat(lag.r,saturation,.44,.18+.28*wobble,tapeMemR);
