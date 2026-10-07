@@ -7,3 +7,7 @@ Modele: MultiHead Reel, Tape Echo, Oil Can, Tube Echo, BBD, Doubletrack i Dual D
 Integracja obejmuje synchronizację BPM z hostem, automatyzację parametrów VST3, MIDI mapping, spillover, skalowalne GUI, panoramę każdej głowicy MultiHead Reel oraz reset kontrolek prawym przyciskiem.
 
 Repozytorium zawiera wyłącznie MX Analog Delay. Tape Drive, Auto Tune i pozostałe wtyczki są rozwijane osobno.
+
+## MX2 build validation
+
+Final CI validation branch for Jerzy MX Analog Delay 2.
