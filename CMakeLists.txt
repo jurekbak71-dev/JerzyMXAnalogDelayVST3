@@ -21,7 +21,7 @@ endif()
 
 smtg_enable_vst3_sdk()
 
-smtg_add_vst3plugin(JerzyMXAnalogDelay
+smtg_add_vst3plugin(JerzyMXAnalogDelay2
     source/mxdelay_version.h source/mxdelay_ids.h source/mxdelay_params.h source/mxdelay_mechanics.h source/mxdelay_state.h
     source/mxdelay_dsp.h source/mxdelay_processor.h source/mxdelay_processor.cpp
     source/mxdelay_editor_geometry.h source/mxdelay_editor.h source/mxdelay_editor.cpp
@@ -35,7 +35,7 @@ if(WIN32)
 endif()
 target_compile_features(JerzyMXAnalogDelay2 PUBLIC cxx_std_17)
 smtg_target_configure_version_file(JerzyMXAnalogDelay2)
-smtg_target_add_plugin_resources(JerzyMXAnalogDelay RESOURCES resource/mxdelay.uidesc)
+smtg_target_add_plugin_resources(JerzyMXAnalogDelay2 RESOURCES resource/mxdelay.uidesc)
 if(SMTG_MAC)
     smtg_target_set_bundle(JerzyMXAnalogDelay2 BUNDLE_IDENTIFIER "pl.jerzyaudio.mxanalogdelay2" COMPANY_NAME "Jerzy Audio")
 endif()
