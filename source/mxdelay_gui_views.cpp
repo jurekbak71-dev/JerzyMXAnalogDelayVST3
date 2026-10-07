@@ -12,7 +12,7 @@
 using namespace VSTGUI;
 namespace JerzyAudio {
 namespace {
-const CColor amber(230,160,78),cream(236,217,181),black(15,14,12),edge(133,112,80);
+const CColor amber(241,166,73),cream(239,226,196),black(8,18,18),edge(112,132,117);
 void ellipse(CDrawContext* c,double x,double y,double radius,CColor fill,CColor frame){
     c->setFillColor(fill); c->setFrameColor(frame); c->setLineWidth(1.0);
     c->drawEllipse({x-radius,y-radius,x+radius,y+radius},kDrawFilledAndStroked);
@@ -30,43 +30,51 @@ void text(CDrawContext* c,const char* s,const CRect& r,double size,CColor color)
 }
 void metalKnob(CDrawContext* c,const CRect& r,double value){
     const double x=r.getCenter().x,y=r.getCenter().y;
-    const double radius=std::min(r.getWidth(),r.getHeight())*0.39;
+    const double radius=std::min(r.getWidth(),r.getHeight())*0.36;
     c->setDrawMode(kAntiAliasing|kNonIntegralMode);
-    for(int i=0;i<=10;++i){
-        const double a=(135.0+27.0*i)*Constants::pi/180.0;
-        c->setFrameColor(amber); c->setLineWidth(i==5?2.2:1.5);
-        c->drawLine({x+std::cos(a)*radius*1.11,y+std::sin(a)*radius*1.11},
-                    {x+std::cos(a)*radius*1.27,y+std::sin(a)*radius*1.27});
+
+    // Amber scale dots / ticks, like a high-end hardware pedal.
+    for(int i=0;i<=20;++i){
+        const double a=(135.0+13.5*i)*Constants::pi/180.0;
+        const double rr=(i%5==0?1.8:1.15);
+        ellipse(c,x+std::cos(a)*radius*1.34,y+std::sin(a)*radius*1.34,rr,
+                i%5==0?amber:CColor(205,150,74),CColor(80,57,27));
     }
-    ellipse(c,x+2,y+4,radius+2,CColor(0,0,0,130),black);
-    ellipse(c,x,y,radius,CColor(43,39,33),edge);
-    // Rubber grip scallops surrounding a spun-metal centre.
-    for(int i=0;i<18;++i){
-        const double a=2.0*Constants::pi*i/18.0;
-        ellipse(c,x+radius*0.82*std::cos(a),y+radius*0.82*std::sin(a),radius*0.18,CColor(23,22,20),CColor(48,44,39));
+
+    // Deep drop shadow.
+    ellipse(c,x+2.8,y+4.2,radius+3.2,CColor(0,0,0,150),CColor(0,0,0,80));
+
+    // Knurled black outer ring.
+    ellipse(c,x,y,radius+1.7,CColor(17,20,18),CColor(125,112,88));
+    for(int i=0;i<28;++i){
+        const double a=2.0*Constants::pi*i/28.0;
+        const double x1=x+radius*.92*std::cos(a),y1=y+radius*.92*std::sin(a);
+        const double x2=x+radius*1.10*std::cos(a),y2=y+radius*1.10*std::sin(a);
+        c->setFrameColor(i%2?CColor(31,32,29):CColor(77,72,61));c->setLineWidth(1.0);
+        c->drawLine({x1,y1},{x2,y2});
     }
-    ellipse(c,x,y,radius*0.76,CColor(103,93,79),CColor(186,171,146));
+
+    // Brushed metal cap rendered as radial wedges.
+    const double cap=radius*.78;
     CDrawContext::PointList wedge;
-    const double metalRadius=radius*0.70;
-    for(int i=0;i<120;++i){
-        const double a=2.0*Constants::pi*i/120.0;
-        const double next=a+2.0*Constants::pi/120.0;
-        const auto shade=static_cast<uint8_t>(std::clamp(130.0+55.0*std::cos(2.0*a+0.6)+15.0*std::cos(6.0*a),55.0,215.0));
-        c->setFillColor(CColor(shade,static_cast<uint8_t>(shade*0.96),static_cast<uint8_t>(shade*0.88)));
-        wedge={{x,y},{x+metalRadius*std::cos(a),y+metalRadius*std::sin(a)},
-                       {x+metalRadius*std::cos(next),y+metalRadius*std::sin(next)}};
+    for(int i=0;i<144;++i){
+        const double a=2.0*Constants::pi*i/144.0;
+        const double next=a+2.0*Constants::pi/144.0;
+        const double light=.58+.30*std::cos(a-.75)+.10*std::cos(5*a);
+        const auto shade=static_cast<uint8_t>(std::clamp(70.0+145.0*light,72.0,225.0));
+        c->setFillColor(CColor(shade,static_cast<uint8_t>(shade*.97),static_cast<uint8_t>(shade*.88)));
+        wedge={{x,y},{x+cap*std::cos(a),y+cap*std::sin(a)},
+                       {x+cap*std::cos(next),y+cap*std::sin(next)}};
         c->drawPolygon(wedge,kDrawFilled);
     }
-    for(int i=1;i<8;++i){
-        c->setFrameColor(CColor(235,222,200,22)); c->setLineWidth(0.5);
-        const double rr=metalRadius*i/8.0;
-        c->drawEllipse({x-rr,y-rr,x+rr,y+rr},kDrawStroked);
-    }
+    ellipse(c,x,y,cap,CColor(0,0,0,0),CColor(222,210,183));
+    ellipse(c,x-cap*.25,y-cap*.28,cap*.20,CColor(255,255,255,34),CColor(255,255,255,0));
+
+    // Pointer.
     const double a=(135.0+270.0*std::clamp(value,0.0,1.0))*Constants::pi/180.0;
-    c->setFrameColor(cream); c->setLineWidth(std::max(2.0,radius*0.065));
-    c->drawLine({x+radius*0.61*std::cos(a),y+radius*0.61*std::sin(a)},
-                {x+radius*0.98*std::cos(a),y+radius*0.98*std::sin(a)});
-}
+    c->setFrameColor(CColor(255,232,185));c->setLineWidth(std::max(2.0,radius*.075));
+    c->drawLine({x+radius*.18*std::cos(a),y+radius*.18*std::sin(a)},
+                {x+radius*.78*std::cos(a),y+radius*.78*std::sin(a)});
 }
 
 ChickenKnob::ChickenKnob(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){
@@ -172,38 +180,37 @@ void BypassButton::draw(CDrawContext* c){
 }
 HardwarePanel::HardwarePanel(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
 void HardwarePanel::draw(CDrawContext* c){
+    const CRect r(getViewSize());
     c->setDrawMode(kAntiAliasing|kNonIntegralMode);
-    c->setFrameColor(CColor(169,113,58,130));c->setLineWidth(1);
-    c->drawLine({40,397},{720,397});c->drawLine({735,235},{735,547});
-    c->drawLine({40,551},{1160,551});c->drawLine({760,381},{1160,381});
+    gradientRect(c,r,CColor(16,44,43),CColor(7,24,25));
+    c->setFrameColor(CColor(181,142,82));c->setLineWidth(1.2);c->drawRect(r,kDrawStroked);
+    CRect inner(r);inner.inset(4,4);
+    c->setFrameColor(CColor(88,128,120));c->setLineWidth(1.0);c->drawRect(inner,kDrawStroked);
+    const CPoint screws[4]={{r.left+10,r.top+10},{r.right-10,r.top+10},{r.left+10,r.bottom-10},{r.right-10,r.bottom-10}};
+    for(const auto& p:screws){
+        ellipse(c,p.x+1,p.y+1,5.5,CColor(0,0,0,120),CColor(0,0,0,80));
+        ellipse(c,p.x,p.y,4.8,CColor(114,113,100),CColor(210,198,166));
+        c->setFrameColor(CColor(37,36,32));c->setLineWidth(1.2);c->drawLine({p.x-3,p.y+2},{p.x+3,p.y-2});
+    }
     setDirty(false);
 }
 OxidizedPanel::OxidizedPanel(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
 void OxidizedPanel::draw(CDrawContext* c){
     const CRect r(getViewSize());
     c->setDrawMode(kAntiAliasing|kNonIntegralMode);
-    gradientRect(c,r,CColor(19,62,79),CColor(8,28,42));
-    // Deterministic blue-oxidized steel patina: broad blooms, pitting and brushed scratches.
-    for(int i=0;i<42;++i){
-        const double fx=0.5+0.47*std::sin(1.713*i+0.4);
-        const double fy=0.5+0.46*std::sin(2.371*i+1.1);
-        const double rr=22.0+70.0*(0.5+0.5*std::sin(3.117*i));
-        const uint8_t a=static_cast<uint8_t>(18+22*(0.5+0.5*std::sin(0.87*i)));
-        ellipse(c,r.left+fx*r.getWidth(),r.top+fy*r.getHeight(),rr,CColor(65,143,157,a),CColor(13,63,79,18));
+    gradientRect(c,r,CColor(18,66,64),CColor(5,27,29));
+    for(int i=0;i<70;++i){
+        const double y=r.top+(i+.5)*r.getHeight()/70.0;
+        c->setFrameColor(i%3?CColor(154,202,191,11):CColor(236,196,115,8));c->setLineWidth(.6);
+        c->drawLine({r.left+4,y},{r.right-4,y});
     }
-    for(int i=0;i<150;++i){
-        const double fx=0.5+0.49*std::sin(7.13*i+0.2);
-        const double fy=0.5+0.49*std::sin(11.71*i+1.8);
-        const double rr=0.7+2.4*(0.5+0.5*std::sin(5.17*i));
-        ellipse(c,r.left+fx*r.getWidth(),r.top+fy*r.getHeight(),rr,CColor(108,173,181,38),CColor(5,35,49,25));
+    for(int i=0;i<55;++i){
+        const double fx=.5+.49*std::sin(5.71*i+.4),fy=.5+.48*std::sin(9.37*i+1.1);
+        const double rr=.6+1.6*(.5+.5*std::sin(2.9*i));
+        ellipse(c,r.left+fx*r.getWidth(),r.top+fy*r.getHeight(),rr,CColor(190,220,208,18),CColor(0,0,0,0));
     }
-    for(int i=0;i<34;++i){
-        const double y=r.top+(i+0.5)*r.getHeight()/34.0;
-        const double dx=8.0+34.0*(0.5+0.5*std::sin(i*1.9));
-        c->setFrameColor(CColor(170,211,216,18));c->setLineWidth(0.7);
-        c->drawLine({r.left+dx,y},{r.right-dx*.7,y+std::sin(i*.8)*2.0});
-    }
-    c->setFrameColor(CColor(132,185,194,90));c->setLineWidth(2.0);c->drawRect(r,kDrawStroked);
+    c->setFrameColor(CColor(205,219,199,100));c->setLineWidth(2.0);c->drawRect(r,kDrawStroked);
+    CRect inner(r);inner.inset(5,5);c->setFrameColor(CColor(7,18,20));c->setLineWidth(2.0);c->drawRect(inner,kDrawStroked);
     setDirty(false);
 }
 namespace {
