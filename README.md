@@ -15,3 +15,6 @@ Final CI validation branch for Jerzy MX Analog Delay 2.
 ## Approved hardware GUI
 
 Real VSTGUI rebuilt around the approved teal dual-engine hardware layout.
+
+
+Screenshot CI validation.
