@@ -311,8 +311,9 @@ template<class T> class MXDelayDSP {
                 if(active<0.5){sum={read(l,sr*ms/1000.0),read(r,sr*ms/1000.0)};active=1.0;}
                 wet.l=(T)(double(sum.l)/std::sqrt(active));wet.r=(T)(double(sum.r)/std::sqrt(active));
                 if(twist>0.001){
-                    const double shove=1.0+0.035*twist*std::sin(phase2);
-                    wet.l=(T)(double(wet.l)*shove);wet.r=(T)(double(wet.r)*(2.0-shove));
+                    const double tw=periodicMod(0.035*twist,0.08+1.20*twist);
+                    wet.l=(T)(double(wet.l)*(1.0+tw));
+                    wet.r=(T)(double(wet.r)*(1.0-tw));
                 }
                 const double hp=28.0+220.0*(1.0-bass);
                 const double lp=3500.0*std::pow(4.7,treble)*(1.0-0.48*age);
