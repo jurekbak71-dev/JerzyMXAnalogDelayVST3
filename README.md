@@ -11,3 +11,7 @@ Repozytorium zawiera wyłącznie MX Analog Delay. Tape Drive, Auto Tune i pozost
 ## MX2 build validation
 
 Final CI validation branch for Jerzy MX Analog Delay 2.
+
+## Approved hardware GUI
+
+Real VSTGUI rebuilt around the approved teal dual-engine hardware layout.
