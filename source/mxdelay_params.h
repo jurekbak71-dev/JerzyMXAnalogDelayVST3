@@ -113,7 +113,7 @@ inline int normIndex(double n,int count){
 }
 inline double dbFromNorm(double n,double lo=-18.0,double hi=12.0){ return lo+(hi-lo)*std::clamp(n,0.0,1.0); }
 inline double gainFromNorm(double n,double lo=-18.0,double hi=12.0){ return std::pow(10.0,dbFromNorm(n,lo,hi)/20.0); }
-inline double freeTimeMs(double n){ return 1.0 + std::clamp(n,0.0,1.0)*2499.0; }
+inline double freeTimeMs(double n){ n=std::clamp(n,0.0,1.0); return std::exp(std::log(1.0)+n*(std::log(2500.0)-std::log(1.0))); }
 inline double divisionBeats(int idx){
     static constexpr double beats[]={4.0,3.0,2.0,1.5,1.0,0.75,0.5,1.0/3.0,0.25,1.0/6.0};
     return beats[std::clamp(idx,0,9)];
