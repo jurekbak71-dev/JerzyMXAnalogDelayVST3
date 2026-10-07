@@ -15,3 +15,8 @@ Final CI validation branch for Jerzy MX Analog Delay 2.
 ## Approved hardware GUI
 
 Real VSTGUI rebuilt around the approved teal dual-engine hardware layout.
+
+
+## JerzyVSTGuiKit
+
+Shared vector hardware GUI components and color themes for the Jerzy Audio VST family.
