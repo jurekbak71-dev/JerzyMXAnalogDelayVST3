@@ -291,6 +291,63 @@ template<class T> class MXDelayDSP {
                 wet.r=(T)((1-blend)*double(inR)+blend*double(lag.r));
                 fbs={};fb=0;
                 applyPhysicalFrame(wet,fbs,mech,16500-4200*saturation-2800*damage);
+            }else if(algo==(int)DelayAlgorithm::SpaceEcho202){
+                ms=std::clamp(ms,40.0,4000.0);
+                const double satAmt=c[0],wowFlutter=c[1],tapeAge=c[2],bass=c[3],treble=c[4],reverb=c[5],headSpread=c[6],twist=c[7];
+                const double age=aged(tapeAge,0.92);
+                auto mech=transport.tick(aged(wowFlutter,0.72),aged(wowFlutter*0.84,0.78),age,aged(wowFlutter+0.42*age,0.92),aged(0.18*age,0.56));
+                static constexpr double hr[4]={0.25,0.50,0.75,1.0};
+                double active=0.0; Stereo sum{};
+                for(int h=0;h<4;++h){
+                    if(c[8+h]<0.5)continue;
+                    const double drift=1.0+mech.pitch*(1.0+0.04*h);
+                    const double ds=sr*ms*hr[h]/1000.0*drift;
+                    auto t=Stereo{read(l,ds*(1.0-0.0025*headSpread*h)),read(r,ds*(1.0+0.0025*headSpread*h))};
+                    const double pan=(h-1.5)/1.5*headSpread;
+                    const double gl=std::sqrt(.5*(1-pan)),gr=std::sqrt(.5*(1+pan));
+                    const double mono=.5*(double(t.l)+double(t.r));
+                    sum.l+=(T)(mono*gl);sum.r+=(T)(mono*gr);active+=1.0;
+                }
+                if(active<0.5){sum={read(l,sr*ms/1000.0),read(r,sr*ms/1000.0)};active=1.0;}
+                wet.l=(T)(double(sum.l)/std::sqrt(active));wet.r=(T)(double(sum.r)/std::sqrt(active));
+                if(twist>0.001){
+                    const double shove=1.0+0.035*twist*std::sin(phase2);
+                    wet.l=(T)(double(wet.l)*shove);wet.r=(T)(double(wet.r)*(2.0-shove));
+                }
+                const double hp=28.0+220.0*(1.0-bass);
+                const double lp=3500.0*std::pow(4.7,treble)*(1.0-0.48*age);
+                fbs.l=highpass(lowpass(tapeSat(wet.l,0.30+0.92*satAmt,.58,age,tapeMemL),lpL,lp),hpMemL,hp);
+                fbs.r=highpass(lowpass(tapeSat(wet.r,0.30+0.92*satAmt,.42,age,tapeMemR),lpR,lp*.985),hpMemR,hp);
+                if(reverb>0.001){
+                    auto a=Stereo{read(l,sr*.029),read(r,sr*.031)},b=Stereo{read(l,sr*.043),read(r,sr*.047)};
+                    wet.l+=(T)(reverb*(.24*double(a.r)-.17*double(b.l)));
+                    wet.r+=(T)(reverb*(.24*double(a.l)-.17*double(b.r)));
+                }
+                applyPhysicalFrame(wet,fbs,mech,15000-9800*age);
+            }else if(algo==(int)DelayAlgorithm::DM101){
+                ms=std::clamp(ms,20.0,2000.0);
+                const int mode=normIndex(c[0],12);
+                const double variation=c[1],md=c[2],mr=c[3],tone=c[4],stereo=c[5],comp=c[6],grit=c[7];
+                const double mod=periodicMod((.00015+.0060*md),.08+4.2*mr);
+                auto tap=[&](double ratio,double offset=0.0){double ds=sr*ms*ratio/1000.0*(1.0+mod+offset);return Stereo{read(l,ds),read(r,ds)};};
+                Stereo x{};
+                if(mode==0||mode==1||mode==2){x=tap(1.0);}
+                else if(mode==3){auto a=tap(.5),b=tap(.75),d=tap(1.0);x={(T)(.46*a.l+.43*b.l+.58*d.l),(T)(.46*a.r+.43*b.r+.58*d.r)};}
+                else if(mode==4){auto a=tap(.18),b=tap(.34),d=tap(.52+variation*.28);x={(T)(.22*a.l+.38*b.l+.72*d.l),(T)(.22*a.r+.38*b.r+.72*d.r)};}
+                else if(mode==5||mode==6){auto a=tap(.08+.10*variation),b=tap(.13+.13*variation);x={(T)(.62*a.l+.44*b.r),(T)(.62*a.r+.44*b.l)};}
+                else if(mode==7){auto a=tap(.035),b=tap(1.0);x={(T)(.35*a.r+.78*b.l),(T)(.35*a.l+.78*b.r)};}
+                else if(mode==8){x={tap(1.0,-.004*stereo).l,tap(1.0,.004*stereo).r};}
+                else if(mode==9){const double m=periodicMod(.007*md,.05+3.5*mr);x={tap(1.0,m).l,tap(1.0,-m).r};}
+                else if(mode==10){auto a=tap(.50-.18*variation),b=tap(.75),d=tap(1.0+.12*variation);x={(T)(.55*a.l+.58*d.r),(T)(.55*b.r+.58*d.l)};}
+                else {static constexpr double pat[5]={.25,.375,.5,.75,1.0};for(int k=0;k<5;++k){auto q=tap(pat[k]*(.84+.32*variation));x.l+=(T)(double(q.l)*.30);x.r+=(T)(double(q.r)*.30);}}
+                wet=x;
+                const double modeDark=(mode==1?.72:(mode==0?.82:1.0));
+                const double cutoff=(1800.0+10800.0*std::pow(tone,1.55))*modeDark;
+                wet.l=compandExpand(wet.l,.46*comp);wet.r=compandExpand(wet.r,.46*comp);
+                fbs.l=lowpass(compandCompress(sat(wet.l,1.18+1.8*grit,.025),comp),lpL,cutoff);
+                fbs.r=lowpass(compandCompress(sat(wet.r,1.18+1.8*grit,-.025),comp),lpR,cutoff*.97);
+                const double n=(0.00002+0.00032*grit)*noiseRng.bipolar();
+                fbs.l=(T)(double(fbs.l)+n);fbs.r=(T)(double(fbs.r)-.83*n);
             }else{
                 ms=std::clamp(ms,20.0,3200.0);
                 const int type=normIndex(c[0],3);
@@ -319,21 +376,66 @@ template<class T> class MXDelayDSP {
         }
     };
 
+    struct WetFxDSP {
+        double sr=44100.0,phase=0.0;
+        std::vector<T> l,r; size_t w=0; uint32_t rng=0x9e3779b9u; int hold=0,holdPeriod=1; T heldL{},heldR{};
+        void prepare(double sampleRate){sr=std::max(8000.0,sampleRate);const size_t n=(size_t)std::ceil(sr*.25)+8;l.assign(n,T{});r.assign(n,T{});reset();}
+        void reset(){std::fill(l.begin(),l.end(),T{});std::fill(r.begin(),r.end(),T{});w=0;phase=0;hold=0;holdPeriod=1;heldL=heldR=T{};rng=0x9e3779b9u;}
+        T read(const std::vector<T>& b,double ds)const{if(b.empty())return T{};ds=std::clamp(ds,1.0,double(b.size()-2));double p=double(w)-ds;while(p<0)p+=b.size();const size_t i0=(size_t)p,i1=(i0+1)%b.size();const double f=p-std::floor(p);return (T)(double(b[i0])+(double(b[i1])-double(b[i0]))*f);}
+        Stereo process(Stereo in,const MXDelayParams& p){
+            const int type=normIndex(p.wetFxType,(int)WetFxType::Count);const double a=std::clamp(p.wetFxAmount,0.0,1.0);if(type==0||a<1e-5)return in;
+            const double rate=.03+5.0*p.wetFxRate*p.wetFxRate,depth=std::clamp(p.wetFxDepth,0.0,1.0),drive=std::clamp(p.wetFxDrive,0.0,1.0);
+            if(type==(int)WetFxType::Overdrive){Stereo q{(T)std::tanh(double(in.l)*(1.0+8.0*drive)),(T)std::tanh(double(in.r)*(1.0+8.0*drive))};return {(T)((1-a)*double(in.l)+a*double(q.l)),(T)((1-a)*double(in.r)+a*double(q.r))};}
+            if(type==(int)WetFxType::LoFi){
+                holdPeriod=1+(int)std::lround((2.0+46.0*depth)*(0.25+0.75*a));if(++hold>=holdPeriod){hold=0;heldL=in.l;heldR=in.r;}
+                const double bits=std::clamp(16.0-11.0*depth-3.0*a,3.0,16.0),q=std::pow(2.0,bits-1.0);
+                Stereo z{(T)(std::round(double(heldL)*q)/q),(T)(std::round(double(heldR)*q)/q)};
+                return {(T)((1-a)*double(in.l)+a*double(z.l)),(T)((1-a)*double(in.r)+a*double(z.r))};
+            }
+            if(l.empty())return in;
+            l[w]=in.l;r[w]=in.r;
+            phase+=2*pi*rate/sr;if(phase>2*pi)phase-=2*pi;
+            Stereo fx{};
+            if(type==(int)WetFxType::Chorus){
+                const double mod=.5+.5*std::sin(phase),dL=sr*(.010+.018*depth*mod),dR=sr*(.011+.018*depth*(1.0-mod));
+                fx={read(l,dL),read(r,dR)};
+            }else if(type==(int)WetFxType::Flanger){
+                const double mod=.5+.5*std::sin(phase),dL=sr*(.0006+.0055*depth*mod),dR=sr*(.0008+.0050*depth*(1.0-mod));
+                fx={(T)(double(in.l)-.72*double(read(l,dL))),(T)(double(in.r)-.72*double(read(r,dR)))};
+            }else{
+                rng^=rng<<13;rng^=rng>>17;rng^=rng<<5;
+                const double jitter=double(rng&0xffffu)/65535.0;
+                const double d=sr*(.018+.095*depth*(.35+.65*jitter));
+                fx={read(l,d),read(r,d*(.93+.14*jitter))};
+            }
+            w=(w+1)%l.size();
+            return {(T)((1-a)*double(in.l)+a*double(fx.l)),(T)((1-a)*double(in.r)+a*double(fx.r))};
+        }
+        Stereo processDryLoFi(Stereo in,const MXDelayParams& p){
+            if(normIndex(p.wetFxType,(int)WetFxType::Count)!=(int)WetFxType::LoFi||p.loFiRoute<.5||p.wetFxAmount<1e-5)return in;
+            const double a=std::clamp(p.wetFxAmount,0.0,1.0),bits=std::clamp(16.0-10.0*p.wetFxDepth-2.0*a,4.0,16.0),q=std::pow(2.0,bits-1.0);
+            Stereo z{(T)(std::round(double(in.l)*q)/q),(T)(std::round(double(in.r)*q)/q)};
+            return {(T)((1-a)*double(in.l)+a*double(z.l)),(T)((1-a)*double(in.r)+a*double(z.r))};
+        }
+    };
+
     SlotDSP s[2];
+    WetFxDSP wetFx;
     double sr=44100.0;
 public:
     void prepare(double sampleRate,int=2){
         sr=sampleRate;
         s[0].prepare(sampleRate,0x13579bdfu);
         s[1].prepare(sampleRate,0x2468ace1u);
+        wetFx.prepare(sampleRate);
     }
-    void reset(){for(auto& x:s)x.reset();}
+    void reset(){for(auto& x:s)x.reset();wetFx.reset();}
 
     template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak){
         const double inGain=gainFromNorm(p.inputTrim,-18,18);
         const double outGain=gainFromNorm(p.outputTrim,-18,12);
         const double mix=std::clamp(p.mix,0.0,1.0);
-        const double dryG=std::cos(mix*pi*.5),wetG=std::sin(mix*pi*.5);
+        const double dryG=1.0-mix,wetG=mix;
         const int routing=normIndex(p.routing,3);
         const bool bypass=p.bypass>=.5,trails=p.spill>=.5;
         peak=0;
@@ -358,24 +460,26 @@ public:
             if(routing==(int)DelayRouting::Parallel){
                 a=s[0].process(inL,inR,p.slot[0],bpm,p.machineCondition);
                 b=s[1].process(inL,inR,p.slot[1],bpm,p.machineCondition);
-                wet={(T)(double(a.l)+double(b.l)),(T)(double(a.r)+double(b.r))};
+                wet={(T)((double(a.l)+double(b.l))*0.70710678118),(T)((double(a.r)+double(b.r))*0.70710678118)};
             }else if(routing==(int)DelayRouting::Series){
                 a=s[0].process(inL,inR,p.slot[0],bpm,p.machineCondition);
                 b=s[1].process((T)(double(inL)+.72*double(a.l)),(T)(double(inR)+.72*double(a.r)),p.slot[1],bpm,p.machineCondition);
-                wet={(T)(.48*double(a.l)+double(b.l)),(T)(.48*double(a.r)+double(b.r))};
+                wet={(T)(.72*(.48*double(a.l)+double(b.l))),(T)(.72*(.48*double(a.r)+double(b.r)))};
             }else{
                 a=s[0].process(inL,inL,p.slot[0],bpm,p.machineCondition);
                 b=s[1].process(inR,inR,p.slot[1],bpm,p.machineCondition);
                 wet={a.l,b.r};
             }
 
+            wet=wetFx.process(wet,p);
+            Stereo dryFx=wetFx.processDryLoFi({inL,inR},p);
             T yL{},yR{};
             if(bypass&&trails){
                 yL=(T)(double(rawL)+wetG*double(wet.l)*outGain);
                 yR=(T)(double(rawR)+wetG*double(wet.r)*outGain);
             }else{
-                yL=(T)((dryG*double(inL)+wetG*double(wet.l))*outGain);
-                yR=(T)((dryG*double(inR)+wetG*double(wet.r))*outGain);
+                yL=(T)((dryG*double(dryFx.l)+wetG*double(wet.l))*outGain);
+                yR=(T)((dryG*double(dryFx.r)+wetG*double(wet.r))*outGain);
             }
             if(out&&out[0])out[0][i]=(Sample)yL;
             if(channels>1&&out&&out[1])out[1][i]=(Sample)yR;
