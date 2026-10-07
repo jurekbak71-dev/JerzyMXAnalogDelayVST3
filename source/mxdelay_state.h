@@ -40,6 +40,7 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
         auto& x=p.slot[s];
         double* common[]={&x.algorithm,&x.enable,&x.sync,&x.division,&x.time,&x.feedback,&x.level,&x.pan,&x.duck};
         for(auto* v:common) if(!rd(*v)) return false;
+        if(version<4){const int oldIndex=std::clamp((int)std::lround(x.algorithm*6.0),0,6);x.algorithm=double(oldIndex)/double(kAlgorithmCount-1);}
         const int storedAlgorithms = version>=4 ? kAlgorithmCount : 7;
         for(int a=0;a<storedAlgorithms;++a) for(int c=0;c<kAlgoControls;++c) if(!rd(x.c[a][c])) return false;
         if(version>=2) for(auto& v:x.headPan) if(!rd(v)) return false;
