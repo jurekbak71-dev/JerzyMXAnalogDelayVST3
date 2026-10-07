@@ -55,7 +55,7 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
    else if(a==(int)DelayAlgorithm::Deco&&k==3)parameters.addParameter(listParam(tn,id,{STR16("SUM"),STR16("INVERT"),STR16("BOUNCE")},0));
    else if(a==(int)DelayAlgorithm::DIG&&k==0)parameters.addParameter(listParam(tn,id,{STR16("24/96"),STR16("ADM"),STR16("12 BIT")},0));
    else if(a==(int)DelayAlgorithm::DM101&&k==0)parameters.addParameter(listParam(tn,id,{STR16("CLASSIC"),STR16("VINTAGE"),STR16("MODERN"),STR16("MULTI-HEAD"),STR16("NON-LINEAR"),STR16("AMBIENCE"),STR16("REFLECT"),STR16("DOUBLING+DELAY"),STR16("WIDE"),STR16("DUAL MOD"),STR16("PAN"),STR16("PATTERN")},0));
-   else if(a==(int)DelayAlgorithm::Volante&&(k>=6&&k<=13))parameters.addParameter(rangeParam(tn,id,STR16(""),0,1,def>=.5?1:0,0,1));
+   else if((a==(int)DelayAlgorithm::Volante&&(k>=6&&k<=13))||(a==(int)DelayAlgorithm::SpaceEcho202&&(k>=8&&k<=11)))parameters.addParameter(rangeParam(tn,id,STR16(""),0,1,def>=.5?1:0,0,1));
    else addPercent(parameters,tn,id,def);
   }
  }
