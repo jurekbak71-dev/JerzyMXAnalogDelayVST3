@@ -484,7 +484,7 @@
 <view class="CTextLabel" origin="442, 256" size="96, 18" control-tag="B8C6" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="210, 292" size="100, 18" title="BBD GRIT" font="Label" font-color="Cream" transparent="true" mouse-enabled="false"/><view class="ChickenKnob" origin="310, 274" size="52, 52" control-tag="B8C7" wheel-inc-value="0.01"/>
 </template>
-<template name="view" class="CViewContainer" origin="0, 0" size="1280, 790" minSize="768, 474" maxSize="2048, 1264" back-color="Black" transparent="false" tooltip="Jerzy MX Analog Delay">
+<template name="view" class="CViewContainer" origin="0, 0" size="1280, 790" minSize="768, 474" maxSize="2048, 1264" back-color="Black" transparent="false" tooltip="Jerzy MX Analog Delay 2">
 <view class="OxidizedPanel" origin="0, 0" size="1280, 790" mouse-enabled="false"/>
 <view class="CViewContainer" origin="10, 36" size="1260, 102" back-color="PanelGlass" transparent="false"/>
 <view class="CTextLabel" origin="20, 8" size="1240, 18" title="JERZY MX ANALOG DELAY 2" font="Title" font-color="Amber" transparent="true" text-alignment="center" mouse-enabled="false"/>
