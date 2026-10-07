@@ -4,13 +4,15 @@
 #include <cmath>
 
 namespace JerzyAudio {
-constexpr int kMXStateVersion=3;
+constexpr int kMXStateVersion=4;
 
 template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
     if(!b.writeInt32(kMXStateVersion)) return false;
     const double global[]={p.mix,p.inputTrim,p.outputTrim,p.routing,p.bypass,p.spill};
     for(double v:global) if(!b.writeFloat((float)v)) return false;
     if(!b.writeFloat((float)p.machineCondition)) return false;
+    const double wetfx[]={p.wetFxType,p.wetFxAmount,p.wetFxRate,p.wetFxDepth,p.wetFxDrive,p.loFiRoute};
+    for(double v:wetfx) if(!b.writeFloat((float)v)) return false;
     for(int s=0;s<2;++s){
         const auto& x=p.slot[s];
         const double common[]={x.algorithm,x.enable,x.sync,x.division,x.time,x.feedback,x.level,x.pan,x.duck};
@@ -30,11 +32,16 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
     double* global[]={&p.mix,&p.inputTrim,&p.outputTrim,&p.routing,&p.bypass,&p.spill};
     for(auto* v:global) if(!rd(*v)) return false;
     if(version>=3){ if(!rd(p.machineCondition)) return false; } else p.machineCondition=0.0;
+    if(version>=4){
+        double* wetfx[]={&p.wetFxType,&p.wetFxAmount,&p.wetFxRate,&p.wetFxDepth,&p.wetFxDrive,&p.loFiRoute};
+        for(auto* v:wetfx) if(!rd(*v)) return false;
+    }
     for(int s=0;s<2;++s){
         auto& x=p.slot[s];
         double* common[]={&x.algorithm,&x.enable,&x.sync,&x.division,&x.time,&x.feedback,&x.level,&x.pan,&x.duck};
         for(auto* v:common) if(!rd(*v)) return false;
-        for(int a=0;a<kAlgorithmCount;++a) for(int c=0;c<kAlgoControls;++c) if(!rd(x.c[a][c])) return false;
+        const int storedAlgorithms = version>=4 ? kAlgorithmCount : 7;
+        for(int a=0;a<storedAlgorithms;++a) for(int c=0;c<kAlgoControls;++c) if(!rd(x.c[a][c])) return false;
         if(version>=2) for(auto& v:x.headPan) if(!rd(v)) return false;
     }
     return true;
