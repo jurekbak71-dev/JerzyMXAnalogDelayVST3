@@ -6,7 +6,8 @@
 
 namespace JerzyAudio {
 
-enum class DelayAlgorithm : int { Volante=0, ElCapistan, Olivera, EC1, Brig, Deco, DIG, Count };
+enum class DelayAlgorithm : int { Volante=0, ElCapistan, Olivera, EC1, Brig, Deco, DIG, SpaceEcho202, DM101, Count };
+enum class WetFxType : int { Off=0, Chorus, Flanger, LoFi, Overdrive, Granular, Count };
 enum class DelayRouting : int { Series=0, Parallel, SplitLR };
 constexpr int kAlgorithmCount = static_cast<int>(DelayAlgorithm::Count);
 constexpr int kAlgoControls = 16;
@@ -23,7 +24,13 @@ enum MXGlobalParamIds : unsigned {
     kMXBypassId,
     kMXSpillId,
     kMXTempoMeterId,
-    kMXMachineConditionId = kMXGlobalBase + 7
+    kMXMachineConditionId = kMXGlobalBase + 7,
+    kMXWetFxTypeId,
+    kMXWetFxAmountId,
+    kMXWetFxRateId,
+    kMXWetFxDepthId,
+    kMXWetFxDriveId,
+    kMXLoFiRouteId
 };
 
 enum SlotOffsets : unsigned {
@@ -69,6 +76,12 @@ struct MXDelayParams {
     double bypass=0.0;
     double spill=1.0;
     double machineCondition=0.0;
+    double wetFxType=0.0;
+    double wetFxAmount=0.0;
+    double wetFxRate=0.30;
+    double wetFxDepth=0.45;
+    double wetFxDrive=0.20;
+    double loFiRoute=0.0;
     SlotParams slot[2];
     MXDelayParams(){
         slot[0].algorithm=0.0;
@@ -88,6 +101,8 @@ struct MXDelayParams {
             s.c[(int)DelayAlgorithm::Brig] = {0.50,0.55,0.18,0.30,0.55,0.10,0.0,0.0};
             s.c[(int)DelayAlgorithm::Deco] = {0.30,0.15,0.58,0.0,0.75,0.0,0.0,0.0};
             s.c[(int)DelayAlgorithm::DIG] = {0.0,0.50,0.12,0.25,0.30,0.55,0.0,0.0};
+            s.c[(int)DelayAlgorithm::SpaceEcho202] = {0.35,0.28,0.20,0.42,0.45,0.18,0.30,0.35,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0};
+            s.c[(int)DelayAlgorithm::DM101] = {0.35,0.32,0.18,0.28,0.52,0.42,0.30,0.24,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
         }
     }
 };
