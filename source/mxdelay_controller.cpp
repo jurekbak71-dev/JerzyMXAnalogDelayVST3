@@ -14,6 +14,13 @@ namespace JerzyAudio {
 namespace {
 StringListParameter* listParam(const TChar* name,ParamID id,std::initializer_list<const TChar*> items,int def=0,int32 flags=ParameterInfo::kCanAutomate){auto*p=new StringListParameter(name,id,nullptr,flags);for(auto*x:items)p->appendString(x);if(items.size()>1)p->setNormalized(double(def)/double(items.size()-1));return p;}
 RangeParameter* rangeParam(const TChar* name,ParamID id,const TChar* unit,double lo,double hi,double def,int prec=1,int32 steps=0,int32 flags=ParameterInfo::kCanAutomate){auto*p=new RangeParameter(name,id,unit,lo,hi,def,steps,flags);p->setPrecision(prec);return p;}
+class LogRangeParameter final : public RangeParameter {
+public:
+ LogRangeParameter(const TChar* name,ParamID id,const TChar* unit,double lo,double hi,double def,int prec=1):RangeParameter(name,id,unit,lo,hi,def,0,ParameterInfo::kCanAutomate),lo_(lo),hi_(hi){setPrecision(prec);}
+ ParamValue toPlain(ParamValue n) const SMTG_OVERRIDE {n=std::clamp(n,0.0,1.0);return std::exp(std::log(lo_)+n*(std::log(hi_)-std::log(lo_)));}
+ ParamValue toNormalized(ParamValue p) const SMTG_OVERRIDE {p=std::clamp(p,lo_,hi_);return std::log(p/lo_)/std::log(hi_/lo_);}
+private:double lo_,hi_;
+};
 void addPercent(ParameterContainer& ps,const TChar* name,ParamID id,double def){ps.addParameter(rangeParam(name,id,STR16("%"),0,100,def*100,1));}
 }
 tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
@@ -44,7 +51,7 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
   auto* ap=new StringListParameter(s==0?STR16("A · Algorithm"):STR16("B · Algorithm"),slotParam(s,kSlotAlgorithm));for(auto*n:algNames){String128 t{};Steinberg::UString(t,128).fromAscii(n);ap->appendString(t);}ap->setNormalized(d.slot[s].algorithm);parameters.addParameter(ap);
   parameters.addParameter(rangeParam(s==0?STR16("A · Enable"):STR16("B · Enable"),slotParam(s,kSlotEnable),STR16(""),0,1,1,0,1));parameters.addParameter(rangeParam(s==0?STR16("A · Sync"):STR16("B · Sync"),slotParam(s,kSlotSync),STR16(""),0,1,1,0,1));
   parameters.addParameter(listParam(s==0?STR16("A · Division"):STR16("B · Division"),slotParam(s,kSlotDivision),{STR16("1/1"),STR16("1/2."),STR16("1/2"),STR16("1/4."),STR16("1/4"),STR16("1/8."),STR16("1/8"),STR16("1/4T"),STR16("1/16"),STR16("1/8T")},4));
-  parameters.addParameter(rangeParam(s==0?STR16("A · Free Time"):STR16("B · Free Time"),slotParam(s,kSlotTime),STR16("ms"),1,2500,500,1));addPercent(parameters,s==0?STR16("A · Feedback"):STR16("B · Feedback"),slotParam(s,kSlotFeedback),d.slot[s].feedback);addPercent(parameters,s==0?STR16("A · Level"):STR16("B · Level"),slotParam(s,kSlotLevel),d.slot[s].level);parameters.addParameter(rangeParam(s==0?STR16("A · Pan"):STR16("B · Pan"),slotParam(s,kSlotPan),STR16("%"),-100,100,0,1));addPercent(parameters,s==0?STR16("A · Duck"):STR16("B · Duck"),slotParam(s,kSlotDuck),d.slot[s].duck);
+  parameters.addParameter(new LogRangeParameter(s==0?STR16("A · Free Time"):STR16("B · Free Time"),slotParam(s,kSlotTime),STR16("ms"),1,2500,500,1));addPercent(parameters,s==0?STR16("A · Feedback"):STR16("B · Feedback"),slotParam(s,kSlotFeedback),d.slot[s].feedback);addPercent(parameters,s==0?STR16("A · Level"):STR16("B · Level"),slotParam(s,kSlotLevel),d.slot[s].level);parameters.addParameter(rangeParam(s==0?STR16("A · Pan"):STR16("B · Pan"),slotParam(s,kSlotPan),STR16("%"),-100,100,0,1));addPercent(parameters,s==0?STR16("A · Duck"):STR16("B · Duck"),slotParam(s,kSlotDuck),d.slot[s].duck);
   for(int h=0;h<4;++h){
    String128 hn{};std::string headName=std::string(prefix)+"MultiHead Reel · Head "+std::to_string(h+1)+" Pan";Steinberg::UString(hn,128).fromAscii(headName.c_str());
    parameters.addParameter(rangeParam(hn,slotParam(s,kSlotHeadPan1+h),STR16("%"),-100,100,d.slot[s].headPan[h]*200.0-100.0,1));
@@ -54,7 +61,7 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
    else if(a==(int)DelayAlgorithm::ElCapistan&&k==7)parameters.addParameter(listParam(tn,id,{STR16("FIXED"),STR16("MULTI"),STR16("SINGLE")},1));
    else if(a==(int)DelayAlgorithm::Deco&&k==3)parameters.addParameter(listParam(tn,id,{STR16("SUM"),STR16("INVERT"),STR16("BOUNCE")},0));
    else if(a==(int)DelayAlgorithm::DIG&&k==0)parameters.addParameter(listParam(tn,id,{STR16("24/96"),STR16("ADM"),STR16("12 BIT")},0));
-   else if(a==(int)DelayAlgorithm::DM101&&k==0)parameters.addParameter(listParam(tn,id,{STR16("CLASSIC"),STR16("VINTAGE"),STR16("MODERN"),STR16("MULTI-HEAD"),STR16("NON-LINEAR"),STR16("AMBIENCE"),STR16("REFLECT"),STR16("DOUBLING+DELAY"),STR16("WIDE"),STR16("DUAL MOD"),STR16("PAN"),STR16("PATTERN")},0));
+   else if(a==(int)DelayAlgorithm::DM101&&k==0)parameters.addParameter(listParam(tn,id,{STR16("CLASSIC"),STR16("VINTAGE"),STR16("MODERN"),STR16("MULTI-HEAD"),STR16("NON-LINEAR"),STR16("AMBIENCE"),STR16("REFLECT"),STR16("DOUBLING+DELAY"),STR16("WIDE"),STR16("DUAL MOD"),STR16("PAN"),STR16("PATTERN")},(int)std::lround(def*11.0)));
    else if((a==(int)DelayAlgorithm::Volante&&(k>=6&&k<=13))||(a==(int)DelayAlgorithm::SpaceEcho202&&(k>=8&&k<=11)))parameters.addParameter(rangeParam(tn,id,STR16(""),0,1,def>=.5?1:0,0,1));
    else addPercent(parameters,tn,id,def);
   }
