@@ -76,6 +76,7 @@ void metalKnob(CDrawContext* c,const CRect& r,double value){
     c->drawLine({x+radius*.18*std::cos(a),y+radius*.18*std::sin(a)},
                 {x+radius*.78*std::cos(a),y+radius*.78*std::sin(a)});
 }
+} // anonymous namespace
 
 ChickenKnob::ChickenKnob(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){
     setStartAngle(static_cast<float>(Constants::pi*0.75));
