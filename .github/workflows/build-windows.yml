@@ -30,6 +30,20 @@ jobs:
           New-Item -ItemType Directory -Force artifact | Out-Null
           Copy-Item -Recurse -Force $plugin.FullName artifact/JerzyMXAnalogDelay2.vst3
           Compress-Archive -Path artifact/JerzyMXAnalogDelay2.vst3 -DestinationPath JerzyMXAnalogDelay2_Windows_x64.zip -Force
+      - name: Collect GUI renders
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force gui-renders | Out-Null
+          Get-ChildItem -Path build -Recurse -Filter "mxdelay2-render-*.png" | ForEach-Object {
+            Copy-Item -Force $_.FullName (Join-Path "gui-renders" $_.Name)
+          }
+      - name: Upload GUI renders
+        uses: actions/upload-artifact@v4
+        with:
+          name: JerzyMXAnalogDelay2-GUI-Renders
+          path: gui-renders/*.png
+          if-no-files-found: error
+          retention-days: 90
       - name: Upload MX Analog Delay
         uses: actions/upload-artifact@v4
         with:
