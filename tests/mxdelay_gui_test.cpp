@@ -33,7 +33,7 @@ void setParam(IEditController* controller,ParamID id,double value){
 void checkFinder(IPlugView*view){
  FUnknownPtr<IParameterFinder> finder(view);require(finder!=nullptr,"No IParameterFinder");auto r=sizeOf(view);ParamID id=0;
  auto find=[&](double x,double y,ParamID expected){require(finder->findParameter((int32)std::lround(x*r.getWidth()/1280.0),(int32)std::lround(y*r.getHeight()/790.0),id)==kResultTrue&&id==expected,"Scaled hit area mismatch");};
- find(55,91,kMXMixId);find(93,553,slotParam(0,kSlotHeadPan1));find(418,230,slotParam(0,kSlotTime));find(500,230,slotParam(0,kSlotFeedback));
+ find(325,70,kMXMixId);find(103,528,slotParam(0,kSlotHeadPan1));find(221,255,slotParam(0,kSlotTime));find(309,255,slotParam(0,kSlotFeedback));
 }
 int main(int argc,char**argv){try{
  require(argc==2,"Pass JerzyMXAnalogDelay2.vst3 path");std::cerr<<"mxgui: start\n";SetProcessDPIAware();CoInitializeEx(nullptr,COINIT_APARTMENTTHREADED);
@@ -48,9 +48,9 @@ int main(int argc,char**argv){try{
  std::cerr<<"mxgui: midi checked\n";auto view=owned(controller->createView(ViewType::kEditor));require(view,"createView failed");HostFrame frame;frame.window=CreateWindowExW(0,L"STATIC",L"MX GUI test",WS_POPUP,0,0,1280,790,nullptr,nullptr,GetModuleHandleW(nullptr),nullptr);require(frame.window,"Host window failed");
  std::cerr<<"mxgui: host hwnd ready\n";FUnknownPtr<IPlugViewContentScaleSupport> scale(view);require(scale!=nullptr,"No DPI support");std::cerr<<"mxgui: setting preattach dpi\n";require(scale->setContentScaleFactor(1.25f)==kResultTrue,"Pre-attach DPI failed");std::cerr<<"mxgui: preattach dpi ok\n";auto initial=sizeOf(view);require(initial.getWidth()==1600&&initial.getHeight()==988,"Wrong pre-attach scale");
  MoveWindow(frame.window,0,0,initial.getWidth(),initial.getHeight(),FALSE);view->setFrame(&frame);std::cerr<<"mxgui: attaching\n";require(view->attached(frame.window,kPlatformTypeHWND)==kResultTrue,"Attach failed");std::cerr<<"mxgui: attached\n";pump();checkFinder(view);std::cerr<<"mxgui: finder ok\n";
- std::cerr<<"mxgui: interaction start\n";setParam(controller,kMXMixId,0.82);pump();require(std::abs(controller->getParamNormalized(kMXMixId)-0.82)<.002,"VST3 parameter change did not reach controller");right(view,frame.window,55,91);require(std::abs(controller->getParamNormalized(kMXMixId)-0.35)<.002,"Right-click did not reset knob to default");
- std::cerr<<"mxgui: right reset ok\n";double en=controller->getParamNormalized(slotParam(0,kSlotEnable));left(view,frame.window,201,225);require(controller->getParamNormalized(slotParam(0,kSlotEnable))!=en,"LED switch click failed");left(view,frame.window,201,225);
- std::cerr<<"mxgui: led ok\n";for(const auto& z: {std::pair<double,double>{690,79}, {745,79}, {800,79}, {855,79}}){left(view,frame.window,z.first,z.second);checkFinder(view);}
+ std::cerr<<"mxgui: interaction start\n";setParam(controller,kMXMixId,0.82);pump();require(std::abs(controller->getParamNormalized(kMXMixId)-0.82)<.002,"VST3 parameter change did not reach controller");right(view,frame.window,325,70);require(std::abs(controller->getParamNormalized(kMXMixId)-0.35)<.002,"Right-click did not reset knob to default");
+ std::cerr<<"mxgui: right reset ok\n";double en=controller->getParamNormalized(slotParam(0,kSlotEnable));left(view,frame.window,476,174);require(controller->getParamNormalized(slotParam(0,kSlotEnable))!=en,"LED switch click failed");left(view,frame.window,201,225);
+ std::cerr<<"mxgui: led ok\n";for(const auto& z: {std::pair<double,double>{914,59}, {958,59}, {1004,59}, {1050,59}}){left(view,frame.window,z.first,z.second);checkFinder(view);}
  std::cerr<<"mxgui: zooms ok\n";ViewRect restored(0,0,1024,632);require(frame.resizeView(view,&restored)==kResultTrue,"Host resize rejected");checkFinder(view);require(renderProbe(view,"mxdelay2-render-1024x632.png")==1,"Rendered MX GUI has blank/unpainted edges");
  std::cerr<<"mxgui: render small ok\n";restored=ViewRect(0,0,1920,1185);require(frame.resizeView(view,&restored)==kResultTrue,"Large host resize rejected");checkFinder(view);require(renderProbe(view,"mxdelay2-render-1920x1185.png")==1,"Large MX render invalid");
  std::cerr<<"mxgui: render large ok\n";view->removed();view->setFrame(nullptr);scale=nullptr;view=nullptr;DestroyWindow(frame.window);midi=nullptr;controller->terminate();controller=nullptr;module.reset();CoUninitialize();
