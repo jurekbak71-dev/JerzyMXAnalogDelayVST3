@@ -131,5 +131,36 @@ int main(){
     for(int i=1;i<C;++i)conditionDifference+=std::abs(servL[i]-damL[i])+std::abs(servR[i]-damR[i]);
     assert(conditionDifference>0.05);
 
+
+    // MultiHead must produce a stable delayed signal without pathological sample-to-sample crackle.
+    {
+        constexpr int M=96000;
+        std::vector<float> xL(M),xR(M),yL(M),yR(M);
+        for(int i=0;i<M;++i){const float v=0.12f*std::sin(2.0*3.14159265358979323846*220.0*i/48000.0);xL[i]=xR[i]=v;}
+        float* xi[2]={xL.data(),xR.data()};float* yo[2]={yL.data(),yR.data()};
+        p=MXDelayParams{};p.mix=1.0;p.machineCondition=0.0;p.slot[1].enable=0.0;
+        p.slot[0].algorithm=double((int)DelayAlgorithm::Volante)/double(kAlgorithmCount-1);
+        p.slot[0].sync=0.0;p.slot[0].time=0.70;p.slot[0].feedback=0.45;
+        dsp.reset();dsp.process(xi,yo,2,M,p,120.0,peak);
+        double e=energy(yL,yR,12000),maxJump=0.0;
+        for(int i=12001;i<M;++i)maxJump=std::max(maxJump,std::max(std::abs(double(yL[i]-yL[i-1])),std::abs(double(yR[i]-yR[i-1]))));
+        assert(e>1.0);
+        assert(std::isfinite(maxJump));
+        assert(maxJump<0.75);
+    }
+
+    // Four FX slots can run serially, split between INPUT/PRE and WET ONLY.
+    {
+        constexpr int F=48000;
+        std::vector<float> xL(F),xR(F),yL(F),yR(F);
+        xL[0]=xR[0]=0.4f;
+        float* xi[2]={xL.data(),xR.data()};float* yo[2]={yL.data(),yR.data()};
+        p=MXDelayParams{};p.mix=0.7;p.slot[1].enable=0.0;p.slot[0].sync=0.0;p.slot[0].time=0.65;
+        const int types[4]={(int)WetFxType::Overdrive,(int)WetFxType::Chorus,(int)WetFxType::LoFi,(int)WetFxType::Flanger};
+        for(int i=0;i<4;++i){p.fx[i].type=double(types[i])/double((int)WetFxType::Count-1);p.fx[i].amount=.35+.1*i;p.fx[i].depth=.45;p.fx[i].drive=.30;p.fx[i].route=i<2?0.0:1.0;}
+        dsp.reset();dsp.process(xi,yo,2,F,p,120.0,peak);
+        assert(std::isfinite(peak));assert(peak<5.0);assert(energy(yL,yR)>1e-3);
+    }
+
     return 0;
 }
