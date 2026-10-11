@@ -29,12 +29,23 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
  parameters.addParameter(listParam(STR16("Routing"),kMXRoutingId,{STR16("SERIES"),STR16("PARALLEL"),STR16("SPLIT L/R")},0));
  parameters.addParameter(rangeParam(STR16("Bypass"),kMXBypassId,STR16(""),0,1,0,0,1,ParameterInfo::kCanAutomate|ParameterInfo::kIsBypass));
  parameters.addParameter(rangeParam(STR16("Spillover"),kMXSpillId,STR16(""),0,1,1,0,1));parameters.addParameter(rangeParam(STR16("Host Tempo"),kMXTempoMeterId,STR16("BPM"),0,300,120,1,0,ParameterInfo::kIsReadOnly));parameters.addParameter(listParam(STR16("Machine Condition"),kMXMachineConditionId,{STR16("SERVICED"),STR16("USED"),STR16("WORN"),STR16("DAMAGED")},0));
- parameters.addParameter(listParam(STR16("Wet FX Type"),kMXWetFxTypeId,{STR16("OFF"),STR16("CHORUS"),STR16("FLANGER"),STR16("LOFI"),STR16("OVERDRIVE"),STR16("GRANULAR")},0));
- addPercent(parameters,STR16("Wet FX Amount"),kMXWetFxAmountId,d.wetFxAmount);
- addPercent(parameters,STR16("Wet FX Rate"),kMXWetFxRateId,d.wetFxRate);
- addPercent(parameters,STR16("Wet FX Depth"),kMXWetFxDepthId,d.wetFxDepth);
- addPercent(parameters,STR16("Wet FX Drive"),kMXWetFxDriveId,d.wetFxDrive);
- parameters.addParameter(listParam(STR16("LoFi Route"),kMXLoFiRouteId,{STR16("WET ONLY"),STR16("WET + DRY")},0));
+ for(int fx=0;fx<4;++fx){
+  const auto& q=d.fx[fx];
+  String128 nType{},nAmount{},nRate{},nDepth{},nDrive{},nRoute{};
+  const std::string prefix="FX "+std::to_string(fx+1)+" · ";
+  Steinberg::UString(nType,128).fromAscii((prefix+"Type").c_str());
+  Steinberg::UString(nAmount,128).fromAscii((prefix+"Amount").c_str());
+  Steinberg::UString(nRate,128).fromAscii((prefix+"Rate").c_str());
+  Steinberg::UString(nDepth,128).fromAscii((prefix+"Depth").c_str());
+  Steinberg::UString(nDrive,128).fromAscii((prefix+"Drive").c_str());
+  Steinberg::UString(nRoute,128).fromAscii((prefix+"Route").c_str());
+  parameters.addParameter(listParam(nType,wetFxParam(fx,kWetFxType),{STR16("OFF"),STR16("CHORUS"),STR16("FLANGER"),STR16("LOFI"),STR16("OVERDRIVE"),STR16("GRANULAR")},0));
+  addPercent(parameters,nAmount,wetFxParam(fx,kWetFxAmount),q.amount);
+  addPercent(parameters,nRate,wetFxParam(fx,kWetFxRate),q.rate);
+  addPercent(parameters,nDepth,wetFxParam(fx,kWetFxDepth),q.depth);
+  addPercent(parameters,nDrive,wetFxParam(fx,kWetFxDrive),q.drive);
+  parameters.addParameter(listParam(nRoute,wetFxParam(fx,kWetFxRoute),{STR16("INPUT / PRE"),STR16("WET ONLY")},1));
+ }
  const char* algNames[]={"MultiHead Reel","Tape Echo","Oil Can","Tube Echo","BBD","Doubletrack","Dual Digital","Space Echo 202","BBD Machine 101"};
  const char* ctl[kAlgorithmCount][kAlgoControls]={
  {"Mechanics","Wear","Spacing","Low Cut","Head Spread","Saturation","Play Head 1","Play Head 2","Play Head 3","Play Head 4","Feedback Head 1","Feedback Head 2","Feedback Head 3","Feedback Head 4","Unused 15","Unused 16"},
@@ -68,7 +79,7 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
  }
  return kResultOk;
 }
-tresult PLUGIN_API MXDelayController::setComponentState(IBStream*s){if(!s)return kResultFalse;IBStreamer b(s,kLittleEndian);MXDelayParams p;if(!readMXState(b,p))return kResultFalse;setParamNormalized(kMXMixId,p.mix);setParamNormalized(kMXInputTrimId,p.inputTrim);setParamNormalized(kMXOutputTrimId,p.outputTrim);setParamNormalized(kMXRoutingId,p.routing);setParamNormalized(kMXBypassId,p.bypass);setParamNormalized(kMXSpillId,p.spill);setParamNormalized(kMXMachineConditionId,p.machineCondition);setParamNormalized(kMXWetFxTypeId,p.wetFxType);setParamNormalized(kMXWetFxAmountId,p.wetFxAmount);setParamNormalized(kMXWetFxRateId,p.wetFxRate);setParamNormalized(kMXWetFxDepthId,p.wetFxDepth);setParamNormalized(kMXWetFxDriveId,p.wetFxDrive);setParamNormalized(kMXLoFiRouteId,p.loFiRoute);for(int x=0;x<2;++x){auto&q=p.slot[x];setParamNormalized(slotParam(x,kSlotAlgorithm),q.algorithm);setParamNormalized(slotParam(x,kSlotEnable),q.enable);setParamNormalized(slotParam(x,kSlotSync),q.sync);setParamNormalized(slotParam(x,kSlotDivision),q.division);setParamNormalized(slotParam(x,kSlotTime),q.time);setParamNormalized(slotParam(x,kSlotFeedback),q.feedback);setParamNormalized(slotParam(x,kSlotLevel),q.level);setParamNormalized(slotParam(x,kSlotPan),q.pan);setParamNormalized(slotParam(x,kSlotDuck),q.duck);for(int h=0;h<4;++h)setParamNormalized(slotParam(x,kSlotHeadPan1+h),q.headPan[h]);for(int a=0;a<kAlgorithmCount;++a)for(int k=0;k<kAlgoControls;++k)if(parameters.getParameter(algoParam(x,a,k)))setParamNormalized(algoParam(x,a,k),q.c[a][k]);}return kResultOk;}
+tresult PLUGIN_API MXDelayController::setComponentState(IBStream*s){if(!s)return kResultFalse;IBStreamer b(s,kLittleEndian);MXDelayParams p;if(!readMXState(b,p))return kResultFalse;setParamNormalized(kMXMixId,p.mix);setParamNormalized(kMXInputTrimId,p.inputTrim);setParamNormalized(kMXOutputTrimId,p.outputTrim);setParamNormalized(kMXRoutingId,p.routing);setParamNormalized(kMXBypassId,p.bypass);setParamNormalized(kMXSpillId,p.spill);setParamNormalized(kMXMachineConditionId,p.machineCondition);for(int fx=0;fx<4;++fx){const auto&q=p.fx[fx];setParamNormalized(wetFxParam(fx,kWetFxType),q.type);setParamNormalized(wetFxParam(fx,kWetFxAmount),q.amount);setParamNormalized(wetFxParam(fx,kWetFxRate),q.rate);setParamNormalized(wetFxParam(fx,kWetFxDepth),q.depth);setParamNormalized(wetFxParam(fx,kWetFxDrive),q.drive);setParamNormalized(wetFxParam(fx,kWetFxRoute),q.route);}for(int x=0;x<2;++x){auto&q=p.slot[x];setParamNormalized(slotParam(x,kSlotAlgorithm),q.algorithm);setParamNormalized(slotParam(x,kSlotEnable),q.enable);setParamNormalized(slotParam(x,kSlotSync),q.sync);setParamNormalized(slotParam(x,kSlotDivision),q.division);setParamNormalized(slotParam(x,kSlotTime),q.time);setParamNormalized(slotParam(x,kSlotFeedback),q.feedback);setParamNormalized(slotParam(x,kSlotLevel),q.level);setParamNormalized(slotParam(x,kSlotPan),q.pan);setParamNormalized(slotParam(x,kSlotDuck),q.duck);for(int h=0;h<4;++h)setParamNormalized(slotParam(x,kSlotHeadPan1+h),q.headPan[h]);for(int a=0;a<kAlgorithmCount;++a)for(int k=0;k<kAlgoControls;++k)if(parameters.getParameter(algoParam(x,a,k)))setParamNormalized(algoParam(x,a,k),q.c[a][k]);}return kResultOk;}
 IPlugView* PLUGIN_API MXDelayController::createView(const char*n){if(n&&std::strcmp(n,ViewType::kEditor)==0){auto*e=new MXDelayEditor(this,"view","mxdelay.uidesc");e->setAllowedZoomFactors({0.75,1.0,1.25,1.5});return e;}return nullptr;}
 tresult PLUGIN_API MXDelayController::getMidiControllerAssignment(int32 bus,int16,CtrlNumber cc,ParamID&id){if(bus!=0)return kResultFalse;switch((int)cc){case 1:id=slotParam(0,kSlotFeedback);break;case 7:id=kMXMixId;break;case 11:id=kMXInputTrimId;break;case 64:id=kMXBypassId;break;case 71:id=slotParam(0,kSlotFeedback);break;case 72:id=slotParam(1,kSlotFeedback);break;case 73:id=slotParam(1,kSlotTime);break;case 74:id=slotParam(0,kSlotTime);break;case 76:id=slotParam(0,kSlotPan);break;case 77:id=slotParam(1,kSlotPan);break;case 20:id=slotParam(0,kSlotHeadPan1);break;case 21:id=slotParam(0,kSlotHeadPan2);break;case 22:id=slotParam(0,kSlotHeadPan3);break;case 23:id=slotParam(0,kSlotHeadPan4);break;
 case 24:id=slotParam(1,kSlotHeadPan1);break;case 25:id=slotParam(1,kSlotHeadPan2);break;case 26:id=slotParam(1,kSlotHeadPan3);break;case 27:id=slotParam(1,kSlotHeadPan4);break;
@@ -76,6 +87,6 @@ case 28:id=algoParam(0,(int)DelayAlgorithm::Volante,6);break;case 29:id=algoPara
 case 32:id=algoParam(0,(int)DelayAlgorithm::Volante,10);break;case 33:id=algoParam(0,(int)DelayAlgorithm::Volante,11);break;case 34:id=algoParam(0,(int)DelayAlgorithm::Volante,12);break;case 35:id=algoParam(0,(int)DelayAlgorithm::Volante,13);break;
 case 36:id=algoParam(1,(int)DelayAlgorithm::Volante,6);break;case 37:id=algoParam(1,(int)DelayAlgorithm::Volante,7);break;case 38:id=algoParam(1,(int)DelayAlgorithm::Volante,8);break;case 39:id=algoParam(1,(int)DelayAlgorithm::Volante,9);break;
 case 40:id=algoParam(1,(int)DelayAlgorithm::Volante,10);break;case 41:id=algoParam(1,(int)DelayAlgorithm::Volante,11);break;case 42:id=algoParam(1,(int)DelayAlgorithm::Volante,12);break;case 43:id=algoParam(1,(int)DelayAlgorithm::Volante,13);break;
-case 80:id=kMXWetFxAmountId;break;case 81:id=kMXWetFxRateId;break;case 82:id=kMXWetFxDepthId;break;case 83:id=kMXWetFxDriveId;break;case 84:id=kMXWetFxTypeId;break;case 85:id=kMXLoFiRouteId;break;case 91:id=slotParam(0,kSlotLevel);break;case 93:id=slotParam(1,kSlotLevel);break;default:return kResultFalse;}return kResultTrue;}
+case 80:id=wetFxParam(0,kWetFxAmount);break;case 81:id=wetFxParam(0,kWetFxRate);break;case 82:id=wetFxParam(0,kWetFxDepth);break;case 83:id=wetFxParam(0,kWetFxDrive);break;case 84:id=wetFxParam(0,kWetFxType);break;case 85:id=wetFxParam(0,kWetFxRoute);break;case 91:id=slotParam(0,kSlotLevel);break;case 93:id=slotParam(1,kSlotLevel);break;default:return kResultFalse;}return kResultTrue;}
 tresult PLUGIN_API MXDelayController::queryInterface(const char*iid,void**obj){QUERY_INTERFACE(iid,obj,IMidiMapping::iid,IMidiMapping)return EditControllerEx1::queryInterface(iid,obj);}
 }
