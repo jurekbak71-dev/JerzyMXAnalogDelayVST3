@@ -25,13 +25,34 @@ enum MXGlobalParamIds : unsigned {
     kMXSpillId,
     kMXTempoMeterId,
     kMXMachineConditionId = kMXGlobalBase + 7,
-    kMXWetFxTypeId,
-    kMXWetFxAmountId,
-    kMXWetFxRateId,
-    kMXWetFxDepthId,
-    kMXWetFxDriveId,
-    kMXLoFiRouteId
+    kMXWetFx1TypeId,
+    kMXWetFx1AmountId,
+    kMXWetFx1RateId,
+    kMXWetFx1DepthId,
+    kMXWetFx1DriveId,
+    kMXWetFx1RouteId,
+    kMXWetFx2TypeId,
+    kMXWetFx2AmountId,
+    kMXWetFx2RateId,
+    kMXWetFx2DepthId,
+    kMXWetFx2DriveId,
+    kMXWetFx2RouteId,
+    kMXWetFx3TypeId,
+    kMXWetFx3AmountId,
+    kMXWetFx3RateId,
+    kMXWetFx3DepthId,
+    kMXWetFx3DriveId,
+    kMXWetFx3RouteId,
+    kMXWetFx4TypeId,
+    kMXWetFx4AmountId,
+    kMXWetFx4RateId,
+    kMXWetFx4DepthId,
+    kMXWetFx4DriveId,
+    kMXWetFx4RouteId
 };
+
+constexpr unsigned wetFxParam(int slot,int field){ return kMXWetFx1TypeId + unsigned(slot*6+field); }
+enum WetFxField : int { kWetFxType=0,kWetFxAmount,kWetFxRate,kWetFxDepth,kWetFxDrive,kWetFxRoute };
 
 enum SlotOffsets : unsigned {
     kSlotAlgorithm = 0,
@@ -68,6 +89,15 @@ struct SlotParams {
     std::array<std::array<double,kAlgoControls>,kAlgorithmCount> c{};
 };
 
+struct WetFxParams {
+    double type=0.0;
+    double amount=0.0;
+    double rate=0.30;
+    double depth=0.45;
+    double drive=0.20;
+    double route=1.0; // 0 = INPUT/PRE, 1 = WET ONLY
+};
+
 struct MXDelayParams {
     double mix=0.35;
     double inputTrim=0.50;
@@ -76,12 +106,7 @@ struct MXDelayParams {
     double bypass=0.0;
     double spill=1.0;
     double machineCondition=0.0;
-    double wetFxType=0.0;
-    double wetFxAmount=0.0;
-    double wetFxRate=0.30;
-    double wetFxDepth=0.45;
-    double wetFxDrive=0.20;
-    double loFiRoute=0.0;
+    std::array<WetFxParams,4> fx{};
     SlotParams slot[2];
     MXDelayParams(){
         slot[0].algorithm=0.0;
