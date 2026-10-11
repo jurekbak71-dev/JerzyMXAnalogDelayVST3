@@ -167,7 +167,9 @@ template<class T> class MXDelayDSP {
             auto& c=p.c[algo];
             const double targetMs=slotDelayMs(p,bpm);
             double ms=smooth(targetMs,delayMsSm,timeSmoothA);
-            double fb=smooth(std::clamp(p.feedback*1.075,0.0,1.075),feedbackSm,controlSmoothA);
+            const double feedbackNorm=std::clamp(p.feedback,0.0,1.0);
+            const double feedbackGain=1.01*std::pow(feedbackNorm,2.20);
+            double fb=smooth(feedbackGain,feedbackSm,controlSmoothA);
             double level=smooth(std::clamp(p.level*1.25,0.0,1.25),levelSm,controlSmoothA);
             const double duckAmt=std::clamp(p.duck,0.0,1.0);
             const double ia=std::max(std::abs((double)inL),std::abs((double)inR));
@@ -184,13 +186,17 @@ template<class T> class MXDelayDSP {
                 auto ratios=volanteRatios(c[2]);double sp=0,sf=0;Stereo feedback{};
                 for(int h=0;h<4;++h){
                     if(c[6+h]<0.5&&c[10+h]<0.5)continue;
-                    const double local=1.0+mech.pitch*(1.0+0.055*h)+0.00035*h*noiseRng.bipolar();
-                    const double ds=sr*ms*ratios[h]/1000.0*local;
-                    const double mono=.5*(double(read(l,ds))+double(read(r,ds)));
+                    const double local=std::clamp(1.0+mech.pitch*(0.72+0.045*h),0.94,1.06);
+                    const double ds=std::clamp(sr*ms*ratios[h]/1000.0*local,2.0,double(l.size()-4));
+                    const double tapL=double(read(l,ds)),tapR=double(read(r,ds));
+                    const double mono=.5*(tapL+tapR);
+                    const double side=.5*(tapL-tapR);
                     const double pos=std::clamp((p.headPan[h]*2.0-1.0)*spread,-1.0,1.0);
                     const double gl=std::sqrt(.5*(1-pos)),gr=std::sqrt(.5*(1+pos));
-                    if(c[6+h]>=.5){wet.l+=(T)(mono*gl);wet.r+=(T)(mono*gr);sp++;}
-                    if(c[10+h]>=.5){feedback.l+=(T)(mono*gl);feedback.r+=(T)(mono*gr);sf++;}
+                    const double headL=mono*gl+0.20*side;
+                    const double headR=mono*gr-0.20*side;
+                    if(c[6+h]>=.5){wet.l+=(T)headL;wet.r+=(T)headR;sp++;}
+                    if(c[10+h]>=.5){feedback.l+=(T)headL;feedback.r+=(T)headR;sf++;}
                 }
                 if(sp>0){wet.l=(T)(double(wet.l)/std::sqrt(sp));wet.r=(T)(double(wet.r)/std::sqrt(sp));}
                 if(sf>0){feedback.l=(T)(double(feedback.l)/sf);feedback.r=(T)(double(feedback.r)/sf);}
@@ -199,7 +205,11 @@ template<class T> class MXDelayDSP {
                 fbs.r=lowpass(tapeSat(feedback.r,drive,.43,globalWear,tapeMemR),lpR,cutoff*.97);
                 const double lc=35+450*c[3];
                 fbs.l=highpass(fbs.l,hpMemL,lc);fbs.r=highpass(fbs.r,hpMemR,lc);
-                applyPhysicalFrame(wet,fbs,mech,15000-9000*globalWear);
+                MechanicalFrame reelFrame=mech;
+                reelFrame.impulse*=0.20;
+                reelFrame.noise*=0.45;
+                reelFrame.gain=0.72+0.28*reelFrame.gain;
+                applyPhysicalFrame(wet,fbs,reelFrame,15000-9000*globalWear);
             }else if(algo==(int)DelayAlgorithm::ElCapistan){
                 ms=std::clamp(ms,35.0,2500.0);
                 const double age=c[0],wow=c[1],flutter=c[2],crinkle=c[3],bias=c[4],lowContour=c[5],spring=c[6];
@@ -383,9 +393,9 @@ template<class T> class MXDelayDSP {
         void prepare(double sampleRate){sr=std::max(8000.0,sampleRate);const size_t n=(size_t)std::ceil(sr*.25)+8;l.assign(n,T{});r.assign(n,T{});reset();}
         void reset(){std::fill(l.begin(),l.end(),T{});std::fill(r.begin(),r.end(),T{});w=0;phase=0;hold=0;holdPeriod=1;heldL=heldR=T{};rng=0x9e3779b9u;}
         T read(const std::vector<T>& b,double ds)const{if(b.empty())return T{};ds=std::clamp(ds,1.0,double(b.size()-2));double p=double(w)-ds;while(p<0)p+=b.size();const size_t i0=(size_t)p,i1=(i0+1)%b.size();const double f=p-std::floor(p);return (T)(double(b[i0])+(double(b[i1])-double(b[i0]))*f);}
-        Stereo process(Stereo in,const MXDelayParams& p){
-            const int type=normIndex(p.wetFxType,(int)WetFxType::Count);const double a=std::clamp(p.wetFxAmount,0.0,1.0);if(type==0||a<1e-5)return in;
-            const double rate=.03+5.0*p.wetFxRate*p.wetFxRate,depth=std::clamp(p.wetFxDepth,0.0,1.0),drive=std::clamp(p.wetFxDrive,0.0,1.0);
+        Stereo process(Stereo in,const WetFxParams& p){
+            const int type=normIndex(p.type,(int)WetFxType::Count);const double a=std::clamp(p.amount,0.0,1.0);if(type==0||a<1e-5)return in;
+            const double rate=.03+5.0*p.rate*p.rate,depth=std::clamp(p.depth,0.0,1.0),drive=std::clamp(p.drive,0.0,1.0);
             if(type==(int)WetFxType::Overdrive){Stereo q{(T)std::tanh(double(in.l)*(1.0+8.0*drive)),(T)std::tanh(double(in.r)*(1.0+8.0*drive))};return {(T)((1-a)*double(in.l)+a*double(q.l)),(T)((1-a)*double(in.r)+a*double(q.r))};}
             if(type==(int)WetFxType::LoFi){
                 holdPeriod=1+(int)std::lround((2.0+46.0*depth)*(0.25+0.75*a));if(++hold>=holdPeriod){hold=0;heldL=in.l;heldR=in.r;}
@@ -412,25 +422,20 @@ template<class T> class MXDelayDSP {
             w=(w+1)%l.size();
             return {(T)((1-a)*double(in.l)+a*double(fx.l)),(T)((1-a)*double(in.r)+a*double(fx.r))};
         }
-        Stereo processDryLoFi(Stereo in,const MXDelayParams& p){
-            if(normIndex(p.wetFxType,(int)WetFxType::Count)!=(int)WetFxType::LoFi||p.loFiRoute<.5||p.wetFxAmount<1e-5)return in;
-            const double a=std::clamp(p.wetFxAmount,0.0,1.0),bits=std::clamp(16.0-10.0*p.wetFxDepth-2.0*a,4.0,16.0),q=std::pow(2.0,bits-1.0);
-            Stereo z{(T)(std::round(double(in.l)*q)/q),(T)(std::round(double(in.r)*q)/q)};
-            return {(T)((1-a)*double(in.l)+a*double(z.l)),(T)((1-a)*double(in.r)+a*double(z.r))};
-        }
+
     };
 
     SlotDSP s[2];
-    WetFxDSP wetFx;
+    std::array<WetFxDSP,4> wetFx;
     double sr=44100.0;
 public:
     void prepare(double sampleRate,int=2){
         sr=sampleRate;
         s[0].prepare(sampleRate,0x13579bdfu);
         s[1].prepare(sampleRate,0x2468ace1u);
-        wetFx.prepare(sampleRate);
+        for(auto& fx:wetFx)fx.prepare(sampleRate);
     }
-    void reset(){for(auto& x:s)x.reset();wetFx.reset();}
+    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();}
 
     template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak){
         const double inGain=gainFromNorm(p.inputTrim,-18,18);
@@ -454,8 +459,13 @@ public:
                 continue;
             }
 
-            const T inL=(T)(bypass?0.0:double(rawL)*inGain);
-            const T inR=(T)(bypass?0.0:double(rawR)*inGain);
+            T inL=(T)(bypass?0.0:double(rawL)*inGain);
+            T inR=(T)(bypass?0.0:double(rawR)*inGain);
+            if(!bypass){
+                Stereo pre{inL,inR};
+                for(int fx=0;fx<4;++fx)if(p.fx[fx].route<.5)pre=wetFx[fx].process(pre,p.fx[fx]);
+                inL=pre.l;inR=pre.r;
+            }
             Stereo a{},b{},wet{};
 
             if(routing==(int)DelayRouting::Parallel){
@@ -472,15 +482,14 @@ public:
                 wet={a.l,b.r};
             }
 
-            wet=wetFx.process(wet,p);
-            Stereo dryFx=wetFx.processDryLoFi({inL,inR},p);
+            for(int fx=0;fx<4;++fx)if(p.fx[fx].route>=.5)wet=wetFx[fx].process(wet,p.fx[fx]);
             T yL{},yR{};
             if(bypass&&trails){
                 yL=(T)(double(rawL)+wetG*double(wet.l)*outGain);
                 yR=(T)(double(rawR)+wetG*double(wet.r)*outGain);
             }else{
-                yL=(T)((dryG*double(dryFx.l)+wetG*double(wet.l))*outGain);
-                yR=(T)((dryG*double(dryFx.r)+wetG*double(wet.r))*outGain);
+                yL=(T)((dryG*double(inL)+wetG*double(wet.l))*outGain);
+                yR=(T)((dryG*double(inR)+wetG*double(wet.r))*outGain);
             }
             if(out&&out[0])out[0][i]=(Sample)yL;
             if(channels>1&&out&&out[1])out[1][i]=(Sample)yR;
