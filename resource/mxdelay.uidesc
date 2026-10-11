@@ -581,23 +581,56 @@
 <view class="CTextLabel" origin="1164, 288" size="78, 18" control-tag="BDuck" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="UIViewSwitchContainer" origin="660, 338" size="600, 328" template-names="B_Algo0,B_Algo1,B_Algo2,B_Algo3,B_Algo4,B_Algo5,B_Algo6,B_Algo7,B_Algo8" template-switch-control="BAlgo" animation-style="fade" animation-time="100"/>
 
-<!-- WET FX HARDWARE STRIP -->
+<!-- FOUR-SLOT SERIAL FX RACK -->
 <view class="HardwarePanel" origin="8, 690" size="1264, 92" mouse-enabled="false"/>
-<view class="CTextLabel" origin="28, 706" size="150, 24" title="WET FX LOOP" font="Title" font-color="Amber" transparent="true" mouse-enabled="false"/>
-<view class="COptionMenu" origin="184, 705" size="190, 30" control-tag="WetFxType" font="Section" font-color="Cream" back-color="ValueBack" frame-color="Amber" frame-width="1"/>
-<view class="CTextLabel" origin="393, 702" size="62, 18" title="AMOUNT" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="398, 718" size="54, 54" control-tag="WetFxAmount" wheel-inc-value="0.01"/>
-<view class="CTextLabel" origin="478, 702" size="52, 18" title="RATE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="477, 718" size="54, 54" control-tag="WetFxRate" wheel-inc-value="0.01"/>
-<view class="CTextLabel" origin="557, 702" size="62, 18" title="DEPTH" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="562, 718" size="54, 54" control-tag="WetFxDepth" wheel-inc-value="0.01"/>
-<view class="CTextLabel" origin="642, 702" size="62, 18" title="DRIVE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="647, 718" size="54, 54" control-tag="WetFxDrive" wheel-inc-value="0.01"/>
 
-<view class="CTextLabel" origin="735, 702" size="110, 18" title="LOFI ROUTE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="COptionMenu" origin="730, 728" size="120, 28" control-tag="LoFiRoute" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
-<view class="CTextLabel" origin="875, 705" size="365, 24" title="CHORUS   FLANGER   LOFI   OVERDRIVE   GRANULAR" font="Value" font-color="TapeGreen" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="CTextLabel" origin="875, 736" size="365, 18" title="FX INSERTED ON THE WET PATH · LOFI CAN ALSO PROCESS DRY" font="Value" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="CTextLabel" origin="24, 697" size="42, 18" title="FX 1" font="Section" font-color="Amber" transparent="true" text-alignment="left" mouse-enabled="false"/>
+<view class="COptionMenu" origin="68, 694" size="112, 24" control-tag="Fx1Type" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
+<view class="COptionMenu" origin="184, 694" size="120, 24" control-tag="Fx1Route" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
+<view class="CTextLabel" origin="24, 720" size="52, 14" title="AMT" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="31, 734" size="38, 38" control-tag="Fx1Amount" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="86, 720" size="52, 14" title="RATE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="93, 734" size="38, 38" control-tag="Fx1Rate" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="148, 720" size="52, 14" title="DEPTH" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="155, 734" size="38, 38" control-tag="Fx1Depth" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="210, 720" size="52, 14" title="DRIVE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="217, 734" size="38, 38" control-tag="Fx1Drive" wheel-inc-value="0.01"/>
+
+<view class="CTextLabel" origin="332, 697" size="42, 18" title="FX 2" font="Section" font-color="Amber" transparent="true" text-alignment="left" mouse-enabled="false"/>
+<view class="COptionMenu" origin="376, 694" size="112, 24" control-tag="Fx2Type" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
+<view class="COptionMenu" origin="492, 694" size="120, 24" control-tag="Fx2Route" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
+<view class="CTextLabel" origin="332, 720" size="52, 14" title="AMT" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="339, 734" size="38, 38" control-tag="Fx2Amount" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="394, 720" size="52, 14" title="RATE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="401, 734" size="38, 38" control-tag="Fx2Rate" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="456, 720" size="52, 14" title="DEPTH" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="463, 734" size="38, 38" control-tag="Fx2Depth" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="518, 720" size="52, 14" title="DRIVE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="525, 734" size="38, 38" control-tag="Fx2Drive" wheel-inc-value="0.01"/>
+
+<view class="CTextLabel" origin="640, 697" size="42, 18" title="FX 3" font="Section" font-color="Amber" transparent="true" text-alignment="left" mouse-enabled="false"/>
+<view class="COptionMenu" origin="684, 694" size="112, 24" control-tag="Fx3Type" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
+<view class="COptionMenu" origin="800, 694" size="120, 24" control-tag="Fx3Route" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
+<view class="CTextLabel" origin="640, 720" size="52, 14" title="AMT" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="647, 734" size="38, 38" control-tag="Fx3Amount" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="702, 720" size="52, 14" title="RATE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="709, 734" size="38, 38" control-tag="Fx3Rate" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="764, 720" size="52, 14" title="DEPTH" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="771, 734" size="38, 38" control-tag="Fx3Depth" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="826, 720" size="52, 14" title="DRIVE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="833, 734" size="38, 38" control-tag="Fx3Drive" wheel-inc-value="0.01"/>
+
+<view class="CTextLabel" origin="948, 697" size="42, 18" title="FX 4" font="Section" font-color="Amber" transparent="true" text-alignment="left" mouse-enabled="false"/>
+<view class="COptionMenu" origin="992, 694" size="112, 24" control-tag="Fx4Type" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
+<view class="COptionMenu" origin="1108, 694" size="120, 24" control-tag="Fx4Route" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
+<view class="CTextLabel" origin="948, 720" size="52, 14" title="AMT" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="955, 734" size="38, 38" control-tag="Fx4Amount" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="1010, 720" size="52, 14" title="RATE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="1017, 734" size="38, 38" control-tag="Fx4Rate" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="1072, 720" size="52, 14" title="DEPTH" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="1079, 734" size="38, 38" control-tag="Fx4Depth" wheel-inc-value="0.01"/>
+<view class="CTextLabel" origin="1134, 720" size="52, 14" title="DRIVE" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="1141, 734" size="38, 38" control-tag="Fx4Drive" wheel-inc-value="0.01"/>
 </template><control-tags>
 <control-tag name="Mix" tag="1000"/>
 <control-tag name="InputTrim" tag="1001"/>
@@ -607,7 +640,7 @@
 <control-tag name="Spill" tag="1005"/>
 <control-tag name="Tempo" tag="1006"/>
 <control-tag name="MachineCondition" tag="1007"/>
-<control-tag name="WetFxType" tag="1008"/><control-tag name="WetFxAmount" tag="1009"/><control-tag name="WetFxRate" tag="1010"/><control-tag name="WetFxDepth" tag="1011"/><control-tag name="WetFxDrive" tag="1012"/><control-tag name="LoFiRoute" tag="1013"/>
+<control-tag name="Fx1Type" tag="1008"/><control-tag name="Fx1Amount" tag="1009"/><control-tag name="Fx1Rate" tag="1010"/><control-tag name="Fx1Depth" tag="1011"/><control-tag name="Fx1Drive" tag="1012"/><control-tag name="Fx1Route" tag="1013"/><control-tag name="Fx2Type" tag="1014"/><control-tag name="Fx2Amount" tag="1015"/><control-tag name="Fx2Rate" tag="1016"/><control-tag name="Fx2Depth" tag="1017"/><control-tag name="Fx2Drive" tag="1018"/><control-tag name="Fx2Route" tag="1019"/><control-tag name="Fx3Type" tag="1020"/><control-tag name="Fx3Amount" tag="1021"/><control-tag name="Fx3Rate" tag="1022"/><control-tag name="Fx3Depth" tag="1023"/><control-tag name="Fx3Drive" tag="1024"/><control-tag name="Fx3Route" tag="1025"/><control-tag name="Fx4Type" tag="1026"/><control-tag name="Fx4Amount" tag="1027"/><control-tag name="Fx4Rate" tag="1028"/><control-tag name="Fx4Depth" tag="1029"/><control-tag name="Fx4Drive" tag="1030"/><control-tag name="Fx4Route" tag="1031"/>
 <control-tag name="AAlgo" tag="1100"/>
 <control-tag name="AEnable" tag="1101"/>
 <control-tag name="ASync" tag="1102"/>
