@@ -4,15 +4,17 @@
 #include <cmath>
 
 namespace JerzyAudio {
-constexpr int kMXStateVersion=4;
+constexpr int kMXStateVersion=5;
 
 template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
     if(!b.writeInt32(kMXStateVersion)) return false;
     const double global[]={p.mix,p.inputTrim,p.outputTrim,p.routing,p.bypass,p.spill};
     for(double v:global) if(!b.writeFloat((float)v)) return false;
     if(!b.writeFloat((float)p.machineCondition)) return false;
-    const double wetfx[]={p.wetFxType,p.wetFxAmount,p.wetFxRate,p.wetFxDepth,p.wetFxDrive,p.loFiRoute};
-    for(double v:wetfx) if(!b.writeFloat((float)v)) return false;
+    for(const auto& fx:p.fx){
+        const double values[]={fx.type,fx.amount,fx.rate,fx.depth,fx.drive,fx.route};
+        for(double v:values) if(!b.writeFloat((float)v)) return false;
+    }
     for(int s=0;s<2;++s){
         const auto& x=p.slot[s];
         const double common[]={x.algorithm,x.enable,x.sync,x.division,x.time,x.feedback,x.level,x.pan,x.duck};
@@ -32,9 +34,17 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
     double* global[]={&p.mix,&p.inputTrim,&p.outputTrim,&p.routing,&p.bypass,&p.spill};
     for(auto* v:global) if(!rd(*v)) return false;
     if(version>=3){ if(!rd(p.machineCondition)) return false; } else p.machineCondition=0.0;
-    if(version>=4){
-        double* wetfx[]={&p.wetFxType,&p.wetFxAmount,&p.wetFxRate,&p.wetFxDepth,&p.wetFxDrive,&p.loFiRoute};
-        for(auto* v:wetfx) if(!rd(*v)) return false;
+    if(version>=5){
+        for(auto& fx:p.fx){
+            double* values[]={&fx.type,&fx.amount,&fx.rate,&fx.depth,&fx.drive,&fx.route};
+            for(auto* v:values) if(!rd(*v)) return false;
+        }
+    }else if(version>=4){
+        double legacy[6]{};
+        for(double& v:legacy) if(!rd(v)) return false;
+        p.fx[0].type=legacy[0]; p.fx[0].amount=legacy[1]; p.fx[0].rate=legacy[2];
+        p.fx[0].depth=legacy[3]; p.fx[0].drive=legacy[4];
+        p.fx[0].route = legacy[5]>.5 ? 0.0 : 1.0;
     }
     for(int s=0;s<2;++s){
         auto& x=p.slot[s];
