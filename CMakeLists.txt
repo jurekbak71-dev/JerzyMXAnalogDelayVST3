@@ -52,7 +52,7 @@ endif()
 if(BUILD_TESTING AND WIN32)
     target_sources(JerzyMXAnalogDelay2 PRIVATE tests/mxdelay_render_probe.cpp)
     add_executable(MXDelayGUITests
-        tests/mxdelay_gui_test.cpp
+        tests/native_gui_smoke.cpp
         ${JERZY_VST3_SDK_DIR}/public.sdk/source/vst/hosting/module_win32.cpp)
     target_compile_definitions(MXDelayGUITests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
     target_link_libraries(MXDelayGUITests PRIVATE sdk_hosting user32 ole32 shell32)
