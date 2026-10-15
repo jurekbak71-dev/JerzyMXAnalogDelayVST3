@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(JerzyMXAnalogDelay2 VERSION 2.1.2.0 DESCRIPTION "Jerzy MX Analog Delay 2 VST3")
+project(JerzyMXAnalogDelay2 VERSION 2.2.0.0 DESCRIPTION "Jerzy MX Analog Delay 2 VST3")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,6 +24,7 @@ smtg_enable_vst3_sdk()
 smtg_add_vst3plugin(JerzyMXAnalogDelay2
     source/mxdelay_version.h source/mxdelay_ids.h source/mxdelay_params.h source/mxdelay_mechanics.h source/mxdelay_state.h
     source/mxdelay_dsp.h source/mxdelay_processor.h source/mxdelay_processor.cpp
+    source/native_windows_editor.h
     source/mxdelay_editor_geometry.h source/mxdelay_editor.h source/mxdelay_editor.cpp
     source/jerzy_vst_gui_kit.h source/jerzy_vst_gui_kit.cpp
     source/mxdelay_gui_views.h source/mxdelay_gui_views.cpp
@@ -51,7 +52,7 @@ endif()
 if(BUILD_TESTING AND WIN32)
     target_sources(JerzyMXAnalogDelay2 PRIVATE tests/mxdelay_render_probe.cpp)
     add_executable(MXDelayGUITests
-        tests/mxdelay_gui_test.cpp
+        tests/native_gui_smoke.cpp
         ${JERZY_VST3_SDK_DIR}/public.sdk/source/vst/hosting/module_win32.cpp)
     target_compile_definitions(MXDelayGUITests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
     target_link_libraries(MXDelayGUITests PRIVATE sdk_hosting user32 ole32 shell32)
