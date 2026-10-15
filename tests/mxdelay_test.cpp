@@ -162,5 +162,31 @@ int main(){
         assert(std::isfinite(peak));assert(peak<5.0);assert(energy(yL,yR)>1e-3);
     }
 
+    // Automation extremes: feedback at maximum and fast tempo changes.
+    {
+        constexpr int K=4096;
+        std::vector<float> il(K),ir(K),ol(K),orr(K);
+        float *input[2]={il.data(),ir.data()},*output[2]={ol.data(),orr.data()};
+        p=MXDelayParams{};p.mix=1.0;p.slot[1].enable=0.0;
+        p.slot[0].algorithm=double((int)DelayAlgorithm::Volante)/double(kAlgorithmCount-1);
+        p.slot[0].sync=1.0;p.slot[0].division=0.5;
+        p.slot[0].feedback=1.0;
+        dsp.reset();
+        double integrated=0.0,maxPeak=0.0;
+        for(int block=0;block<180;++block){
+            std::fill(il.begin(),il.end(),0.f);
+            std::fill(ir.begin(),ir.end(),0.f);
+            if(block==0) il[0]=ir[0]=0.5f;
+            const double bpm=block<60?75.0:block<120?147.0:95.0;
+            dsp.process(input,output,2,K,p,bpm,peak);
+            assert(std::isfinite(peak));
+            maxPeak=std::max(maxPeak,peak);
+            for(int i=0;i<K;++i){
+                assert(std::isfinite(ol[i])&&std::isfinite(orr[i]));
+                integrated+=std::abs(ol[i])+std::abs(orr[i]);
+            }
+        }
+        assert(integrated>0.01 && maxPeak<8.0);
+    }
     return 0;
 }
