@@ -29,7 +29,13 @@ jobs:
           if (-not $plugin) { throw "JerzyMXAnalogDelay2.vst3 was not produced" }
           New-Item -ItemType Directory -Force artifact | Out-Null
           Copy-Item -Recurse -Force $plugin.FullName artifact/JerzyMXAnalogDelay2.vst3
-          Compress-Archive -Path artifact/JerzyMXAnalogDelay2.vst3 -DestinationPath JerzyMXAnalogDelay2_Windows_x64.zip -Force
+          # Ship the complete VST3 bundle. The UI's UIDescription must be present.
+          $bundle = "artifact/JerzyMXAnalogDelay2.vst3"
+          $resource = Join-Path $bundle "Contents/Resources/mxdelay.uidesc"
+          if (-not (Test-Path $resource)) { throw "VST3 GUI unavailable: missing mxdelay.uidesc" }
+          $module = Get-ChildItem $bundle -Recurse -File -Filter "JerzyMXAnalogDelay2.vst3" | Select-Object -First 1
+          if (-not $module) { throw "VST3 processor binary missing" }
+          Compress-Archive -Path $bundle -DestinationPath JerzyMXAnalogDelay2_Windows_x64.zip -Force
       - name: Collect GUI renders
         shell: pwsh
         run: |
@@ -49,7 +55,6 @@ jobs:
         with:
           name: JerzyMXAnalogDelay2-Windows-x64
           path: |
-            artifact/JerzyMXAnalogDelay2.vst3
             JerzyMXAnalogDelay2_Windows_x64.zip
           if-no-files-found: error
           retention-days: 90
