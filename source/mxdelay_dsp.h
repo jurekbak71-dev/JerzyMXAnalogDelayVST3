@@ -168,7 +168,8 @@ template<class T> class MXDelayDSP {
             const double targetMs=slotDelayMs(p,bpm);
             double ms=smooth(targetMs,delayMsSm,timeSmoothA);
             const double feedbackNorm=std::clamp(p.feedback,0.0,1.0);
-            const double feedbackGain=1.01*std::pow(feedbackNorm,2.20);
+            // Sub-unity feedback even at 100%, with more useful low-end knob resolution.
+            const double feedbackGain=0.965*std::pow(feedbackNorm,2.55);
             double fb=smooth(feedbackGain,feedbackSm,controlSmoothA);
             double level=smooth(std::clamp(p.level*1.25,0.0,1.25),levelSm,controlSmoothA);
             const double duckAmt=std::clamp(p.duck,0.0,1.0);
@@ -375,14 +376,19 @@ template<class T> class MXDelayDSP {
                 fbs.l=lowpass((T)(double(fbs.l)+noiseRng.bipolar()*.00012*damage),lpL,cutoff*(1.0-.24*damage));fbs.r=lowpass((T)(double(fbs.r)+noiseRng.bipolar()*.00010*damage),lpR,cutoff*(1.0-.22*damage));
             }
 
-            T recL=sat((T)(double(inL)+fb*double(fbs.l)),1.05,.01);
-            T recR=sat((T)(double(inR)+fb*double(fbs.r)),1.05,-.01);
+            // Keep bad upstream samples or automation from poisoning the feedback ring.
+            const double nextL=double(inL)+fb*double(fbs.l);
+            const double nextR=double(inR)+fb*double(fbs.r);
+            T recL=std::isfinite(nextL)?sat((T)std::clamp(nextL,-16.0,16.0),1.05,.01):T{};
+            T recR=std::isfinite(nextR)?sat((T)std::clamp(nextR,-16.0,16.0),1.05,-.01):T{};
             l[w]=recL;r[w]=recR;w=(w+1)%l.size();
 
             const double pan=std::clamp(p.pan*2-1.0,-1.0,1.0);
             const double gl=std::sqrt(.5*(1-pan))*1.41421356237,gr=std::sqrt(.5*(1+pan))*1.41421356237;
-            wet.l=(T)(double(wet.l)*level*duckGain*gl);
-            wet.r=(T)(double(wet.r)*level*duckGain*gr);
+            const double wL=double(wet.l)*level*duckGain*gl;
+            const double wR=double(wet.r)*level*duckGain*gr;
+            wet.l=std::isfinite(wL)?(T)std::clamp(wL,-8.0,8.0):T{};
+            wet.r=std::isfinite(wR)?(T)std::clamp(wR,-8.0,8.0):T{};
             return wet;
         }
     };
