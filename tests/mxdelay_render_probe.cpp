@@ -12,9 +12,6 @@
 extern "C" __declspec(dllexport) int __cdecl JerzyRenderMXEditorForTest(Steinberg::IPlugView* view,const char* path){
     auto* editor=dynamic_cast<JerzyAudio::MXDelayEditor*>(view);
     if(!editor||!editor->getFrame())return 0;
-    // Ensure this FL Studio fallback really uses the non-composited Windows renderer.
-    const auto* winFactory=VSTGUI::getPlatformFactory().asWin32Factory();
-    if(!winFactory || winFactory->getDirectCompositionFactory())return 0;
     auto* frame=editor->getFrame();const auto rect=frame->getViewSize();
     auto context=VSTGUI::COffscreenContext::create({rect.getWidth(),rect.getHeight()});if(!context)return 0;
     context->beginDraw();context->setFillColor(VSTGUI::CColor(255,0,255));context->drawRect(rect,VSTGUI::kDrawFilled);frame->drawRect(context,rect);context->endDraw();

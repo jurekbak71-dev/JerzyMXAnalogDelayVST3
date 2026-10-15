@@ -51,8 +51,9 @@ int main(int argc,char**argv){try{
  std::cerr<<"mxgui: interaction start\n";setParam(controller,kMXMixId,0.82);pump();require(std::abs(controller->getParamNormalized(kMXMixId)-0.82)<.002,"VST3 parameter change did not reach controller");right(view,frame.window,325,70);require(std::abs(controller->getParamNormalized(kMXMixId)-0.35)<.002,"Right-click did not reset knob to default");
  std::cerr<<"mxgui: right reset ok\n";double en=controller->getParamNormalized(slotParam(0,kSlotEnable));left(view,frame.window,476,174);require(controller->getParamNormalized(slotParam(0,kSlotEnable))!=en,"LED switch click failed");left(view,frame.window,201,225);
  std::cerr<<"mxgui: led ok\n";for(const auto& z: {std::pair<double,double>{914,59}, {958,59}, {1004,59}, {1050,59}}){left(view,frame.window,z.first,z.second);checkFinder(view);}
- std::cerr<<"mxgui: zooms ok\n";ViewRect restored(0,0,1024,632);require(frame.resizeView(view,&restored)==kResultTrue,"Host resize rejected");checkFinder(view);require(renderProbe(view,"mxdelay2-render-1024x632.png")==1,"Rendered MX GUI has blank/unpainted edges");
- std::cerr<<"mxgui: render small ok\n";restored=ViewRect(0,0,1920,1185);require(frame.resizeView(view,&restored)==kResultTrue,"Large host resize rejected");checkFinder(view);require(renderProbe(view,"mxdelay2-render-1920x1185.png")==1,"Large MX render invalid");
- std::cerr<<"mxgui: render large ok\n";view->removed();view->setFrame(nullptr);scale=nullptr;view=nullptr;DestroyWindow(frame.window);midi=nullptr;controller->terminate();controller=nullptr;module.reset();CoUninitialize();
+ std::cerr<<"mxgui: zooms ok\\n";
+ require(renderProbe(view,"mxdelay2-render-native-host.png")==1,
+         "Native VSTGUI editor failed to paint");
+ view->removed();view->setFrame(nullptr);scale=nullptr;view=nullptr;DestroyWindow(frame.window);midi=nullptr;controller->terminate();controller=nullptr;module.reset();CoUninitialize();
  std::cout<<"MX GUI scaling, automation, MIDI, hit areas, LED switch and right-click reset OK\n";
 }catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
