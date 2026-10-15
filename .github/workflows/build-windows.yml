@@ -35,7 +35,7 @@ jobs:
           if (-not (Test-Path $resource)) { throw "VST3 GUI unavailable: missing mxdelay.uidesc" }
           $module = Get-ChildItem $bundle -Recurse -File -Filter "JerzyMXAnalogDelay2.vst3" | Select-Object -First 1
           if (-not $module) { throw "VST3 processor binary missing" }
-          Compress-Archive -Path $bundle -DestinationPath JerzyMXAnalogDelay2_Windows_x64.zip -Force
+          # No inner ZIP: GitHub's artifact is already a ZIP containing the .vst3 directory.
       - name: Collect GUI renders
         shell: pwsh
         run: |
@@ -55,6 +55,6 @@ jobs:
         with:
           name: JerzyMXAnalogDelay2-Windows-x64
           path: |
-            JerzyMXAnalogDelay2_Windows_x64.zip
+            artifact
           if-no-files-found: error
           retention-days: 90
