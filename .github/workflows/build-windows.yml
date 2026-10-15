@@ -48,7 +48,9 @@ jobs:
         with:
           name: JerzyMXAnalogDelay2-GUI-Renders
           path: gui-renders/*.png
-          if-no-files-found: error
+          # Native Win32 GUI is verified by pixel assertions inside the GUI test;
+          # legacy VSTGUI PNG probes are no longer produced.
+          if-no-files-found: ignore
           retention-days: 90
       - name: Upload MX Analog Delay
         uses: actions/upload-artifact@v4
