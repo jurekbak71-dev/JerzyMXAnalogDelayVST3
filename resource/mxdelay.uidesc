@@ -554,19 +554,19 @@
 <view class="COptionMenu" origin="98, 79" size="76, 26" control-tag="ADiv" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
 
 <view class="CTextLabel" origin="182, 57" size="78, 18" title="TIME" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="184, 73" size="74, 74" control-tag="ATime" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="179, 66" size="84, 84" control-tag="ATime" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="181, 153" size="80, 18" control-tag="ATime" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="270, 57" size="78, 18" title="FEEDBACK" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="272, 73" size="74, 74" control-tag="AFeedback" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="267, 66" size="84, 84" control-tag="AFeedback" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="269, 153" size="80, 18" control-tag="AFeedback" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="358, 57" size="70, 18" title="LEVEL" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="356, 73" size="74, 74" control-tag="ALevel" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="362, 79" size="62, 62" control-tag="ALevel" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="354, 153" size="78, 18" control-tag="ALevel" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="443, 57" size="70, 18" title="PAN" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="441, 73" size="74, 74" control-tag="APan" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="447, 79" size="62, 62" control-tag="APan" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="439, 153" size="78, 18" control-tag="APan" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="528, 57" size="70, 18" title="DUCK" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="526, 73" size="74, 74" control-tag="ADuck" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="532, 79" size="62, 62" control-tag="ADuck" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="524, 153" size="78, 18" control-tag="ADuck" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="UIViewSwitchContainer" origin="20, 190" size="600, 328" template-names="A_Algo0,A_Algo1,A_Algo2,A_Algo3,A_Algo4,A_Algo5,A_Algo6,A_Algo7,A_Algo8" template-switch-control="AAlgo" animation-style="fade" animation-time="100"/>
 
@@ -585,19 +585,19 @@
 <view class="COptionMenu" origin="738, 79" size="76, 26" control-tag="BDiv" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
 
 <view class="CTextLabel" origin="822, 57" size="78, 18" title="TIME" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="824, 73" size="74, 74" control-tag="BTime" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="819, 66" size="84, 84" control-tag="BTime" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="821, 153" size="80, 18" control-tag="BTime" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="910, 57" size="78, 18" title="FEEDBACK" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="912, 73" size="74, 74" control-tag="BFeedback" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="907, 66" size="84, 84" control-tag="BFeedback" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="909, 153" size="80, 18" control-tag="BFeedback" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="998, 57" size="70, 18" title="LEVEL" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="996, 73" size="74, 74" control-tag="BLevel" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="1002, 79" size="62, 62" control-tag="BLevel" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="994, 153" size="78, 18" control-tag="BLevel" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="1083, 57" size="70, 18" title="PAN" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="1081, 73" size="74, 74" control-tag="BPan" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="1087, 79" size="62, 62" control-tag="BPan" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="1079, 153" size="78, 18" control-tag="BPan" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="1168, 57" size="70, 18" title="DUCK" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="1166, 73" size="74, 74" control-tag="BDuck" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="ChickenKnob" origin="1172, 79" size="62, 62" control-tag="BDuck" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="1164, 153" size="78, 18" control-tag="BDuck" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="UIViewSwitchContainer" origin="660, 190" size="600, 328" template-names="B_Algo0,B_Algo1,B_Algo2,B_Algo3,B_Algo4,B_Algo5,B_Algo6,B_Algo7,B_Algo8" template-switch-control="BAlgo" animation-style="fade" animation-time="100"/>
 
