@@ -8,6 +8,7 @@ public:
     void valueChanged(VSTGUI::CControl* control) override;
     void onMouseEvent(VSTGUI::MouseEvent& event, VSTGUI::CFrame* frame) override;
 protected:
+    VSTGUI::CView* verifyView(VSTGUI::CView*,const VSTGUI::UIAttributes&,const VSTGUI::IUIDescription*) override;
     void PLUGIN_API close() override;
     bool PLUGIN_API open(void* parent,const VSTGUI::PlatformType& type) override;
 #ifdef VST3_CONTENT_SCALE_SUPPORT
@@ -21,6 +22,8 @@ private:
     NativeResizeWatcher* nativeWatcher=nullptr;
     bool applyingSize=false;
     double userZoom=1.0;
+    int consolePage=0; // Editor-local navigation; never an audio parameter or preset field.
+    void selectConsolePage(int page);
     void fitHostSize(const Steinberg::ViewRect& size);
     void applyZoom(double factor);
 };

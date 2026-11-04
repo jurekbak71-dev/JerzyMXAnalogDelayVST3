@@ -19,6 +19,7 @@ struct JerzyGuiTheme {
 const JerzyGuiTheme& jerzyThemePetrol();
 const JerzyGuiTheme& jerzyThemeBrass();
 const JerzyGuiTheme& jerzyThemeSteel();
+const JerzyGuiTheme& jerzyThemeConsole();
 const JerzyGuiTheme& jerzyThemeBurgundy();
 const JerzyGuiTheme& jerzyThemeViolet();
 

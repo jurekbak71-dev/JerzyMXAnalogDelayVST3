@@ -87,6 +87,12 @@ const JerzyGuiTheme& jerzyThemeSteel(){
         CColor(115,200,232),CColor(216,229,233),CColor(117,142,156),CColor(83,220,118),CColor(115,200,232)};
     return t;
 }
+const JerzyGuiTheme& jerzyThemeConsole(){
+    static const JerzyGuiTheme t{
+        CColor(83,84,86),CColor(29,30,32),CColor(47,48,50),CColor(15,16,18),
+        CColor(241,166,73),CColor(232,237,240),CColor(139,144,148),CColor(68,220,96),CColor(241,166,73)};
+    return t;
+}
 const JerzyGuiTheme& jerzyThemeBurgundy(){
     static const JerzyGuiTheme t{
         CColor(110,37,33),CColor(22,12,10),CColor(53,24,21),CColor(28,13,12),

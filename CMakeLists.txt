@@ -3,6 +3,9 @@ project(JerzyMXAnalogDelay2 VERSION 2.1.2.0 DESCRIPTION "Jerzy MX Analog Delay 2
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+option(JERZY_BUILD_PLUGIN "Build the native VST3 and editor (OFF for portable DSP/state tests)" ON)
+
+if(JERZY_BUILD_PLUGIN)
 
 set(VST3_SDK_ROOT "" CACHE PATH "Path to a recursively cloned Steinberg vst3sdk")
 if(VST3_SDK_ROOT AND EXISTS "${VST3_SDK_ROOT}/CMakeLists.txt")
@@ -12,7 +15,7 @@ else()
     include(FetchContent)
     FetchContent_Declare(vst3sdk
         GIT_REPOSITORY https://github.com/steinbergmedia/vst3sdk.git
-        GIT_TAG master
+        GIT_TAG 3cdf9ca5d1f5b1b21e0a86832aa4abe55607bd96
         GIT_SHALLOW TRUE
         GIT_SUBMODULES_RECURSE TRUE)
     FetchContent_MakeAvailable(vst3sdk)
@@ -30,7 +33,12 @@ smtg_add_vst3plugin(JerzyMXAnalogDelay2
     source/mxdelay_controller.h source/mxdelay_controller.cpp
     source/mxdelay_entry.cpp resource/mxdelay.uidesc
 )
-target_link_libraries(JerzyMXAnalogDelay2 PRIVATE sdk vstgui_support)
+if(UNIX AND NOT APPLE)
+    # VSTGUI references the SDK factory IID; static archives need a rescan on ELF.
+    target_link_libraries(JerzyMXAnalogDelay2 PRIVATE "$<LINK_GROUP:RESCAN,sdk,vstgui_support>")
+else()
+    target_link_libraries(JerzyMXAnalogDelay2 PRIVATE sdk vstgui_support)
+endif()
 if(WIN32)
     target_link_libraries(JerzyMXAnalogDelay2 PRIVATE comctl32)
 endif()
@@ -41,14 +49,24 @@ if(SMTG_MAC)
     smtg_target_set_bundle(JerzyMXAnalogDelay2 BUNDLE_IDENTIFIER "pl.jerzyaudio.mxanalogdelay2" COMPANY_NAME "Jerzy Audio")
 endif()
 
+endif() # JERZY_BUILD_PLUGIN
 include(CTest)
 if(BUILD_TESTING)
     add_executable(MXDelayDSPTests tests/mxdelay_test.cpp)
     target_include_directories(MXDelayDSPTests PRIVATE source)
     add_test(NAME MXDelayDSP COMMAND MXDelayDSPTests)
+    add_executable(MXDelayCompatibilityTests tests/mxdelay_compatibility_test.cpp)
+    target_include_directories(MXDelayCompatibilityTests PRIVATE source)
+    add_test(NAME MXDelayCompatibility COMMAND MXDelayCompatibilityTests)
+    # DSP tests use assert; Release must execute the same checks as Debug.
+    if(MSVC)
+        target_compile_options(MXDelayDSPTests PRIVATE /UNDEBUG)
+    else()
+        target_compile_options(MXDelayDSPTests PRIVATE -UNDEBUG)
+    endif()
 endif()
 
-if(BUILD_TESTING AND WIN32)
+if(BUILD_TESTING AND WIN32 AND JERZY_BUILD_PLUGIN)
     target_sources(JerzyMXAnalogDelay2 PRIVATE tests/mxdelay_render_probe.cpp)
     add_executable(MXDelayGUITests
         tests/mxdelay_gui_test.cpp
@@ -58,4 +76,15 @@ if(BUILD_TESTING AND WIN32)
     add_dependencies(MXDelayGUITests JerzyMXAnalogDelay2)
     add_test(NAME MXDelayGUI COMMAND MXDelayGUITests $<TARGET_FILE:JerzyMXAnalogDelay2>)
     set_tests_properties(MXDelayGUI PROPERTIES TIMEOUT 90)
+endif()
+
+if(BUILD_TESTING AND UNIX AND NOT APPLE AND JERZY_BUILD_PLUGIN)
+    find_package(X11 REQUIRED)
+    add_executable(MXDelayConsoleLinuxTests tests/mxdelay_console_linux_test.cpp
+        ${JERZY_VST3_SDK_DIR}/public.sdk/source/vst/hosting/module_linux.cpp)
+    target_include_directories(MXDelayConsoleLinuxTests PRIVATE source ${X11_INCLUDE_DIR})
+    target_link_libraries(MXDelayConsoleLinuxTests PRIVATE sdk_hosting ${X11_LIBRARIES})
+    add_dependencies(MXDelayConsoleLinuxTests JerzyMXAnalogDelay2)
+    add_test(NAME MXDelayConsoleLinux COMMAND MXDelayConsoleLinuxTests $<TARGET_FILE_DIR:JerzyMXAnalogDelay2>/../..)
+    set_tests_properties(MXDelayConsoleLinux PROPERTIES TIMEOUT 90)
 endif()
