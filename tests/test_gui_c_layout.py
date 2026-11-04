@@ -10,8 +10,8 @@ assert all(f"{side}_Algo{i}" in templates for side in "AB" for i in range(9))
 for side in "AB":
     for i in range(9):
         template = templates[f"{side}_Algo{i}"]
-        assert template.find("view[@class='HardwarePanel']") is not None, (
-            f"{side}_Algo{i}: missing modular hardware surface"
+        assert template.find("view[@class='ConsoleInsetPanel']") is not None, (
+            f"{side}_Algo{i}: missing recessed modular surface"
         )
 main = templates["view"]
 tags = {v.attrib.get("control-tag") for v in main.iter("view")}
