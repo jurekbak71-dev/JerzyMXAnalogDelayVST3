@@ -16,7 +16,7 @@ template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
         for(double v:values) if(!b.writeFloat((float)v)) return false;
     }
     for(int s=0;s<2;++s){
-        const auto& x=decoded.slot[s];
+        const auto& x=p.slot[s];
         const double common[]={x.algorithm,x.enable,x.sync,x.division,x.time,x.feedback,x.level,x.pan,x.duck};
         for(double v:common) if(!b.writeFloat((float)v)) return false;
         for(int a=0;a<kAlgorithmCount;++a) for(int c=0;c<kAlgoControls;++c)
@@ -49,7 +49,7 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
         decoded.fx[0].route = legacy[5]>.5 ? 0.0 : 1.0;
     }
     for(int s=0;s<2;++s){
-        auto& x=p.slot[s];
+        auto& x=decoded.slot[s];
         double* common[]={&x.algorithm,&x.enable,&x.sync,&x.division,&x.time,&x.feedback,&x.level,&x.pan,&x.duck};
         for(auto* v:common) if(!rd(*v)) return false;
         if(version<4){const int oldIndex=std::clamp((int)std::lround(x.algorithm*6.0),0,6);x.algorithm=double(oldIndex)/double(kAlgorithmCount-1);}
