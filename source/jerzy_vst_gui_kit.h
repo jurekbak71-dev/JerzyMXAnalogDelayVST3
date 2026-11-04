@@ -77,6 +77,13 @@ public:
     void draw(VSTGUI::CDrawContext*) override;
 };
 
+// Recessed, screw-free surface for densely populated algorithm modules.
+class JerzyConsoleInsetPanel : public JerzyHardwarePanel {
+public:
+    using JerzyHardwarePanel::JerzyHardwarePanel;
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
 class JerzyChassis : public VSTGUI::CKnob {
 public:
     JerzyChassis(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
