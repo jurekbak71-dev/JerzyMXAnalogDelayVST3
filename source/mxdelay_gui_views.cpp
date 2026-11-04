@@ -26,6 +26,7 @@ SimpleCreator<LedToggleSwitch> ledToggle("LedToggleSwitch");
 SimpleCreator<LedThreeWaySwitch> ledThree("LedThreeWaySwitch");
 SimpleCreator<BypassButton> bypass("BypassButton");
 SimpleCreator<HardwarePanel> panel("HardwarePanel");
+SimpleCreator<ConsoleInsetPanel> insetPanel("ConsoleInsetPanel");
 SimpleCreator<OxidizedPanel> oxidePanel("OxidizedPanel");
 }
 
