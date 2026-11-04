@@ -32,7 +32,11 @@ void setParam(IEditController* controller,ParamID id,double value){
 }
 void checkFinder(IPlugView*view){
  FUnknownPtr<IParameterFinder> finder(view);require(finder!=nullptr,"No IParameterFinder");auto r=sizeOf(view);ParamID id=0;
- auto find=[&](double x,double y,ParamID expected){require(finder->findParameter((int32)std::lround(x*r.getWidth()/1280.0),(int32)std::lround(y*r.getHeight()/790.0),id)==kResultTrue&&id==expected,"Scaled hit area mismatch");};
+ auto find=[&](double x,double y,ParamID expected){
+  const auto result=finder->findParameter((int32)std::lround(x*r.getWidth()/1280.0),(int32)std::lround(y*r.getHeight()/790.0),id);
+  if(result!=kResultTrue||id!=expected)std::cerr<<"Finder at "<<x<<","<<y<<" size "<<r.getWidth()<<"x"<<r.getHeight()<<" expected "<<expected<<" actual "<<id<<" result "<<result<<"\n";
+  require(result==kResultTrue&&id==expected,"Scaled hit area mismatch");
+ };
  find(325,738,kMXMixId);find(103,528,slotParam(0,kSlotHeadPan1));find(221,255,slotParam(0,kSlotTime));find(309,255,slotParam(0,kSlotFeedback));
 }
 int main(int argc,char**argv){try{
