@@ -131,6 +131,7 @@ bool PLUGIN_API MXDelayEditor::open(void* parent,const VSTGUI::PlatformType& typ
     });
 #endif
     if(!VSTGUI::VST3Editor::open(parent,type))return false;
+    selectConsolePage(consolePage);
     fitHostSize(getRect());
 #if defined(_WIN32)
     delete nativeWatcher;
@@ -209,7 +210,11 @@ void MXDelayEditor::onMouseEvent(VSTGUI::MouseEvent& event,VSTGUI::CFrame* frame
 }
 void MXDelayEditor::valueChanged(VSTGUI::CControl* control){
     if(control&&control->getTag()>=firstConsoleTab&&control->getTag()<=lastConsoleTab){
-        selectConsolePage(control->getTag()-firstConsoleTab);
+        // VSTGUI also reports zero-valued initialization/tag-binding changes.
+        // Only a selected button requests navigation; clicking the current tab
+        // keeps it selected rather than leaving the console without an active tab.
+        if(control->getValueNormalized()>.5f)selectConsolePage(control->getTag()-firstConsoleTab);
+        else if(control->getTag()-firstConsoleTab==consolePage)control->setValueNormalized(1.f);
         return;
     }
     if(control&&control->getTag()>=9101&&control->getTag()<=9104){
