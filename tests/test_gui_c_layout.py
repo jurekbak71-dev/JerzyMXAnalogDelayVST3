@@ -39,6 +39,6 @@ for chassis_x, deck_x, time_tag in (("8, 0", "20, 50", "ATime"),
     knob = next(i for i, v in enumerate(children)
                 if v.attrib.get("control-tag") == time_tag)
     assert chassis < deck < knob, f"{time_tag}: incorrect drawing order"
-    assert children[knob].attrib["size"] == "74, 74", "Primary knob hierarchy regressed"
+    assert children[knob].attrib["size"] == "84, 84", "Primary knob hierarchy regressed"
 assert main.find("view[@gui-c-page='0']").attrib["origin"] == "0, 120"
 print("GUI C primary knob sizing and paint order passed")
