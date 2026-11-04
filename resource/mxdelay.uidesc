@@ -539,16 +539,10 @@
 <view class="CTextLabel" origin="300, 79" size="920, 18" title="TWO INDEPENDENT DELAY ENGINES   /   SERIES · PARALLEL · SPLIT L/R" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="CTextLabel" origin="300, 99" size="920, 14" title="Right-click: neutral reset   /   Shift: fine adjust" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="CViewContainer" origin="0, 120" size="1280, 562" transparent="true" gui-c-page="0" visible="true">
-<!-- Shared display bays and large-primary-control decks; all bound controls remain unchanged. -->
-<view class="CViewContainer" origin="20, 50" size="600, 130" back-color="PanelGlass" transparent="false" mouse-enabled="false"/>
-<view class="CViewContainer" origin="660, 50" size="600, 130" back-color="PanelGlass" transparent="false" mouse-enabled="false"/>
-<view class="CViewContainer" origin="20, 51" size="600, 2" back-color="Copper" transparent="false" mouse-enabled="false"/>
-<view class="CViewContainer" origin="660, 51" size="600, 2" back-color="Blue" transparent="false" mouse-enabled="false"/>
-<!-- Independent color identity and signal-flow spine: no new parameter bindings. -->
-<view class="CViewContainer" origin="20, 46" size="600, 3" back-color="Copper" transparent="false" mouse-enabled="false"/>
-<view class="CViewContainer" origin="660, 46" size="600, 3" back-color="Blue" transparent="false" mouse-enabled="false"/>
 <!-- ENGINE A -->
 <view class="HardwarePanel" origin="8, 0" size="624, 562" mouse-enabled="false"/>
+<view class="CViewContainer" origin="20, 50" size="600, 130" back-color="PanelGlass" transparent="false" mouse-enabled="false"/>
+<view class="CViewContainer" origin="20, 51" size="600, 2" back-color="Copper" transparent="false" mouse-enabled="false"/>
 <view class="CTextLabel" origin="28, 12" size="175, 25" title="A  /  DELAY ENGINE" font="Title" font-color="Amber" transparent="true" mouse-enabled="false"/>
 <view class="COptionMenu" origin="214, 10" size="220, 30" control-tag="AAlgo" font="Section" font-color="Cream" back-color="ValueBack" frame-color="Amber" frame-width="1"/>
 <view class="LedToggleSwitch" origin="452, 2" size="48, 48" control-tag="AEnable"/>
@@ -578,6 +572,8 @@
 
 <!-- ENGINE B -->
 <view class="HardwarePanel" origin="648, 0" size="624, 562" mouse-enabled="false"/>
+<view class="CViewContainer" origin="660, 50" size="600, 130" back-color="PanelGlass" transparent="false" mouse-enabled="false"/>
+<view class="CViewContainer" origin="660, 51" size="600, 2" back-color="Blue" transparent="false" mouse-enabled="false"/>
 <view class="CTextLabel" origin="668, 12" size="175, 25" title="B  /  DELAY ENGINE" font="Title" font-color="Blue" transparent="true" mouse-enabled="false"/>
 <view class="COptionMenu" origin="854, 10" size="220, 30" control-tag="BAlgo" font="Section" font-color="Cream" back-color="ValueBack" frame-color="Blue" frame-width="1"/>
 <view class="LedToggleSwitch" origin="1092, 2" size="48, 48" control-tag="BEnable"/>
