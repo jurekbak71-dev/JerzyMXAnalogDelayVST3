@@ -153,6 +153,19 @@ void JerzyHardwarePanel::draw(CDrawContext* c){
     const auto& t=getJerzyGuiTheme();const CRect r(getViewSize());c->setDrawMode(kAntiAliasing|kNonIntegralMode);gradientRect(c,r,t.panelTop,t.panelBottom);c->setFrameColor(t.accent);c->setLineWidth(1.2);c->drawRect(r,kDrawStroked);CRect inner(r);inner.inset(4,4);c->setFrameColor(t.edge);c->setLineWidth(1);c->drawRect(inner,kDrawStroked);
     const CPoint screws[4]={{r.left+10,r.top+10},{r.right-10,r.top+10},{r.left+10,r.bottom-10},{r.right-10,r.bottom-10}};for(const auto& p:screws){ellipse(c,p.x+1,p.y+1,5.5,CColor(0,0,0,120),CColor(0,0,0,80));ellipse(c,p.x,p.y,4.8,CColor(114,113,100),CColor(210,198,166));c->setFrameColor(CColor(37,36,32));c->setLineWidth(1.2);c->drawLine({p.x-3,p.y+2},{p.x+3,p.y-2});}setDirty(false);
 }
+void JerzyConsoleInsetPanel::draw(CDrawContext* c){
+    const CRect r(getViewSize());
+    c->setDrawMode(kAntiAliasing|kNonIntegralMode);
+    gradientRect(c,r,CColor(29,32,36),CColor(20,23,27));
+    // A machined inset with quiet edges, rather than four ornamental screws.
+    c->setFrameColor(CColor(7,9,11));c->setLineWidth(2.0);
+    c->drawLine({r.left,r.top},{r.right,r.top});
+    c->drawLine({r.left,r.top},{r.left,r.bottom});
+    c->setFrameColor(CColor(112,117,122,115));c->setLineWidth(1.0);
+    c->drawLine({r.left+1,r.bottom-1},{r.right-1,r.bottom-1});
+    c->drawLine({r.right-1,r.top+1},{r.right-1,r.bottom-1});
+    setDirty(false);
+}
 JerzyChassis::JerzyChassis(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
 void JerzyChassis::draw(CDrawContext* c){
     const auto& t=getJerzyGuiTheme();const CRect r(getViewSize());c->setDrawMode(kAntiAliasing|kNonIntegralMode);gradientRect(c,r,t.chassisTop,t.chassisBottom);
