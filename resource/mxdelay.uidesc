@@ -522,9 +522,9 @@
 </template>
 <template name="view" class="CViewContainer" origin="0, 0" size="1280, 790" minSize="768, 474" maxSize="2048, 1264" back-color="Black" transparent="false" tooltip="Jerzy MX Analog Delay 2 - Modular Console visual rework">
 <view class="OxidizedPanel" origin="0, 0" size="1280, 790" mouse-enabled="false"/>
-<view class="HardwarePanel" origin="8, 8" size="1264, 132" mouse-enabled="false"/>
-<view class="CTextLabel" origin="28, 22" size="250, 30" title="MX DELAY 2" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
-<view class="CTextLabel" origin="28, 57" size="250, 24" title="MODULAR CONSOLE  /  DUAL ENGINE" font="Section" font-color="Amber" transparent="true" mouse-enabled="false"/>
+<view class="HardwarePanel" origin="8, 8" size="1264, 104" mouse-enabled="false"/>
+<view class="CTextLabel" origin="28, 20" size="250, 30" title="MX DELAY 2" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="28, 55" size="260, 22" title="MODULAR CONSOLE  /  DUAL ENGINE" font="Section" font-color="Amber" transparent="true" mouse-enabled="false"/>
 <view class="CTextButton" origin="300, 24" size="132, 32" title="A/B" font="Section" control-tag="GuiPage0" text-color="Cream" text-color-highlighted="Amber" frame-color="Border" frame-width="1" round-radius="3" kick-style="false" transparent="false"/>
 <view class="CTextButton" origin="440, 24" size="132, 32" title="FX" font="Section" control-tag="GuiPage1" text-color="Cream" text-color-highlighted="Amber" frame-color="Border" frame-width="1" round-radius="3" kick-style="false" transparent="false"/>
 <view class="CTextButton" origin="580, 24" size="132, 32" title="REVERB" font="Section" control-tag="GuiPage2" text-color="Cream" text-color-highlighted="Amber" frame-color="Border" frame-width="1" round-radius="3" kick-style="false" transparent="false"/>
@@ -536,14 +536,19 @@
 <view class="CTextButton" origin="1029, 47" size="42, 24" title="150%" font="Value" control-tag="9104" text-color="Cream" text-color-highlighted="Amber" frame-color="Border" frame-width="1" round-radius="5" kick-style="true" transparent="true"/>
 <view class="CTextLabel" origin="1120, 23" size="88, 18" title="HOST BPM" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="1120, 51" size="76, 24" control-tag="Tempo" font="Section" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
-<view class="CTextLabel" origin="300, 86" size="920, 24" title="TWO INDEPENDENT DELAY ENGINES   /   SERIES · PARALLEL · SPLIT L/R" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
-<view class="CTextLabel" origin="300, 111" size="920, 20" title="A/B  ·  FX CHAIN  ·  REVERB  ·  ROUTING     |     Right-click: reset  ·  Shift: fine" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
-<view class="CViewContainer" origin="0, 148" size="1280, 534" transparent="true" gui-c-page="0" visible="true">
+<view class="CTextLabel" origin="300, 79" size="920, 18" title="TWO INDEPENDENT DELAY ENGINES   /   SERIES · PARALLEL · SPLIT L/R" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="300, 99" size="920, 14" title="Right-click: neutral reset   /   Shift: fine adjust" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CViewContainer" origin="0, 120" size="1280, 562" transparent="true" gui-c-page="0" visible="true">
+<!-- Shared display bays and large-primary-control decks; all bound controls remain unchanged. -->
+<view class="CViewContainer" origin="20, 50" size="600, 130" back-color="PanelGlass" transparent="false" mouse-enabled="false"/>
+<view class="CViewContainer" origin="660, 50" size="600, 130" back-color="PanelGlass" transparent="false" mouse-enabled="false"/>
+<view class="CViewContainer" origin="20, 51" size="600, 2" back-color="Copper" transparent="false" mouse-enabled="false"/>
+<view class="CViewContainer" origin="660, 51" size="600, 2" back-color="Blue" transparent="false" mouse-enabled="false"/>
 <!-- Independent color identity and signal-flow spine: no new parameter bindings. -->
 <view class="CViewContainer" origin="20, 46" size="600, 3" back-color="Copper" transparent="false" mouse-enabled="false"/>
 <view class="CViewContainer" origin="660, 46" size="600, 3" back-color="Blue" transparent="false" mouse-enabled="false"/>
 <!-- ENGINE A -->
-<view class="HardwarePanel" origin="8, 0" size="624, 534" mouse-enabled="false"/>
+<view class="HardwarePanel" origin="8, 0" size="624, 562" mouse-enabled="false"/>
 <view class="CTextLabel" origin="28, 12" size="175, 25" title="A  /  DELAY ENGINE" font="Title" font-color="Amber" transparent="true" mouse-enabled="false"/>
 <view class="COptionMenu" origin="214, 10" size="220, 30" control-tag="AAlgo" font="Section" font-color="Cream" back-color="ValueBack" frame-color="Amber" frame-width="1"/>
 <view class="LedToggleSwitch" origin="452, 2" size="48, 48" control-tag="AEnable"/>
@@ -555,24 +560,24 @@
 <view class="COptionMenu" origin="98, 79" size="76, 26" control-tag="ADiv" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
 
 <view class="CTextLabel" origin="182, 57" size="78, 18" title="TIME" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="189, 75" size="64, 64" control-tag="ATime" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="181, 140" size="80, 18" control-tag="ATime" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="184, 73" size="74, 74" control-tag="ATime" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="181, 153" size="80, 18" control-tag="ATime" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="270, 57" size="78, 18" title="FEEDBACK" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="277, 75" size="64, 64" control-tag="AFeedback" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="269, 140" size="80, 18" control-tag="AFeedback" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="272, 73" size="74, 74" control-tag="AFeedback" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="269, 153" size="80, 18" control-tag="AFeedback" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="358, 57" size="70, 18" title="LEVEL" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="361, 75" size="64, 64" control-tag="ALevel" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="354, 140" size="78, 18" control-tag="ALevel" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="356, 73" size="74, 74" control-tag="ALevel" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="354, 153" size="78, 18" control-tag="ALevel" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="443, 57" size="70, 18" title="PAN" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="446, 75" size="64, 64" control-tag="APan" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="439, 140" size="78, 18" control-tag="APan" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="441, 73" size="74, 74" control-tag="APan" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="439, 153" size="78, 18" control-tag="APan" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="528, 57" size="70, 18" title="DUCK" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="531, 75" size="64, 64" control-tag="ADuck" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="524, 140" size="78, 18" control-tag="ADuck" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="526, 73" size="74, 74" control-tag="ADuck" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="524, 153" size="78, 18" control-tag="ADuck" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="UIViewSwitchContainer" origin="20, 190" size="600, 328" template-names="A_Algo0,A_Algo1,A_Algo2,A_Algo3,A_Algo4,A_Algo5,A_Algo6,A_Algo7,A_Algo8" template-switch-control="AAlgo" animation-style="fade" animation-time="100"/>
 
 <!-- ENGINE B -->
-<view class="HardwarePanel" origin="648, 0" size="624, 534" mouse-enabled="false"/>
+<view class="HardwarePanel" origin="648, 0" size="624, 562" mouse-enabled="false"/>
 <view class="CTextLabel" origin="668, 12" size="175, 25" title="B  /  DELAY ENGINE" font="Title" font-color="Blue" transparent="true" mouse-enabled="false"/>
 <view class="COptionMenu" origin="854, 10" size="220, 30" control-tag="BAlgo" font="Section" font-color="Cream" back-color="ValueBack" frame-color="Blue" frame-width="1"/>
 <view class="LedToggleSwitch" origin="1092, 2" size="48, 48" control-tag="BEnable"/>
@@ -584,20 +589,20 @@
 <view class="COptionMenu" origin="738, 79" size="76, 26" control-tag="BDiv" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Border" frame-width="1"/>
 
 <view class="CTextLabel" origin="822, 57" size="78, 18" title="TIME" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="829, 75" size="64, 64" control-tag="BTime" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="821, 140" size="80, 18" control-tag="BTime" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="824, 73" size="74, 74" control-tag="BTime" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="821, 153" size="80, 18" control-tag="BTime" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="910, 57" size="78, 18" title="FEEDBACK" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="917, 75" size="64, 64" control-tag="BFeedback" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="909, 140" size="80, 18" control-tag="BFeedback" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="912, 73" size="74, 74" control-tag="BFeedback" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="909, 153" size="80, 18" control-tag="BFeedback" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="998, 57" size="70, 18" title="LEVEL" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="1001, 75" size="64, 64" control-tag="BLevel" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="994, 140" size="78, 18" control-tag="BLevel" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="996, 73" size="74, 74" control-tag="BLevel" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="994, 153" size="78, 18" control-tag="BLevel" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="1083, 57" size="70, 18" title="PAN" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="1086, 75" size="64, 64" control-tag="BPan" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="1079, 140" size="78, 18" control-tag="BPan" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="1081, 73" size="74, 74" control-tag="BPan" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="1079, 153" size="78, 18" control-tag="BPan" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="1168, 57" size="70, 18" title="DUCK" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="1171, 75" size="64, 64" control-tag="BDuck" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="1164, 140" size="78, 18" control-tag="BDuck" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="1166, 73" size="74, 74" control-tag="BDuck" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="1164, 153" size="78, 18" control-tag="BDuck" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="UIViewSwitchContainer" origin="660, 190" size="600, 328" template-names="B_Algo0,B_Algo1,B_Algo2,B_Algo3,B_Algo4,B_Algo5,B_Algo6,B_Algo7,B_Algo8" template-switch-control="BAlgo" animation-style="fade" animation-time="100"/>
 
 
@@ -692,7 +697,7 @@
 <view class="CTextLabel" origin="560, 702" size="210, 22" title="FX CHAIN" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="CTextLabel" origin="560, 737" size="230, 22" title="01 FILTER   02 DRIVE   03 MOD   04 LO-FI" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="CTextLabel" origin="810, 702" size="240, 22" title="REVERB" font="Section" font-color="Amber" transparent="true" mouse-enabled="false"/>
-<view class="CTextLabel" origin="810, 737" size="240, 22" title="INDEPENDENT ENGINE  /  IN DEVELOPMENT" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="810, 737" size="240, 22" title="ALGORITHMIC / IR / HYBRID — PLANNED" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 </template><control-tags>
 <control-tag name="GuiPage0" tag="9200"/>
 <control-tag name="GuiPage1" tag="9201"/>
