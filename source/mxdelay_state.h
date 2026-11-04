@@ -27,27 +27,29 @@ template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
 }
 
 template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
-    p=MXDelayParams{};
+    // Decode into a temporary state. A corrupt or truncated preset must not
+    // partially overwrite the live plug-in parameters.
+    MXDelayParams decoded{};
     int32_t version=0; if(!b.readInt32(version)) return false;
     if(version<1 || version>kMXStateVersion) return false;
     auto rd=[&](double& v){ float x=0; if(!b.readFloat(x)||!std::isfinite(x)) return false; v=std::clamp((double)x,0.0,1.0); return true; };
-    double* global[]={&p.mix,&p.inputTrim,&p.outputTrim,&p.routing,&p.bypass,&p.spill};
+    double* global[]={&decoded.mix,&decoded.inputTrim,&decoded.outputTrim,&decoded.routing,&decoded.bypass,&decoded.spill};
     for(auto* v:global) if(!rd(*v)) return false;
-    if(version>=3){ if(!rd(p.machineCondition)) return false; } else p.machineCondition=0.0;
+    if(version>=3){ if(!rd(decoded.machineCondition)) return false; } else decoded.machineCondition=0.0;
     if(version>=5){
-        for(auto& fx:p.fx){
+        for(auto& fx:decoded.fx){
             double* values[]={&fx.type,&fx.amount,&fx.rate,&fx.depth,&fx.drive,&fx.route};
             for(auto* v:values) if(!rd(*v)) return false;
         }
     }else if(version>=4){
         double legacy[6]{};
         for(double& v:legacy) if(!rd(v)) return false;
-        p.fx[0].type=legacy[0]; p.fx[0].amount=legacy[1]; p.fx[0].rate=legacy[2];
-        p.fx[0].depth=legacy[3]; p.fx[0].drive=legacy[4];
-        p.fx[0].route = legacy[5]>.5 ? 0.0 : 1.0;
+        decoded.fx[0].type=legacy[0]; decoded.fx[0].amount=legacy[1]; decoded.fx[0].rate=legacy[2];
+        decoded.fx[0].depth=legacy[3]; decoded.fx[0].drive=legacy[4];
+        decoded.fx[0].route = legacy[5]>.5 ? 0.0 : 1.0;
     }
     for(int s=0;s<2;++s){
-        auto& x=p.slot[s];
+        auto& x=decoded.slot[s];
         double* common[]={&x.algorithm,&x.enable,&x.sync,&x.division,&x.time,&x.feedback,&x.level,&x.pan,&x.duck};
         for(auto* v:common) if(!rd(*v)) return false;
         if(version<4){const int oldIndex=std::clamp((int)std::lround(x.algorithm*6.0),0,6);x.algorithm=double(oldIndex)/double(kAlgorithmCount-1);}
@@ -55,6 +57,7 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
         for(int a=0;a<storedAlgorithms;++a) for(int c=0;c<kAlgoControls;++c) if(!rd(x.c[a][c])) return false;
         if(version>=2) for(auto& v:x.headPan) if(!rd(v)) return false;
     }
+    p=decoded;
     return true;
 }
 }

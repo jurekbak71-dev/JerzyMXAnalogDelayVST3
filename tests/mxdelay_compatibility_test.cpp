@@ -47,12 +47,15 @@ void stateChecks(){
         Stream again;check(writeMXState(again,restored)&&again.bytes==saved.bytes,"round trip bytes changed");
         for(size_t length=0;length<fixture.bytes.size();++length){
             Stream cut;cut.bytes.assign(fixture.bytes.begin(),fixture.bytes.begin()+length);
-            MXDelayParams q;check(!readMXState(cut,q),"truncated state accepted");
+            MXDelayParams q;q.mix=.91;q.slot[0].feedback=.13;q.fx[0].amount=.77;
+            Stream before;check(writeMXState(before,q),"sentinel serialization failed");
+            check(!readMXState(cut,q),"truncated state accepted");
+            Stream after;check(writeMXState(after,q)&&before.bytes==after.bytes,"truncated state mutated live parameters");
         }
     }
-    for(int version:{0,6}){Stream bad;bad.writeInt32(version);MXDelayParams p;check(!readMXState(bad,p),"unknown version accepted");}
+    for(int version:{0,6}){Stream bad;bad.writeInt32(version);MXDelayParams p;p.mix=.91;check(!readMXState(bad,p),"unknown version accepted");check(p.mix==.91,"unknown version mutated state");}
     auto bad=legacy(5);float nan=std::numeric_limits<float>::quiet_NaN();std::memcpy(bad.bytes.data()+4,&nan,4);
-    MXDelayParams p;check(!readMXState(bad,p),"non-finite state accepted");
+    MXDelayParams p;p.mix=.91;check(!readMXState(bad,p),"non-finite state accepted");check(p.mix==.91,"non-finite state mutated parameters");
 }
 void geometryChecks(){
     for(double dpi:{1.,1.25,1.5,2.})for(double zoom:{.75,1.,1.25,1.5}){
