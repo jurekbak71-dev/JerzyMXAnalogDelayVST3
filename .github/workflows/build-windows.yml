@@ -21,7 +21,17 @@ jobs:
         run: cmake --build build --config Release --target JerzyMXAnalogDelay2 MXDelayDSPTests MXDelayCompatibilityTests MXDelayGUITests --parallel
       - name: Test DSP and GUI
         shell: pwsh
-        run: ctest --test-dir build -C Release --verbose --output-on-failure -R "^(MXDelayDSP|MXDelayCompatibility|MXDelayGUI)$"
+        run: |
+          ctest --test-dir build -C Release --verbose --output-on-failure -R "^(MXDelayDSP|MXDelayCompatibility|MXDelayGUI)$"
+          $testExit = $LASTEXITCODE
+          if ($testExit -ne 0) {
+            # Expose test diagnostics in check annotations as well as runner logs.
+            Get-Content build/Testing/Temporary/LastTest.log | Select-Object -Last 100 | ForEach-Object {
+              $message = $_.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+              Write-Output "::error title=CTest::$message"
+            }
+            exit $testExit
+          }
       - name: Package
         shell: pwsh
         run: |
