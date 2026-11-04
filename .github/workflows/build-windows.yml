@@ -26,10 +26,8 @@ jobs:
           $testExit = $LASTEXITCODE
           if ($testExit -ne 0) {
             # Expose test diagnostics in check annotations as well as runner logs.
-            Get-Content build/Testing/Temporary/LastTest.log | Select-Object -Last 100 | ForEach-Object {
-              $message = $_.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
-              Write-Output "::error title=CTest::$message"
-            }
+            $message = (Get-Content build/Testing/Temporary/LastTest.log -Raw).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Output "::error title=CTest::$message"
             exit $testExit
           }
       - name: Package
