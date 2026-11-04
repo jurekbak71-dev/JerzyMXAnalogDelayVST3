@@ -13,6 +13,7 @@ using LedToggleSwitch = JerzyLedToggle;
 using LedThreeWaySwitch = JerzyLedThreeWay;
 using BypassButton = JerzyBypassButton;
 using HardwarePanel = JerzyHardwarePanel;
+using ConsoleInsetPanel = JerzyConsoleInsetPanel;
 using OxidizedPanel = JerzyChassis;
 
 void registerMXDelayViews();
