@@ -31,10 +31,11 @@ void metalKnob(CDrawContext* c,const CRect& r,double value){
     const auto& t=getJerzyGuiTheme();
     const double x=r.getCenter().x,y=r.getCenter().y;
     const double radius=std::min(r.getWidth(),r.getHeight())*.37;
+    const bool primary=r.getWidth()>=70.0 && r.getHeight()>=70.0;
     c->setDrawMode(kAntiAliasing|kNonIntegralMode);
     for(int i=0;i<=20;++i){
         const double a=(135.0+13.5*i)*Constants::pi/180.0;
-        const double rr=i%5==0?1.8:1.15;
+        const double rr=i%5==0?(primary?2.3:1.8):(primary?1.35:1.15);
         const auto minor=CColor(
             static_cast<uint8_t>(t.accent.red*.82),
             static_cast<uint8_t>(t.accent.green*.82),
@@ -61,8 +62,9 @@ void metalKnob(CDrawContext* c,const CRect& r,double value){
     }
     ellipse(c,x,y,cap,CColor(0,0,0,0),CColor(222,210,183));
     ellipse(c,x-cap*.25,y-cap*.28,cap*.20,CColor(255,255,255,34),CColor(255,255,255,0));
+    if(primary){ellipse(c,x,y,cap*.90,CColor(0,0,0,0),CColor(248,220,167,55));}
     const double a=(135.0+270.0*std::clamp(value,0.0,1.0))*Constants::pi/180.0;
-    c->setFrameColor(CColor(255,232,185));c->setLineWidth(std::max(2.0,radius*.075));
+    c->setFrameColor(CColor(255,232,185));c->setLineWidth(std::max(primary?2.7:2.0,radius*.085));
     c->drawLine({x+radius*.18*std::cos(a),y+radius*.18*std::sin(a)},
                 {x+radius*.78*std::cos(a),y+radius*.78*std::sin(a)});
 }
