@@ -30,7 +30,7 @@ void label(CDrawContext* c,const char* s,const CRect& r,double size,CColor color
 void metalKnob(CDrawContext* c,const CRect& r,double value){
     const auto& t=getJerzyGuiTheme();
     const double x=r.getCenter().x,y=r.getCenter().y;
-    const double radius=std::min(r.getWidth(),r.getHeight())*.36;
+    const double radius=std::min(r.getWidth(),r.getHeight())*.37;
     c->setDrawMode(kAntiAliasing|kNonIntegralMode);
     for(int i=0;i<=20;++i){
         const double a=(135.0+13.5*i)*Constants::pi/180.0;
