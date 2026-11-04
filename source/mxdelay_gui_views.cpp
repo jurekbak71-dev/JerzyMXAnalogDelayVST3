@@ -30,6 +30,6 @@ SimpleCreator<OxidizedPanel> oxidePanel("OxidizedPanel");
 }
 
 void registerMXDelayViews(){
-    setJerzyGuiTheme(jerzyThemePetrol());
+    setJerzyGuiTheme(jerzyThemeConsole());
 }
 } // namespace JerzyAudio
