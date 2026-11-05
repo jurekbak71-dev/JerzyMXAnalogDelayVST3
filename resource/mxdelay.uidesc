@@ -814,32 +814,56 @@
     </view>
     <view class="CViewContainer" origin="0, 148" size="1280, 534" transparent="true" gui-c-page="2" visible="false">
       <view class="HardwarePanel" origin="8, 0" size="1264, 534" mouse-enabled="false" />
-      <view class="CTextLabel" origin="36, 28" size="1180, 32" title="REVERB / FDN + BUILT-IN FIR + HYBRID" font="Title" font-color="Amber" transparent="true" mouse-enabled="false" frame-width="0" />
-      <view class="CTextLabel" origin="36, 70" size="1180, 22" title="Independent stereo reverb: algorithmic FDN, built-in FIR convolution, or hybrid. External IR loading is pending." font="Label" font-color="Cream" transparent="true" mouse-enabled="false" frame-width="0" />
-      <view class="CTextLabel" origin="470, 118" size="190, 22" title="REVERB MODE" font="Label" font-color="Cream" transparent="true" mouse-enabled="false" frame-width="0" />
-      <view class="COptionMenu" origin="470, 153" size="190, 28" control-tag="ReverbMode" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Amber" frame-width="1" />
-      <view class="CTextLabel" origin="715, 118" size="190, 22" title="BUILT-IN IR PROFILE" font="Label" font-color="Cream" transparent="true" mouse-enabled="false" frame-width="0" />
-      <view class="COptionMenu" origin="715, 153" size="190, 28" control-tag="ReverbIR" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Amber" frame-width="1" />
-      <view class="CTextLabel" origin="44, 122" size="160, 22" title="REVERB ON" font="Section" font-color="Cream" transparent="true" mouse-enabled="false" frame-width="0" />
-      <view class="LedToggleSwitch" origin="64, 153" size="52, 52" control-tag="ReverbEnable" />
-      <view class="CTextLabel" origin="230, 122" size="160, 22" title="FREEZE" font="Section" font-color="Cream" transparent="true" mouse-enabled="false" frame-width="0" />
-      <view class="LedToggleSwitch" origin="252, 153" size="52, 52" control-tag="ReverbFreeze" />
-      <view class="CTextLabel" origin="90, 260" size="170, 24" title="WET" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
-      <view class="ChickenKnob" origin="136, 292" size="78, 78" control-tag="ReverbWet" wheel-inc-value="0.01" tooltip="Right-click: reset to default" />
-      <view class="CTextLabel" origin="114, 382" size="122, 25" control-tag="ReverbWet" font="Value" font-color="Amber" text-alignment="center" mouse-enabled="false" transparent="true" frame-width="0" />
-      <view class="CTextLabel" origin="315, 260" size="170, 24" title="DECAY" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
-      <view class="ChickenKnob" origin="361, 292" size="78, 78" control-tag="ReverbDecay" wheel-inc-value="0.01" tooltip="Right-click: reset to default" />
-      <view class="CTextLabel" origin="339, 382" size="122, 25" control-tag="ReverbDecay" font="Value" font-color="Amber" text-alignment="center" mouse-enabled="false" transparent="true" frame-width="0" />
-      <view class="CTextLabel" origin="540, 260" size="170, 24" title="DAMPING" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
-      <view class="ChickenKnob" origin="586, 292" size="78, 78" control-tag="ReverbDamping" wheel-inc-value="0.01" tooltip="Right-click: reset to default" />
-      <view class="CTextLabel" origin="564, 382" size="122, 25" control-tag="ReverbDamping" font="Value" font-color="Amber" text-alignment="center" mouse-enabled="false" transparent="true" frame-width="0" />
-      <view class="CTextLabel" origin="765, 260" size="170, 24" title="WIDTH" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
-      <view class="ChickenKnob" origin="811, 292" size="78, 78" control-tag="ReverbWidth" wheel-inc-value="0.01" tooltip="Right-click: reset to default" />
-      <view class="CTextLabel" origin="789, 382" size="122, 25" control-tag="ReverbWidth" font="Value" font-color="Amber" text-alignment="center" mouse-enabled="false" transparent="true" frame-width="0" />
-      <view class="CTextLabel" origin="990, 260" size="170, 24" title="PRE-DELAY" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
-      <view class="ChickenKnob" origin="1036, 292" size="78, 78" control-tag="ReverbPreDelay" wheel-inc-value="0.01" tooltip="Right-click: reset to default" />
-      <view class="CTextLabel" origin="1014, 382" size="122, 25" control-tag="ReverbPreDelay" font="Value" font-color="Amber" text-alignment="center" mouse-enabled="false" transparent="true" frame-width="0" />
-      <view class="CTextLabel" origin="36, 457" size="1190, 24" title="IR uses short synthetic built-in responses. External WAV / AIFF import is not implemented." font="Label" font-color="Cream" transparent="true" mouse-enabled="false" frame-width="0" />
+      <view class="CTextLabel" origin="28, 18" size="1200, 22" title="REVERB / FDN - PARTITIONED IR - HYBRID" font="Title" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="CTextLabel" origin="36, 48" size="194, 22" title="MODE" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="COptionMenu" origin="36, 73" size="194, 28" control-tag="ReverbMode" font="Label" font-color="Cream" back-color="ValueBack" frame-width="0" />
+      <view class="CTextLabel" origin="260, 48" size="194, 22" title="FACTORY IR" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="COptionMenu" origin="260, 73" size="194, 28" control-tag="ReverbIR" font="Label" font-color="Cream" back-color="ValueBack" frame-width="0" />
+      <view class="ConsoleButton" origin="500, 73" size="190, 32" title="LOAD WAV IR" control-tag="9300" font="Section" text-color="Cream" text-color-highlighted="Amber" kick-style="true" />
+      <view class="CTextLabel" origin="716, 48" size="150, 22" title="EXTERNAL WAV" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="LedToggleSwitch" origin="760, 68" size="52, 52" control-tag="ReverbExternal" />
+      <view class="CTextLabel" origin="932, 48" size="150, 22" title="REVERB ON" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="LedToggleSwitch" origin="976, 68" size="52, 52" control-tag="ReverbEnable" />
+      <view class="CTextLabel" origin="1100, 48" size="150, 22" title="FDN FREEZE" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="LedToggleSwitch" origin="1144, 68" size="52, 52" control-tag="ReverbFreeze" />
+      <view class="CTextLabel" origin="36, 123" size="1190, 22" title="IR: Factory Room" font="Section" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="9301" />
+      <view class="CTextLabel" origin="36, 151" size="1190, 22" title="IR status" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="9302" />
+      <view class="CTextLabel" origin="22, 190" size="148, 22" title="WET / DRY" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="50, 214" size="72, 72" control-tag="ReverbWet" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="22, 291" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbWet" />
+      <view class="CTextLabel" origin="222, 190" size="148, 22" title="RT60" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="250, 214" size="72, 72" control-tag="ReverbDecay" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="222, 291" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbDecay" />
+      <view class="CTextLabel" origin="422, 190" size="148, 22" title="FDN HF DAMPING" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="450, 214" size="72, 72" control-tag="ReverbDamping" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="422, 291" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbDamping" />
+      <view class="CTextLabel" origin="622, 190" size="148, 22" title="FDN LOW CUT" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="650, 214" size="72, 72" control-tag="ReverbLowCut" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="622, 291" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbLowCut" />
+      <view class="CTextLabel" origin="822, 190" size="148, 22" title="DIFFUSION" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="850, 214" size="72, 72" control-tag="ReverbDiffusion" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="822, 291" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbDiffusion" />
+      <view class="CTextLabel" origin="1022, 190" size="148, 22" title="EARLY REFLECTIONS" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="1050, 214" size="72, 72" control-tag="ReverbEarly" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="1022, 291" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbEarly" />
+      <view class="CTextLabel" origin="22, 335" size="148, 22" title="IR LENGTH" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="50, 359" size="72, 72" control-tag="ReverbIRLength" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="22, 436" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbIRLength" />
+      <view class="CTextLabel" origin="222, 335" size="148, 22" title="IR HF DAMPING" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="250, 359" size="72, 72" control-tag="ReverbIRDamping" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="222, 436" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbIRDamping" />
+      <view class="CTextLabel" origin="422, 335" size="148, 22" title="HYBRID IR BALANCE" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="450, 359" size="72, 72" control-tag="ReverbHybrid" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="422, 436" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbHybrid" />
+      <view class="CTextLabel" origin="622, 335" size="148, 22" title="STEREO WIDTH" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="650, 359" size="72, 72" control-tag="ReverbWidth" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="622, 436" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbWidth" />
+      <view class="CTextLabel" origin="822, 335" size="148, 22" title="PRE-DELAY" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="ChickenKnob" origin="850, 359" size="72, 72" control-tag="ReverbPreDelay" wheel-inc-value=".005" tooltip="Right-click: factory default; Shift: fine control" />
+      <view class="CTextLabel" origin="822, 436" size="148, 22" title="" font="Value" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="ReverbPreDelay" />
+      <view class="CTextLabel" origin="1020, 335" size="180, 22" title="IR NORMALIZE" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="LedToggleSwitch" origin="1080, 370" size="52, 52" control-tag="ReverbNormalize" />
+      <view class="CTextLabel" origin="36, 488" size="1190, 22" title="IR/FDN controls retain their values in all modes. Hybrid is a bounded blend, not a gain boost." font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
     </view>
     <view class="CViewContainer" origin="0, 148" size="1280, 534" transparent="true" gui-c-page="3" visible="false">
       <view class="HardwarePanel" origin="8, 0" size="1264, 534" mouse-enabled="false" />
@@ -1277,6 +1301,14 @@
     <control-tag name="B8C5" tag="1553" />
     <control-tag name="B8C6" tag="1554" />
     <control-tag name="B8C7" tag="1555" />
+    <control-tag name="ReverbExternal" tag="1070" />
+    <control-tag name="ReverbIRLength" tag="1071" />
+    <control-tag name="ReverbNormalize" tag="1072" />
+    <control-tag name="ReverbLowCut" tag="1073" />
+    <control-tag name="ReverbDiffusion" tag="1074" />
+    <control-tag name="ReverbEarly" tag="1075" />
+    <control-tag name="ReverbHybrid" tag="1076" />
+    <control-tag name="ReverbIRDamping" tag="1077" />
   </control-tags>
   <gradients />
   <variables />

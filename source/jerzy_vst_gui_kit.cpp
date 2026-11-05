@@ -80,7 +80,7 @@ void JerzyKnob::draw(CDrawContext* c){
     drawJerzyAsset(c,b?a.cyan.get():a.amber.get(),r,0,1,.12f+.25f*getValueNormalized());
     drawJerzyAsset(c,r.getWidth()<60?a.smallKnob.get():a.knob.get(),r,int(std::lround(std::clamp(getValueNormalized(),0.f,1.f)*100)),101);
     // Fixed reference marker: centred for signed gain/pan, minimum for unipolar controls.
-    const bool centre=tag==1001||tag==1002||tag==1107||tag==1407||(tag>=1110&&tag<=1113)||(tag>=1410&&tag<=1413);
+    const bool centre=tag==1054||tag==1001||tag==1002||tag==1107||tag==1407||(tag>=1110&&tag<=1113)||(tag>=1410&&tag<=1413);
     const double n=tag==1002?.6:centre?.5:0.;const double angle=(135+270*n)*Constants::pi/180.;
     const auto p=r.getCenter();const double radius=std::min(r.getWidth(),r.getHeight())*.49;
     c->setFrameColor(CColor(237,238,220));c->setLineWidth(2);

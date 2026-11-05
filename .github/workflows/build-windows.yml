@@ -26,6 +26,8 @@ jobs:
           python -m pip install -r scripts/gui3d-requirements.txt
           python tests/test_gui3d_assets.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tests/test_reverb_layout.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tests/test_gui_c_layout.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Configure
@@ -33,11 +35,11 @@ jobs:
         run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DSMTG_CREATE_PLUGIN_LINK=0
       - name: Build Release
         shell: pwsh
-        run: cmake --build build --config Release --target JerzyMXAnalogDelay2 MXDelayDSPTests MXDelayCompatibilityTests MXDelayGUITests --parallel
+        run: cmake --build build --config Release --target JerzyMXAnalogDelay2 MXDelayDSPTests MXDelayCompatibilityTests MXReverbTests MXReverbHostTests MXDelayGUITests --parallel
       - name: Test DSP and GUI
         shell: pwsh
         run: |
-          ctest --test-dir build -C Release --verbose --output-on-failure -R "^(MXDelayDSP|MXDelayCompatibility|MXDelayGUI)$"
+          ctest --test-dir build -C Release --verbose --output-on-failure -R "^(MXDelayDSP|MXDelayCompatibility|MXReverb|MXReverbHost|MXDelayGUI)$"
           $testExit = $LASTEXITCODE
           if ($testExit -ne 0) {
             # Expose test diagnostics in check annotations as well as runner logs.
@@ -52,16 +54,31 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          try {
           Invoke-WebRequest 'https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_Windows.zip' -OutFile pluginval.zip
           if ((Get-FileHash pluginval.zip -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c08e61ce3b96db41636f8ec7e76f4c7e2c13ebdac7fa1b5a1f52b4f32ec715ab') { throw 'pluginval checksum mismatch' }
           Expand-Archive pluginval.zip -DestinationPath pluginval
           $plugin = Get-ChildItem build -Recurse -Directory -Filter 'MX Delay 2.vst3' | Select-Object -First 1
-          & ./pluginval/pluginval.exe --strictness-level 5 --random-seed 1971 --sample-rates 44100,48000,96000 --block-sizes 64,128,257,1024 --output-dir build/pluginval-logs --validate $plugin.FullName *> build/pluginval-console.txt
-          $valExit = $LASTEXITCODE
+          # pluginval is a Windows GUI-subsystem executable. PowerShell's direct
+          # invocation may return before it exits, leaving LASTEXITCODE unset.
+          $arguments = @('--strictness-level', '5', '--random-seed', '1971', '--sample-rates', '44100,48000,96000', '--block-sizes', '64,128,257,1024', '--output-dir', 'build/pluginval-logs', '--validate', ('"' + $plugin.FullName + '"'))
+          $process = Start-Process -FilePath (Resolve-Path './pluginval/pluginval.exe').Path -ArgumentList $arguments -Wait -PassThru -RedirectStandardOutput build/pluginval-console.txt -RedirectStandardError build/pluginval-stderr.txt
+          $valExit = $process.ExitCode
+          if ($valExit -eq 0) {
+            $validation = [string]((Get-ChildItem build/pluginval-logs -File | Get-Content) -join "`n")
+            if (-not $validation.Contains('Strictness level: 5') -or -not $validation.Contains('SUCCESS')) { throw 'pluginval exited without successful strictness-5 validation evidence' }
+          }
           if ($valExit -ne 0) {
-            $message = (Get-Content build/pluginval-console.txt -Raw).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            $logs = [string](Get-Content build/pluginval-console.txt -Raw) + [string](Get-Content build/pluginval-stderr.txt -Raw)
+            Get-ChildItem build/pluginval-logs -File -ErrorAction SilentlyContinue | ForEach-Object { $logs += [string](Get-Content $_.FullName -Raw) }
+            $message = $logs.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
             Write-Output "::error title=pluginval::$message"
             throw "pluginval failed: $valExit"
+          }
+          } catch {
+            $message = ($_ | Out-String).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Output "::error title=pluginval setup or execution::$message"
+            throw
           }
       - name: Package
         shell: pwsh
@@ -76,8 +93,13 @@ jobs:
           if (-not (Test-Path $resource)) { throw "VST3 GUI unavailable: missing mxdelay.uidesc" }
           $module = Get-ChildItem $bundle -Recurse -File -Filter "MX Delay 2.vst3" | Select-Object -First 1
           if (-not $module) { throw "VST3 processor binary missing" }
+          $moduleHash = (Get-FileHash $module.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$moduleHash  Contents/x86_64-win/MX Delay 2.vst3" | Set-Content artifact/VST3_MODULE_SHA256.txt
+          Write-Output "::notice title=Windows x64 VST3 module SHA-256::$moduleHash"
           python scripts/verify_bundle.py $bundle
           if ($LASTEXITCODE -ne 0) { throw 'Incomplete GUI resources' }
+          Copy-Item build/reverb-results artifact/reverb-results -Recurse
+          Copy-Item docs/REVERB_VALIDATION.md artifact/
           Copy-Item docs/INSTALL_FL_STUDIO.md artifact/
           Copy-Item docs/GUI3D_ASSET_AUDIT.md artifact/
           Copy-Item docs/GUI3D_VALIDATION.md artifact/
@@ -89,7 +111,15 @@ jobs:
           Copy-Item build/_deps/vst3sdk-src/LICENSE.txt artifact/VST3-SDK-LICENSE.txt
           Copy-Item build/_deps/vst3sdk-src/vstgui4/LICENSE artifact/VSTGUI-LICENSE.txt
           Compress-Archive -Path artifact/* -DestinationPath MX_Delay_2_Windows_x64.zip -Force
-          Get-FileHash MX_Delay_2_Windows_x64.zip -Algorithm SHA256 | Format-List | Out-File MX_Delay_2_SHA256.txt
+          python scripts/verify_package.py MX_Delay_2_Windows_x64.zip
+          if ($LASTEXITCODE -ne 0) { throw 'Installation ZIP verification failed' }
+          $hash = (Get-FileHash MX_Delay_2_Windows_x64.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  MX_Delay_2_Windows_x64.zip" | Set-Content MX_Delay_2_SHA256.txt
+          Write-Output "::notice title=Windows installation ZIP SHA-256::$hash"
+          $measurements = (Get-Content build/reverb-results/measurements.csv -Raw).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+          Write-Output "::notice title=Reverb DSP measurements::$measurements"
+          $longIR = (Get-Content build/reverb-results/long-ir-cpu.csv -Raw).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+          Write-Output "::notice title=Long IR CPU and deadlines::$longIR"
           Compress-Archive -Path resource/gui3d,scripts/render_gui3d_assets.py,scripts/gui3d-requirements.txt -DestinationPath MX_Delay_2_GUI3D_Library.zip -Force
       - name: Collect GUI renders
         shell: pwsh
@@ -122,8 +152,10 @@ jobs:
         with:
           name: MX-Delay-2-diagnostics
           path: |
+            build/reverb-results
             build/Testing/Temporary/*.log
             build/pluginval-logs
             build/pluginval-console.txt
+            build/pluginval-stderr.txt
             build/mxdelay2-render-*.png
           if-no-files-found: warn

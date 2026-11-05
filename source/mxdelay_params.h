@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <string>
 
 namespace JerzyAudio {
 
@@ -63,7 +64,9 @@ enum MXGlobalParamIds : unsigned {
     kMXWetPeakMeterId,
     kMXEngineAActiveId,
     kMXEngineBActiveId,
-    kMXEngineBothActiveId
+    kMXEngineBothActiveId,
+    kMXReverbExternalId=1070,kMXReverbIRLengthId,kMXReverbNormalizeId,kMXReverbLowCutId,
+    kMXReverbDiffusionId,kMXReverbEarlyId,kMXReverbHybridId,kMXReverbIRDampingId
 };
 
 constexpr unsigned wetFxParam(int slot,int field){ return kMXWetFx1TypeId + unsigned(slot*6+field); }
@@ -113,7 +116,10 @@ struct WetFxParams {
     double route=1.0; // 0 = INPUT/PRE, 1 = WET ONLY
 };
 
-struct ReverbParams { double enable=0.0,wet=0.25,decay=0.6,damping=0.5,width=0.5,preDelay=0.075,freeze=0.0,mode=0.0,ir=0.0; };
+struct ReverbParams { double enable=0.0,wet=0.25,decay=0.6,damping=0.5,width=0.5,preDelay=0.075,freeze=0.0,mode=0.0,ir=0.0;
+    double external=0.,irLength=1.,normalize=1.,lowCut=0.,diffusion=.6,early=.25,hybrid=.5,irDamping=0.;
+    std::string irPath;
+};
 
 struct MXDelayParams {
     ReverbParams reverb{};

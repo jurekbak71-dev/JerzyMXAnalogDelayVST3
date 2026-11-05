@@ -1,5 +1,7 @@
 #pragma once
 #include "vstgui/plugin-bindings/vst3editor.h"
+#include "vstgui/lib/cfileselector.h"
+#include "vstgui/lib/cvstguitimer.h"
 namespace JerzyAudio {
 class MXDelayEditor : public VSTGUI::VST3Editor {
 public:
@@ -26,5 +28,8 @@ private:
     void selectConsolePage(int page);
     void fitHostSize(const Steinberg::ViewRect& size);
     void applyZoom(double factor);
+    void refreshIRStatus();
+    VSTGUI::SharedPointer<VSTGUI::CVSTGUITimer> irStatusTimer;
+    VSTGUI::SharedPointer<VSTGUI::CNewFileSelector> irSelector;
 };
 }

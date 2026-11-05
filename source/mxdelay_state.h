@@ -4,7 +4,7 @@
 #include <cmath>
 
 namespace JerzyAudio {
-constexpr int kMXStateVersion=8;
+constexpr int kMXStateVersion=9;
 
 template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
     if(!b.writeInt32(kMXStateVersion)) return false;
@@ -25,6 +25,10 @@ template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
     }
     const double rv[]={p.reverb.enable,p.reverb.wet,p.reverb.decay,p.reverb.damping,p.reverb.width,p.reverb.preDelay,p.reverb.freeze,p.reverb.mode,p.reverb.ir};
     for(double v:rv)if(!b.writeFloat((float)v))return false;
+    const double extra[]={p.reverb.external,p.reverb.irLength,p.reverb.normalize,p.reverb.lowCut,p.reverb.diffusion,p.reverb.early,p.reverb.hybrid,p.reverb.irDamping};
+    for(double v:extra)if(!b.writeFloat(float(v)))return false;
+    if(p.reverb.irPath.size()>32768||!b.writeInt32(int32_t(p.reverb.irPath.size())))return false;
+    for(unsigned char c:p.reverb.irPath)if(!b.writeInt32(c))return false;
     return true;
 }
 
@@ -60,6 +64,13 @@ template<class Stream> bool readMXStateUnchecked(Stream& b,MXDelayParams& p){
     }
     if(version>=6){double* rv[]={&p.reverb.enable,&p.reverb.wet,&p.reverb.decay,&p.reverb.damping,&p.reverb.width,&p.reverb.preDelay,&p.reverb.freeze};for(auto* v:rv)if(!rd(*v))return false;}
     if(version>=8){if(!rd(p.reverb.mode)||!rd(p.reverb.ir))return false;}
+    if(version>=9){
+        double* extra[]={&p.reverb.external,&p.reverb.irLength,&p.reverb.normalize,&p.reverb.lowCut,&p.reverb.diffusion,&p.reverb.early,&p.reverb.hybrid,&p.reverb.irDamping};
+        for(auto* v:extra)if(!rd(*v))return false;
+        int32_t count=0;if(!b.readInt32(count)||count<0||count>32768)return false;
+        p.reverb.irPath.reserve(size_t(count));
+        for(int32_t i=0;i<count;++i){int32_t c;if(!b.readInt32(c)||c<=0||c>255)return false;p.reverb.irPath.push_back(char(c));}
+    }
     return true;
 }
 // Transactional load: a truncated or malformed preset never mutates live DSP state.
