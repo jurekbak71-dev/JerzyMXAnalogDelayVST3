@@ -77,3 +77,26 @@ for tag, panel_x, panel_w in (("InputTrim",8,150),("Mix",166,370),("OutputTrim",
     assert v[1]>=752 and v[3]<=770, f"{tag}: value touches panel bottom screws"
     assert k[2]<=v[0] or v[2]<=k[0] or k[3]<=v[1], f"{tag}: knob overlaps numeric frame"
 print("Footer knobs, numeric frames and panel screw clearance validated")
+
+# Requested GLOBAL MIX revision: the knob/value pair belongs in the left
+# third of its chassis, outside the LED labels and all meter hit areas.
+def footer_rect(view):
+    x, y = map(int, view.attrib["origin"].split(", "))
+    w, h = map(int, view.attrib["size"].split(", "))
+    return x, y, x+w, y+h
+
+for tag in ("InputTrim", "Mix"):
+    controls = [v for v in main.iter("view") if v.attrib.get("control-tag") == tag]
+    knob = footer_rect(next(v for v in controls if v.attrib.get("class") == "ChickenKnob"))
+    value = footer_rect(next(v for v in controls if v.attrib.get("class") == "CTextLabel"))
+    assert knob[3] + 4 <= value[1], f"{tag}: value frame overlaps the knob artwork"
+    assert value[3] <= 770, f"{tag}: value frame overlaps bottom chassis border"
+    assert 78 <= value[2] - value[0] <= 82, f"{tag}: wrong value-frame width"
+mix_knob = next(v for v in main.iter("view")
+                if v.attrib.get("control-tag") == "Mix" and v.attrib.get("class") == "ChickenKnob")
+mix_value = next(v for v in main.iter("view")
+                 if v.attrib.get("control-tag") == "Mix" and v.attrib.get("class") == "CTextLabel")
+assert footer_rect(mix_knob)[2] < 270, "GLOBAL MIX knob was not moved left"
+assert footer_rect(mix_value)[2] < 270, "GLOBAL MIX value frame was not moved with its knob"
+assert footer_rect(mix_value)[2] + 50 < 342, "GLOBAL MIX value overlaps meter labels"
+print("GLOBAL MIX control moved left; INPUT/MIX value frames clear artwork and chassis borders")
