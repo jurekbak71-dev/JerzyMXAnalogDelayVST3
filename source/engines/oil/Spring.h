@@ -14,6 +14,7 @@ class SpringTank {
  float damping=.2f,highpass=.99f;double rate=48000;
 public:
  void prepare(double sr){rate=sr;const double lengths[]={.0437,.0563,.0691,.0797};for(size_t j=0;j<4;++j){auto& l=lines[j];l.buffer.assign(size_t(sr*lengths[j])+1,0);l.pos=0;l.lp=l.dc=0;for(size_t k=0;k<4;++k){auto& c=coils[j][k];c.buffer.assign(size_t(sr*(.00041+.00017*k+.00011*j))+1,0);c.pos=0;}}configure(2.2f,.55f);}
+ void reset(){for(auto& l:lines){std::fill(l.buffer.begin(),l.buffer.end(),0.f);l.pos=0;l.lp=l.dc=0;}for(auto& a:coils)for(auto& c:a){std::fill(c.buffer.begin(),c.buffer.end(),0.f);c.pos=0;}}
  void configure(float seconds,float tone){seconds=std::clamp(seconds,.4f,6.f);for(auto& l:lines)l.gain=std::pow(10.f,-3.f*float(double(l.buffer.size())/rate)/seconds);damping=float(1-std::exp(-6.28318530718*(900+tone*8500)/rate));highpass=float(1-std::exp(-6.28318530718*100/rate));}
  void process(float inL,float inR,float& outL,float& outR){
  float v[4];for(size_t j=0;j<4;++j){auto& l=lines[j];float x=l.buffer[l.pos];for(auto& c:coils[j])x=c.tick(x);l.lp+=damping*(x-l.lp);l.dc+=highpass*(l.lp-l.dc);v[j]=(l.lp-l.dc)*l.gain;}
