@@ -35,7 +35,7 @@ void stateChecks(){
         auto fixture=legacy(version);MXDelayParams p;
         check(readMXState(fixture,p),"legacy state rejected");
         check(fixture.cursor==fixture.bytes.size(),"legacy byte layout changed");
-        check(std::abs(p.slot[0].algorithm-.75)<1e-6,"legacy algorithm index changed");
+        check(std::abs(p.slot[0].algorithm-(6.0/11.0))<1e-6,"legacy algorithm index changed");
         check(std::abs(p.outputTrim-.6)<1e-6,"legacy gain changed");
         check(std::abs(p.slot[1].c[6][15]-.11)<1e-6,"legacy algorithm controls lost");
         check(std::abs(p.slot[0].headPan[0]-(version>=2?.1:.125))<1e-6,"head pan migration changed");
@@ -50,7 +50,7 @@ void stateChecks(){
             MXDelayParams q;check(!readMXState(cut,q),"truncated state accepted");
         }
     }
-    for(int version:{0,6}){Stream bad;bad.writeInt32(version);MXDelayParams p;check(!readMXState(bad,p),"unknown version accepted");}
+    for(int version:{0,8}){Stream bad;bad.writeInt32(version);MXDelayParams p;check(!readMXState(bad,p),"unknown version accepted");}
     auto bad=legacy(5);float nan=std::numeric_limits<float>::quiet_NaN();std::memcpy(bad.bytes.data()+4,&nan,4);
     MXDelayParams p;check(!readMXState(bad,p),"non-finite state accepted");
 }
