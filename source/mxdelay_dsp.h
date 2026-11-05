@@ -2,6 +2,7 @@
 #include "mxdelay_params.h"
 #include "mxdelay_mechanics.h"
 #include "mxdelay_reverb_fdn.h"
+#include "mxdelay_original_engines.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -435,6 +436,7 @@ template<class T> class MXDelayDSP {
     SlotDSP s[2];
     std::array<WetFxDSP,4> wetFx;
     MXReverbFDN<T> reverb;
+    MXOriginalEngines<T> originals[2];
     double sr=44100.0;
 public:
     void prepare(double sampleRate,int=2){
@@ -443,8 +445,9 @@ public:
         s[1].prepare(sampleRate,0x2468ace1u);
         for(auto& fx:wetFx)fx.prepare(sampleRate);
         reverb.prepare(sampleRate);
+        for(auto& engine:originals)engine.initialize(sampleRate);
     }
-    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();}
+    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();for(auto& engine:originals)engine.reset();}
 
     template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak){
         const double inGain=gainFromNorm(p.inputTrim,-18,18);
@@ -477,17 +480,25 @@ public:
             }
             Stereo a{},b{},wet{};
 
+            auto runSlot=[&](int slot,T left,T right)->Stereo {
+                const int algorithm=normIndex(p.slot[slot].algorithm,kAlgorithmCount);
+                if(algorithm>=(int)DelayAlgorithm::MemoryDelay){
+                    originals[slot].process(algorithm,left,right,p.slot[slot],bpm);
+                    return {left,right};
+                }
+                return s[slot].process(left,right,p.slot[slot],bpm,p.machineCondition);
+            };
             if(routing==(int)DelayRouting::Parallel){
-                a=s[0].process(inL,inR,p.slot[0],bpm,p.machineCondition);
-                b=s[1].process(inL,inR,p.slot[1],bpm,p.machineCondition);
+                a=runSlot(0,inL,inR);
+                b=runSlot(1,inL,inR);
                 wet={(T)((double(a.l)+double(b.l))*0.70710678118),(T)((double(a.r)+double(b.r))*0.70710678118)};
             }else if(routing==(int)DelayRouting::Series){
-                a=s[0].process(inL,inR,p.slot[0],bpm,p.machineCondition);
-                b=s[1].process((T)(double(inL)+.72*double(a.l)),(T)(double(inR)+.72*double(a.r)),p.slot[1],bpm,p.machineCondition);
+                a=runSlot(0,inL,inR);
+                b=runSlot(1,(T)(double(inL)+.72*double(a.l)),(T)(double(inR)+.72*double(a.r)));
                 wet={(T)(.72*(.48*double(a.l)+double(b.l))),(T)(.72*(.48*double(a.r)+double(b.r)))};
             }else{
-                a=s[0].process(inL,inL,p.slot[0],bpm,p.machineCondition);
-                b=s[1].process(inR,inR,p.slot[1],bpm,p.machineCondition);
+                a=runSlot(0,inL,inL);
+                b=runSlot(1,inR,inR);
                 wet={a.l,b.r};
             }
 
