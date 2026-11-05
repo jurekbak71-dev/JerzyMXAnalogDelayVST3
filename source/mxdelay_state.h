@@ -4,7 +4,7 @@
 #include <cmath>
 
 namespace JerzyAudio {
-constexpr int kMXStateVersion=7;
+constexpr int kMXStateVersion=8;
 
 template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
     if(!b.writeInt32(kMXStateVersion)) return false;
@@ -23,7 +23,7 @@ template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
             if(!b.writeFloat((float)x.c[a][c])) return false;
         for(double v:x.headPan) if(!b.writeFloat((float)v)) return false;
     }
-    const double rv[]={p.reverb.enable,p.reverb.wet,p.reverb.decay,p.reverb.damping,p.reverb.width,p.reverb.preDelay,p.reverb.freeze};
+    const double rv[]={p.reverb.enable,p.reverb.wet,p.reverb.decay,p.reverb.damping,p.reverb.width,p.reverb.preDelay,p.reverb.freeze,p.reverb.mode,p.reverb.ir};
     for(double v:rv)if(!b.writeFloat((float)v))return false;
     return true;
 }
@@ -59,6 +59,7 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
         if(version>=2) for(auto& v:x.headPan) if(!rd(v)) return false;
     }
     if(version>=6){double* rv[]={&p.reverb.enable,&p.reverb.wet,&p.reverb.decay,&p.reverb.damping,&p.reverb.width,&p.reverb.preDelay,&p.reverb.freeze};for(auto* v:rv)if(!rd(*v))return false;}
+    if(version>=8){if(!rd(p.reverb.mode)||!rd(p.reverb.ir))return false;}
     return true;
 }
 }
