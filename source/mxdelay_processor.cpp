@@ -42,7 +42,7 @@ tresult PLUGIN_API MXDelayProcessor::process(ProcessData& d){
   while(ei<events.size()&&events[ei].offset==off){setNormalized(events[ei].id,events[ei].value);++ei;}
  }
  if(pos<d.numSamples){if(d.symbolicSampleSize==kSample32)run32(pos,d.numSamples-pos);else run64(pos,d.numSamples-pos);}
- d.outputs[0].silenceFlags=0;sendTempo(d);return kResultOk;
+ d.outputs[0].silenceFlags=0;sendTempo(d);if(d.outputParameterChanges){int32 qi=0;if(auto*q=d.outputParameterChanges->addParameterData(kMXPeakMeterId,qi)){int32 pi=0;q->addPoint(std::max<int32>(0,d.numSamples-1),std::clamp(lastPeak,0.0,1.0),pi);}}return kResultOk;
 }
 tresult PLUGIN_API MXDelayProcessor::setState(IBStream*s){if(!s)return kResultFalse;IBStreamer b(s,kLittleEndian);return readMXState(b,p)?kResultOk:kResultFalse;}
 tresult PLUGIN_API MXDelayProcessor::getState(IBStream*s){if(!s)return kResultFalse;IBStreamer b(s,kLittleEndian);return writeMXState(b,p)?kResultOk:kResultFalse;}
