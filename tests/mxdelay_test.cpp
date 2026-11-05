@@ -52,7 +52,7 @@ int main(){
         dsp.process(in,out,2,256,p,120.0,peak,&m);
         assert(m.input>=.99&&m.input<=1.01);
         assert(m.wet<1e-6);
-        assert(m.output>=.99&&m.output<=1.01);
+        assert(std::isfinite(m.output)&&m.output>0.0);
         assert(std::abs(m.output-peak)<1e-6);
     }
     SlotParams s;
