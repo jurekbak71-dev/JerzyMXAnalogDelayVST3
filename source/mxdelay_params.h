@@ -6,7 +6,7 @@
 
 namespace JerzyAudio {
 
-enum class DelayAlgorithm : int { Volante=0, ElCapistan, Olivera, EC1, Brig, Deco, DIG, SpaceEcho202, DM101, Count };
+enum class DelayAlgorithm : int { Volante=0, ElCapistan, Olivera, EC1, Brig, Deco, DIG, SpaceEcho202, DM101, MemoryDelay, ReelEcho, OilDrum, Count };
 enum class WetFxType : int { Off=0, Chorus, Flanger, LoFi, Overdrive, Granular, Count };
 enum class DelayRouting : int { Series=0, Parallel, SplitLR };
 constexpr int kAlgorithmCount = static_cast<int>(DelayAlgorithm::Count);
@@ -138,6 +138,9 @@ struct MXDelayParams {
             s.c[(int)DelayAlgorithm::DIG] = {0.0,0.50,0.12,0.25,0.30,0.55,0.0,0.0};
             s.c[(int)DelayAlgorithm::SpaceEcho202] = {0.35,0.28,0.20,0.42,0.45,0.18,0.30,0.35,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0};
             s.c[(int)DelayAlgorithm::DM101] = {0.35,0.32,0.18,0.28,0.52,0.42,0.30,0.24,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+            s.c[(int)DelayAlgorithm::MemoryDelay] = {0.6,0.18,0.15,0.0,0.0,0.35,1.0};
+            s.c[(int)DelayAlgorithm::ReelEcho] = {0.12,0.08,0.15,0.1,0.18,0.0,0.0};
+            s.c[(int)DelayAlgorithm::OilDrum] = {0.65,0.5,0.15,0.12,0.3,0.4,1.0};
         }
     }
 };
