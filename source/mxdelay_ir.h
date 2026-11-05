@@ -61,7 +61,7 @@ inline MXIRAudio factoryMXIR(int profile,double rate){
 }
 inline MXIRAudio prepareMXIR(const MXIRAudio& input,double rate,double maxSeconds,bool normalize){
     if(!std::isfinite(input.rate)||input.rate<8000||input.rate>384000||input.left.empty()||input.left.size()!=input.right.size()||!std::isfinite(rate)||rate<8000||rate>384000)throw std::runtime_error("Invalid IR or processing rate");
-    const size_t n=std::min(size_t(std::ceil(input.left.size()*rate/input.rate)),size_t(rate*std::clamp(maxSeconds,.02,8.)));
+    const size_t n=std::min(size_t(std::ceil(input.left.size()*rate/input.rate)),size_t(rate*std::clamp(std::isfinite(maxSeconds)?maxSeconds:8.,.02,8.)));
     if(n>1048576)throw std::runtime_error("IR exceeds 1048576 resampled-frame memory limit");
     MXIRAudio out;out.rate=rate;out.name=input.name;out.left.resize(n);out.right.resize(n);
     const double cutoff=std::min(1.,rate/input.rate)*.94;
@@ -80,6 +80,7 @@ inline MXIRAudio prepareMXIR(const MXIRAudio& input,double rate,double maxSecond
     double energyL=0,energyR=0,peak=0;
     for(size_t i=0;i<n;++i){if(!std::isfinite(out.left[i])||!std::isfinite(out.right[i]))throw std::runtime_error("Invalid IR samples");energyL+=double(out.left[i])*out.left[i];energyR+=double(out.right[i])*out.right[i];peak=std::max({peak,std::abs(double(out.left[i])),std::abs(double(out.right[i]))});}
     if(peak<1e-12)throw std::runtime_error("IR is silent");
+    if(!normalize&&peak>32)throw std::runtime_error("IR amplitude exceeds safety limit; enable normalization");
     const double gain=normalize?1/std::max({1e-12,peak,std::sqrt(energyL),std::sqrt(energyR)}):1.;
     for(size_t i=0;i<n;++i){out.left[i]=float(out.left[i]*gain);out.right[i]=float(out.right[i]*gain);}
     return out;
@@ -91,7 +92,7 @@ public:
     void prepare(size_t size){n=size;twiddle.resize(n/2);reverse.resize(n);for(size_t i=0;i<n/2;++i){const double a=-6.283185307179586*i/n;twiddle[i]={float(std::cos(a)),float(std::sin(a))};}for(size_t i=0;i<n;++i){size_t r=0,v=i;for(size_t p=n;p>1;p>>=1){r=(r<<1)|(v&1);v>>=1;}reverse[i]=r;}}
     void transform(std::complex<float>* x,bool inverse=false)const{
         for(size_t i=0;i<n;++i)if(i<reverse[i])std::swap(x[i],x[reverse[i]]);
-        for(size_t size=2;size<=n;size*=2)for(size_t start=0;start<n;start+=size)for(size_t j=0;j<size/2;++j){const auto w=inverse?std::conj(twiddle[j*n/size]):twiddle[j*n/size];const auto a=x[start+j],b=x[start+j+size/2]*w;x[start+j]=a+b;x[start+j+size/2]=a-b;}
+        for(size_t size=2;size<=n;size*=2)for(size_t start=0;start<n;start+=size)for(size_t j=0;j<size/2;++j){const auto w=inverse?std::conj(twiddle[j*n/size]):twiddle[j*n/size];const auto a=x[start+j],v=x[start+j+size/2];const std::complex<float> b{v.real()*w.real()-v.imag()*w.imag(),v.real()*w.imag()+v.imag()*w.real()};x[start+j]=a+b;x[start+j+size/2]=a-b;}
         if(inverse)for(size_t i=0;i<n;++i)x[i]/=float(n);
     }
 };
@@ -105,9 +106,9 @@ class MXPartitionTier {
 public:
     void prepare(const MXIRAudio& ir,size_t offset,size_t b,size_t end){
         block=b;stagger=offset==2*b;count=end>offset?(end-offset+b-1)/b:0;fft.prepare(2*b);valid.assign(count,0);
-        for(int c=0;c<2;++c){filters[c].assign(count*2*b,{});history[c].assign(count*2*b,{});work[c].assign(2*b,{});input[c].assign(b,0);output[c].assign(b,0);overlap[c].assign(b,0);
+        for(int c=0;c<2;++c){filters[c].assign(count*(b+1),{});history[c].assign(count*(b+1),{});work[c].assign(2*b,{});input[c].assign(b,0);output[c].assign(b,0);overlap[c].assign(b,0);
             const auto& taps=c?ir.right:ir.left;
-            for(size_t q=0;q<count;++q){auto* h=filters[c].data()+q*2*b;for(size_t k=0;k<b&&offset+q*b+k<end;++k)h[k]=taps[offset+q*b+k];fft.transform(h);}}
+            for(size_t q=0;q<count;++q){auto& h=work[c];std::fill(h.begin(),h.end(),std::complex<float>{});for(size_t k=0;k<b&&offset+q*b+k<end;++k)h[k]=taps[offset+q*b+k];fft.transform(h.data());std::copy_n(h.data(),b+1,filters[c].data()+q*(b+1));}}
         reset();
     }
     void reset(){pos=head=macIndex=macHead=0;scheduled=false;for(auto& w:work)std::fill(w.begin(),w.end(),std::complex<float>{});if(++epoch==0){std::fill(valid.begin(),valid.end(),0);epoch=1;}for(int c=0;c<2;++c){std::fill(input[c].begin(),input[c].end(),0);std::fill(output[c].begin(),output[c].end(),0);std::fill(overlap[c].begin(),overlap[c].end(),0);}}
@@ -116,7 +117,7 @@ public:
         outL=output[0][pos];outR=output[1][pos];input[0][pos]=l;input[1][pos]=r;
         ++pos;
         // Far partitions start two blocks after the input. The extra block
-        // lets us spread spectral MACs over sixteen 64-sample slices instead
+        // lets us spread spectral MACs over 64-sample slices instead
         // of a large CPU burst at every 1024-sample boundary.
         if(stagger&&scheduled&&pos%64==0){
             const size_t until=std::min(count,(count*pos+block-1)/block);
@@ -124,12 +125,17 @@ public:
         }
         if(pos<block)return;pos=0;
         if(stagger&&scheduled)finish();
-        for(int c=0;c<2;++c){
-            auto* x=history[c].data()+head*2*block;
-            for(size_t i=0;i<block;++i)x[i]=input[c][i];
-            std::fill(x+block,x+2*block,std::complex<float>{});fft.transform(x);
-            std::fill(work[c].begin(),work[c].end(),std::complex<float>{});
+        // Pack two real channels into one complex FFT, then separate their
+        // Hermitian spectra. This halves the transforms at the block boundary.
+        auto& packed=work[0];
+        for(size_t i=0;i<block;++i)packed[i]={input[0][i],input[1][i]};
+        std::fill(packed.begin()+block,packed.end(),std::complex<float>{});fft.transform(packed.data());
+        for(size_t i=0;i<=block;++i){
+            const auto z=packed[i],mirror=std::conj(packed[(2*block-i)%(2*block)]);
+            history[0][head*(block+1)+i]=(z+mirror)*.5f;
+            const auto delta=z-mirror;history[1][head*(block+1)+i]={delta.imag()*.5f,-delta.real()*.5f};
         }
+        for(auto& w:work)std::fill(w.begin(),w.end(),std::complex<float>{});
         valid[head]=epoch;
         if(stagger){scheduled=true;macHead=head;macIndex=0;}
         else {accumulate(0,count,head);finish();}
@@ -141,38 +147,59 @@ private:
             auto* sum=work[c].data();
             for(size_t q=first;q<last;++q){
                 const size_t index=(sourceHead+count-q)%count;if(valid[index]!=epoch)continue;
-                const auto* h=filters[c].data()+q*2*block;
-                const auto* x=history[c].data()+index*2*block;
-                for(size_t i=0;i<2*block;++i)sum[i]+=h[i]*x[i];
+                const auto* h=filters[c].data()+q*(block+1);
+                const auto* x=history[c].data()+index*(block+1);
+                // std::complex multiplication may dispatch a NaN-recovery helper.
+                // Inputs and IR are finite-checked before entering this kernel.
+                auto* dst=reinterpret_cast<float*>(sum);
+                const auto* hf=reinterpret_cast<const float*>(h);
+                const auto* xf=reinterpret_cast<const float*>(x);
+                for(size_t i=0;i<2*(block+1);i+=2){
+                    dst[i]+=hf[i]*xf[i]-hf[i+1]*xf[i+1];
+                    dst[i+1]+=hf[i]*xf[i+1]+hf[i+1]*xf[i];
+                }
             }
         }
     }
     void finish(){
-        for(int c=0;c<2;++c){
-            auto& sum=work[c];fft.transform(sum.data(),true);
-            for(size_t i=0;i<block;++i){output[c][i]=sum[i].real()+overlap[c][i];overlap[c][i]=sum[i+block].real();}
+        // Recombine the two real outputs into one inverse complex FFT.
+        auto& packed=work[0];const auto& right=work[1];
+        for(size_t i=0;i<=block;++i){
+            const auto l=packed[i],r=right[i];
+            packed[i]={l.real()-r.imag(),l.imag()+r.real()};
+            if(i>0&&i<block)packed[2*block-i]={l.real()+r.imag(),-l.imag()+r.real()};
+        }
+        fft.transform(packed.data(),true);
+        for(size_t i=0;i<block;++i){
+            output[0][i]=packed[i].real()+overlap[0][i];output[1][i]=packed[i].imag()+overlap[1][i];
+            overlap[0][i]=packed[i+block].real();overlap[1][i]=packed[i+block].imag();
         }
     }
 };
 // Nonuniform zero-added-latency convolution: direct 64-sample head, 64-sample
-// near partitions (offset 64, through 2047), staggered 1024-sample far
-// partitions (offset 2048). The added scheduling delay is in the IR offset.
+// near partitions (64..1023), staggered 512-sample middle partitions
+// (1024..4095) and 2048-sample far partitions (4096..end).
+// Scheduling delays are absorbed by the IR offsets, without delaying its head.
 class MXPartitionedConvolver {
     std::array<std::array<float,64>,2> head{},ring{};size_t pos=0;
-    MXPartitionTier near,far;
+    MXPartitionTier near,middle,far;
 public:
     std::string name;size_t frames=0;double rate=48000;
     explicit MXPartitionedConvolver(const MXIRAudio& ir):name(ir.name),frames(ir.left.size()),rate(ir.rate){
         for(size_t i=0;i<std::min<size_t>(64,frames);++i){head[0][i]=ir.left[i];head[1][i]=ir.right[i];}
-        near.prepare(ir,64,64,std::min<size_t>(2048,frames));far.prepare(ir,2048,1024,frames);reset();
+        if(frames<=size_t(rate*2)){
+            near.prepare(ir,64,64,std::min<size_t>(2048,frames));middle.prepare(ir,1024,512,1024);far.prepare(ir,2048,1024,frames);
+        }else{
+            near.prepare(ir,64,64,std::min<size_t>(1024,frames));middle.prepare(ir,1024,512,std::min<size_t>(4096,frames));far.prepare(ir,4096,2048,frames);
+        }reset();
     }
-    void reset(){for(auto& c:ring)c.fill(0);pos=0;near.reset();far.reset();}
+    void reset(){for(auto& c:ring)c.fill(0);pos=0;near.reset();middle.reset();far.reset();}
     void process(float& l,float& r){
-        l=std::isfinite(l)?l:0;r=std::isfinite(r)?r:0;
+        l=std::isfinite(l)?std::clamp(l,-32.f,32.f):0;r=std::isfinite(r)?std::clamp(r,-32.f,32.f):0;
         ring[0][pos]=l;ring[1][pos]=r;
         double a=0,b=0;for(size_t i=0;i<64;++i){const size_t k=(pos+64-i)%64;a+=double(ring[0][k])*head[0][i];b+=double(ring[1][k])*head[1][i];}
-        float nl,nr,fl,fr;near.process(l,r,nl,nr);far.process(l,r,fl,fr);pos=(pos+1)%64;
-        l=float(a+nl+fl);r=float(b+nr+fr);
+        float nl,nr,ml,mr,fl,fr;near.process(l,r,nl,nr);middle.process(l,r,ml,mr);far.process(l,r,fl,fr);pos=(pos+1)%64;
+        l=float(a+nl+ml+fl);r=float(b+nr+mr+fr);
     }
 };
 }

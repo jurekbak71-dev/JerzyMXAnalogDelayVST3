@@ -28,9 +28,14 @@ against invalid input and runaway output.
 
 `mxdelay_ir.h` implements actual stereo diagonal convolution (mono IR is copied
 to both channels; this is not four-channel true-stereo convolution). Samples
-0–63 use a direct FIR, 64–2047 use 64-sample FFT partitions, and the remainder
-uses 1024-sample partitions. Far-partition spectral accumulation is spread over
-sixteen 64-sample slices using the available 2048-sample IR offset. These offsets absorb block latency: there is no
+0–63 use a direct FIR, 64–1023 use 64-sample FFT partitions, 1024–4095 use 512-sample
+partitions, and the remainder uses 2048-sample partitions. Middle/far spectral
+accumulation is spread over 64-sample slices using the available IR offsets.
+For IRs up to two seconds, the middle tier is omitted and a 1024-sample
+far tier starts at sample 2048 to reduce FFT overhead for factory spaces.
+Only positive-frequency bins are stored; stereo channels share one packed
+complex transform. These optimizations retain actual convolution, without
+truncating or downsampling the late tail. These offsets absorb block latency: there is no
 extra algorithmic latency. Predelay and the IR's own onset remain audible.
 
 Factory Room (0.18 s), Plate (0.45 s), and Hall (1.1 s) are deterministic,
@@ -98,8 +103,33 @@ checks, and depend on runner hardware. They are not an FL Studio CPU reading.
 
 Windows workflow builds the VST3 and all tests, runs pluginval strictness 5,
 verifies bundled resource checksums and packages the complete bundle, licenses,
-source, WAVs, measurements and logs. A failed required step prevents release
+source, WAVs, measurements and logs. The resulting ZIP is extracted and its
+CRC, paths, required documentation/audio evidence and x64 bundle are verified. A failed required step prevents release
 packaging. Artifact SHA-256 is generated only for an actual successful ZIP.
+
+## Observed verification and limits
+
+Windows run [42028048253](https://github.com/jurekbak71-dev/JerzyMXAnalogDelayVST3/actions/runs/42028048253)
+at `0572a97` passed build, CTest (DSP, compatibility, reverb, compiled VST3 host,
+native GUI), native render verification and pluginval strictness 5, and produced
+installation/resource/render artifacts. Later CPU and archive-verification
+changes require their own final run; consult COMMIT.txt in the delivered ZIP.
+
+The long-IR benchmark fills **all eight seconds** of convolution history before
+timing. Earlier short warmups undercounted active spectral partitions. On this
+shared Linux machine, a full 8 s / 96 kHz bank can consume tens of percent of one
+core, and measured 64-sample callbacks can exceed their deadline. Optimizations
+halve spectral storage, share stereo transforms and spread middle/far MACs;
+there is no claim of glitch-free maximum-length IR at the smallest buffers on
+all CPUs. Use a larger audio buffer/shorter IR where the measurement exceeds the
+available deadline. The CSV includes p99 and maximum callback times; this is a
+performance limitation, not a passed real-time scheduling guarantee.
+
+Old normalized presets remain loadable, but the expanded FDN and longer factory
+IRs intentionally change reverb timbre relative to v8. Blend weights limit
+summation energy; modes do not perform perceptual loudness matching. Abnormally
+large non-normalized IR coefficients (>32) are rejected; reverb excitation is
+finite-checked and bounded to +/-32 for numerical safety.
 
 ## Acceptance still requiring evidence
 

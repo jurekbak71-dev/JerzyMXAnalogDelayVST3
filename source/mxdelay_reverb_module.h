@@ -39,7 +39,7 @@ public:
         if(enabled<1e-5&&!targetEnable){if(!quiescent){fdn.reset();active->reset();if(old)old->reset();prePos=preValid=0;quiescent=true;}l=T(dryL);r=T(dryR);return;}
         quiescent=false;
         const double excitation[2]={safe(double(sourceL)),safe(double(sourceR))};float input[2]{};
-        for(int c=0;c<2;++c){pre[c][prePos]=float(excitation[c]*targetEnable);const size_t d=size_t(delay);const double f=delay-d;
+        for(int c=0;c<2;++c){pre[c][prePos]=float(std::clamp(excitation[c],-32.,32.)*targetEnable);const size_t d=size_t(delay);const double f=delay-d;
             auto read=[&](size_t lag){return lag>preValid?0.f:pre[c][(prePos+pre[c].size()-lag)%pre[c].size()];};input[c]=float(read(d)+(read(d+1)-read(d))*f);}
         prePos=(prePos+1)%pre[0].size();preValid=std::min(preValid+1,pre[0].size()-1);
         T fl=T(input[0]),fr=T(input[1]);typename MXReverbFDN<T>::Params f;

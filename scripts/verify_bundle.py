@@ -5,6 +5,7 @@ import hashlib,json,sys
 root=Path(__file__).resolve().parents[1]
 bundle=Path(sys.argv[1]);res=bundle/'Contents/Resources'
 assert (res/'mxdelay.uidesc').is_file(),'Missing UI description'
+assert (res/'mxdelay.uidesc').read_bytes()==(root/'resource/mxdelay.uidesc').read_bytes(),'Stale UI description'
 m=json.loads((root/'resource/gui3d/manifest.json').read_text())
 for a in m['assets']:
  f=res/'gui3d'/a['file'];assert f.is_file(),f
