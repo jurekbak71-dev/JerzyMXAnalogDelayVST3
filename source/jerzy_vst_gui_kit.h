@@ -1,6 +1,8 @@
 #pragma once
 #include "vstgui/lib/controls/cknob.h"
 #include "vstgui/lib/ccolor.h"
+#include "jerzy_gui_assets.h"
+#include "vstgui/lib/controls/cbuttons.h"
 
 namespace JerzyAudio {
 
@@ -28,9 +30,31 @@ const JerzyGuiTheme& getJerzyGuiTheme();
 
 class JerzyKnob : public VSTGUI::CKnob {
 public:
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
     JerzyKnob(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
     void draw(VSTGUI::CDrawContext*) override;
     VSTGUI::CMouseEventResult onMouseDown(VSTGUI::CPoint&,const VSTGUI::CButtonState&) override;
+};
+
+// Segmented horizontal peak meter. The control value is linear amplitude (0..1).
+class JerzyLedBarMeter : public VSTGUI::CKnob {
+public:
+    JerzyLedBarMeter(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
+class JerzyConsoleButton : public VSTGUI::CTextButton {
+public:
+    using VSTGUI::CTextButton::CTextButton;
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
+class JerzySignalLED : public VSTGUI::CKnob {
+public:
+    JerzySignalLED(const VSTGUI::CRect& r,VSTGUI::IControlListener* l,int32_t t):CKnob(r,l,t,nullptr,nullptr){setMouseEnabled(false);}
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
+    void draw(VSTGUI::CDrawContext*) override;
 };
 
 class JerzyAnalogMeter : public VSTGUI::CKnob {
@@ -40,7 +64,10 @@ public:
 };
 
 class JerzyToggle : public VSTGUI::CKnob {
+    float visualPosition=-1.f;
 public:
+    void onIdle() override;
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
     JerzyToggle(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
     void draw(VSTGUI::CDrawContext*) override;
     VSTGUI::CMouseEventResult onMouseDown(VSTGUI::CPoint&,const VSTGUI::CButtonState&) override;
@@ -73,12 +100,27 @@ public:
 
 class JerzyHardwarePanel : public VSTGUI::CKnob {
 public:
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
     JerzyHardwarePanel(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
+class JerzyGlassPanel : public JerzyHardwarePanel {
+public:
+    using JerzyHardwarePanel::JerzyHardwarePanel;
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
+// Recessed, screw-free surface for densely populated algorithm modules.
+class JerzyConsoleInsetPanel : public JerzyHardwarePanel {
+public:
+    using JerzyHardwarePanel::JerzyHardwarePanel;
     void draw(VSTGUI::CDrawContext*) override;
 };
 
 class JerzyChassis : public VSTGUI::CKnob {
 public:
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
     JerzyChassis(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
     void draw(VSTGUI::CDrawContext*) override;
 };

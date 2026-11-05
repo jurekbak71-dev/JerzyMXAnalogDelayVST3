@@ -7,12 +7,27 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: mxdelay-windows-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: windows-2022
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate material library and layout
+        shell: pwsh
+        run: |
+          python -m pip install -r scripts/gui3d-requirements.txt
+          python tests/test_gui3d_assets.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tests/test_gui_c_layout.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Configure
         shell: pwsh
         run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DSMTG_CREATE_PLUGIN_LINK=0
@@ -30,20 +45,85 @@ jobs:
             Write-Output "::error title=CTest::$message"
             exit $testExit
           }
+      - name: Validate rendered control states
+        shell: pwsh
+        run: python scripts/verify_gui_renders.py build
+      - name: Independent pluginval validation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Invoke-WebRequest 'https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_Windows.zip' -OutFile pluginval.zip
+          if ((Get-FileHash pluginval.zip -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c08e61ce3b96db41636f8ec7e76f4c7e2c13ebdac7fa1b5a1f52b4f32ec715ab') { throw 'pluginval checksum mismatch' }
+          Expand-Archive pluginval.zip -DestinationPath pluginval
+          $plugin = Get-ChildItem build -Recurse -Directory -Filter 'MX Delay 2.vst3' | Select-Object -First 1
+          if (-not $plugin) { throw "Cannot locate MX Delay 2.vst3 for pluginval" }
+          Write-Output "Validating VST3: $($plugin.FullName)"
+          New-Item -ItemType Directory -Force build/pluginval-logs | Out-Null
+          # Native pluginval may exit with no stdout when a child VST3 host crashes.
+          # Preserve the exit code and dump diagnostic files before failing CI.
+          # A GUI-subsystem native executable can leave PowerShell's
+          # LASTEXITCODE unset. Launch pluginval with an explicit Windows
+          # Process, await its exit and capture BOTH standard streams.
+          $validator = (Resolve-Path './pluginval/pluginval.exe').Path
+          $pinfo = [System.Diagnostics.ProcessStartInfo]::new()
+          $pinfo.FileName = $validator
+          $pinfo.WorkingDirectory = (Get-Location).Path
+          $pinfo.UseShellExecute = $false
+          $pinfo.RedirectStandardOutput = $true
+          $pinfo.RedirectStandardError = $true
+          foreach ($arg in @('--strictness-level','5','--random-seed','1971','--sample-rates','44100,48000,96000','--block-sizes','64,128,257,1024','--output-dir',((Resolve-Path 'build/pluginval-logs').Path),'--validate',$plugin.FullName)) {
+            [void]$pinfo.ArgumentList.Add($arg)
+          }
+          $process = [System.Diagnostics.Process]::new()
+          $process.StartInfo = $pinfo
+          if (-not $process.Start()) { throw 'Failed to start pluginval process' }
+          $output = $process.StandardOutput.ReadToEndAsync()
+          $errors = $process.StandardError.ReadToEndAsync()
+          if (-not $process.WaitForExit(180000)) {
+            $process.Kill($true)
+            throw 'pluginval timed out after 180 seconds'
+          }
+          $valExit = $process.ExitCode
+          $console = $output.GetAwaiter().GetResult() + [Environment]::NewLine + $errors.GetAwaiter().GetResult()
+          $console | Set-Content build/pluginval-console.txt
+          if ($console.Trim()) { Write-Output $console }
+          $reports = @(Get-ChildItem build/pluginval-logs -Recurse -File -ErrorAction SilentlyContinue)
+          foreach ($report in $reports) {
+            Write-Output "pluginval report: $($report.FullName)"
+            Get-Content $report.FullName -Tail 120 -ErrorAction SilentlyContinue | Write-Output
+          }
+          if ($valExit -ne 0) {
+            Write-Output "::error title=pluginval::Validator exited with code $valExit; reports: $($reports.Count)"
+            throw "pluginval failed: $valExit"
+          }
       - name: Package
         shell: pwsh
         run: |
-          $plugin = Get-ChildItem -Path build -Recurse -Directory -Filter "JerzyMXAnalogDelay2.vst3" | Select-Object -First 1
+          $plugin = Get-ChildItem -Path build -Recurse -Directory -Filter "MX Delay 2.vst3" | Select-Object -First 1
           if (-not $plugin) { throw "JerzyMXAnalogDelay2.vst3 was not produced" }
           New-Item -ItemType Directory -Force artifact | Out-Null
-          Copy-Item -Recurse -Force $plugin.FullName artifact/JerzyMXAnalogDelay2.vst3
+          Copy-Item -Recurse -Force $plugin.FullName "artifact/MX Delay 2.vst3"
           # Ship the complete VST3 bundle. The UI's UIDescription must be present.
-          $bundle = "artifact/JerzyMXAnalogDelay2.vst3"
+          $bundle = "artifact/MX Delay 2.vst3"
           $resource = Join-Path $bundle "Contents/Resources/mxdelay.uidesc"
           if (-not (Test-Path $resource)) { throw "VST3 GUI unavailable: missing mxdelay.uidesc" }
-          $module = Get-ChildItem $bundle -Recurse -File -Filter "JerzyMXAnalogDelay2.vst3" | Select-Object -First 1
+          $module = Get-ChildItem $bundle -Recurse -File -Filter "MX Delay 2.vst3" | Select-Object -First 1
           if (-not $module) { throw "VST3 processor binary missing" }
-          Compress-Archive -Path $bundle -DestinationPath JerzyMXAnalogDelay2_Windows_x64.zip -Force
+          python scripts/verify_bundle.py $bundle
+          if ($LASTEXITCODE -ne 0) { throw 'Incomplete GUI resources' }
+          Copy-Item docs/INSTALL_FL_STUDIO.md artifact/
+          Copy-Item docs/GUI3D_ASSET_AUDIT.md artifact/
+          Copy-Item docs/GUI3D_VALIDATION.md artifact/
+          Copy-Item build/Testing/Temporary/LastTest.log artifact/CTEST_RESULTS.txt
+          Copy-Item build/pluginval-logs artifact/pluginval-logs -Recurse
+          git rev-parse HEAD | Set-Content artifact/COMMIT.txt
+          git archive --format=zip --output=artifact/MX_Delay_2-source.zip HEAD
+          Copy-Item source/engines/AGPL-3.0-LICENSE.txt artifact/
+          Copy-Item build/_deps/vst3sdk-src/LICENSE.txt artifact/VST3-SDK-LICENSE.txt
+          Copy-Item build/_deps/vst3sdk-src/vstgui4/LICENSE artifact/VSTGUI-LICENSE.txt
+          Compress-Archive -Path artifact/* -DestinationPath MX_Delay_2_Windows_x64.zip -Force
+          Get-FileHash MX_Delay_2_Windows_x64.zip -Algorithm SHA256 | Format-List | Out-File MX_Delay_2_SHA256.txt
+          Compress-Archive -Path resource/gui3d,scripts/render_gui3d_assets.py,scripts/gui3d-requirements.txt -DestinationPath MX_Delay_2_GUI3D_Library.zip -Force
       - name: Collect GUI renders
         shell: pwsh
         run: |
@@ -63,6 +143,20 @@ jobs:
         with:
           name: JerzyMXAnalogDelay2-Windows-x64
           path: |
-            JerzyMXAnalogDelay2_Windows_x64.zip
+            MX_Delay_2_Windows_x64.zip
+            MX_Delay_2_SHA256.txt
+            MX_Delay_2_GUI3D_Library.zip
           if-no-files-found: error
           retention-days: 90
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MX-Delay-2-diagnostics
+          path: |
+            build/Testing/Temporary/*.log
+            build/pluginval-logs
+            build/pluginval-console.txt
+            build/mxdelay2-render-*.png
+          if-no-files-found: warn

@@ -1,4 +1,6 @@
 #include "mxdelay_dsp.h"
+#include "mxdelay_reverb_fdn.h"
+#include "mxdelay_reverb_convolution.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -41,6 +43,18 @@ int main(){
         std::cout<<"algo "<<algo<<" peak="<<peak<<" energy="<<e<<"\n";
     }
 
+    // INPUT and WET must be measured before final dry/wet mixing.
+    // OUTPUT must report the actual summed audio, not the wet-only signal.
+    {
+        dsp.reset();
+        p=MXDelayParams{};p.mix=0.0;p.slot[0].enable=0.0;p.slot[1].enable=0.0;
+        MXDelayDSP<float>::MeterPeaks m{};
+        dsp.process(in,out,2,256,p,120.0,peak,&m);
+        assert(m.input>=.99&&m.input<=1.01);
+        assert(m.wet<1e-6);
+        assert(std::isfinite(m.output)&&m.output>0.0);
+        assert(std::abs(m.output-peak)<1e-6);
+    }
     SlotParams s;
     s.sync=1.0;s.division=4.0/9.0;
     assert(std::abs(slotDelayMs(s,120.0)-500.0)<1e-6);
@@ -187,6 +201,31 @@ int main(){
             }
         }
         assert(integrated>0.01 && maxPeak<8.0);
+    }
+    { MXReverbFDN<float> reverb; reverb.prepare(48000); MXReverbFDN<float>::Params cfg; cfg.enabled=true; cfg.wet=1.0; cfg.preDelayMs=12; double e=0; for(int i=0;i<96000;++i){float l=i==0?1.f:0.f,r=l;reverb.process(l,r,cfg);assert(std::isfinite(l)&&std::isfinite(r));if(i>4000)e+=std::abs(l)+std::abs(r);} assert(e>0.01); }
+    { MXReverbConvolution<float> ir;ir.prepare(48000);
+      for(int preset=0;preset<3;++preset){
+        ir.reset();double energy=0;
+        for(int i=0;i<2048;++i){float l=i==0?1.f:0.f,r=l;ir.process(l,r,preset);assert(std::isfinite(l)&&std::isfinite(r));energy+=std::abs(l)+std::abs(r);}
+        assert(energy>.001);
+      }
+    }
+    // Reverb works independently of both delay engines, in all three modes.
+    for(int mode=0;mode<3;++mode){
+        dsp.reset();
+        p=MXDelayParams{};
+        p.slot[0].enable=p.slot[1].enable=0.0;
+        p.mix=0.0;p.reverb.enable=1.0;p.reverb.wet=1.0;
+        p.reverb.mode=double(mode)/2.0;
+        p.reverb.ir=0.5;
+        std::fill(inL.begin(),inL.end(),0.f);
+        std::fill(inR.begin(),inR.end(),0.f);
+        inL[0]=inR[0]=0.25f;
+        std::fill(outL.begin(),outL.end(),0.f);
+        std::fill(outR.begin(),outR.end(),0.f);
+        dsp.process(in,out,2,N,p,120.0,peak);
+        assert(std::isfinite(peak)&&peak<8.0);
+        assert(energy(outL,outR,1)>1e-5);
     }
     return 0;
 }
