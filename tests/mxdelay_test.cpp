@@ -43,6 +43,18 @@ int main(){
         std::cout<<"algo "<<algo<<" peak="<<peak<<" energy="<<e<<"\n";
     }
 
+    // INPUT and WET must be measured before final dry/wet mixing.
+    // OUTPUT must report the actual summed audio, not the wet-only signal.
+    {
+        dsp.reset();
+        p=MXDelayParams{};p.mix=0.0;p.slot[0].enable=0.0;p.slot[1].enable=0.0;
+        MXDelayDSP<float>::MeterPeaks m{};
+        dsp.process(in,out,2,256,p,120.0,peak,&m);
+        assert(m.input>=.99&&m.input<=1.01);
+        assert(m.wet<1e-6);
+        assert(m.output>=.99&&m.output<=1.01);
+        assert(std::abs(m.output-peak)<1e-6);
+    }
     SlotParams s;
     s.sync=1.0;s.division=4.0/9.0;
     assert(std::abs(slotDelayMs(s,120.0)-500.0)<1e-6);
