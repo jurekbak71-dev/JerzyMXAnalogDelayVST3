@@ -857,6 +857,7 @@
 <view class="CTextLabel" origin="270, 696" size="110, 18" title="GLOBAL MIX" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="ChickenKnob" origin="301, 714" size="48, 48" control-tag="Mix" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="286, 762" size="78, 18" control-tag="Mix" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="AnalogMeter" origin="1061, 709" size="70, 70" control-tag="OutputPeak" mouse-enabled="false"/>
 <view class="CTextLabel" origin="1145, 696" size="110, 18" title="OUTPUT" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="ChickenKnob" origin="1176, 714" size="48, 48" control-tag="OutputTrim" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
 <view class="CTextLabel" origin="1161, 762" size="78, 18" control-tag="OutputTrim" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
@@ -864,8 +865,9 @@
 <view class="CTextLabel" origin="560, 702" size="210, 22" title="FX CHAIN" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="CTextLabel" origin="560, 737" size="230, 22" title="01 FILTER   02 DRIVE   03 MOD   04 LO-FI" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="CTextLabel" origin="810, 702" size="240, 22" title="REVERB" font="Section" font-color="Amber" transparent="true" mouse-enabled="false"/>
-<view class="CTextLabel" origin="810, 737" size="240, 22" title="ALGORITHMIC / IR / HYBRID — PLANNED" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="810, 737" size="240, 22" title="FDN / BUILT-IN IR / HYBRID" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 </template><control-tags>
+<control-tag name="OutputPeak" tag="1059"/>
 <control-tag name="ReverbMode" tag="1057"/>
 <control-tag name="ReverbIR" tag="1058"/>
 <control-tag name="A9C0" tag="1264"/>
