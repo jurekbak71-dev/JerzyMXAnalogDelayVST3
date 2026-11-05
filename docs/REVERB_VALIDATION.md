@@ -61,7 +61,9 @@ results. Status strings and file selection use control-thread messages and a
 
 The processor's previous allocating vector/stable-sort automation staging is
 replaced with a preallocated merge of VST3 parameter queues (1024 queues max).
-No parameter IDs were removed; state versions 1–8 remain readable. New IDs:
+No-trails global bypass clears reverb history once on entry, so releasing bypass
+does not resurrect a paused tail. Repeated bypass blocks avoid repeatedly
+clearing the large delay buffers. No parameter IDs were removed; state versions 1–8 remain readable. New IDs:
 1070 External, 1071 IR Length, 1072 Normalize, 1073 LF Cut, 1074 Diffusion,
 1075 Early, 1076 Hybrid IR Balance, 1077 IR HF Damping. Existing 1050–1058
 retain normalized storage. Decay/HF displays now use seconds/Hz without changing

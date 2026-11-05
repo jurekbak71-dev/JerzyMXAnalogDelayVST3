@@ -440,16 +440,17 @@ template<class T> class MXDelayDSP {
     MXReverbModule<T> reverb;
     MXOriginalEngines<T> originals[2];
     double sr=44100.0;
+    bool bypassCleared=false;
 public:
     void prepare(double sampleRate,int=2,const ReverbParams* initialReverb=nullptr){
-        sr=sampleRate;
+        sr=sampleRate;bypassCleared=false;
         s[0].prepare(sampleRate,0x13579bdfu);
         s[1].prepare(sampleRate,0x2468ace1u);
         for(auto& fx:wetFx)fx.prepare(sampleRate);
         reverb.prepare(sampleRate,initialReverb);
         for(auto& engine:originals)engine.initialize(sampleRate);
     }
-    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();for(auto& engine:originals)engine.reset();}
+    void reset(){bypassCleared=false;for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();for(auto& engine:originals)engine.reset();}
 
     void requestIRPath(const std::string& path,bool select=true){reverb.requestPath(path,select);}
     MXIRLoader::Status irStatus()const{return reverb.status();}
@@ -464,7 +465,9 @@ public:
         const bool bypass=p.bypass>=.5,trails=p.spill>=.5;
         peak=0;
 
-        if(bypass&&!trails){s[0].reset();s[1].reset();}
+        if(bypass&&!trails){
+            if(!bypassCleared){s[0].reset();s[1].reset();reverb.reset();bypassCleared=true;}
+        }else bypassCleared=false;
 
         for(int i=0;i<n;++i){
             const T rawL=(T)(in&&in[0]&&std::isfinite(double(in[0][i]))?in[0][i]:0);
