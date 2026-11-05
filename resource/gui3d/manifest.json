@@ -3763,6 +3763,26 @@
       "audio_parameter": true
     },
     {
+      "tag": "9300",
+      "param_id": 9300,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "ReverbExternal",
+      "param_id": 1070,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
       "tag": "ReverbEnable",
       "param_id": 1050,
       "view": "LedToggleSwitch",
@@ -3826,6 +3846,96 @@
       "audio_parameter": true
     },
     {
+      "tag": "ReverbLowCut",
+      "param_id": 1073,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbDiffusion",
+      "param_id": 1074,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbEarly",
+      "param_id": 1075,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbIRLength",
+      "param_id": 1071,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbIRDamping",
+      "param_id": 1077,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbHybrid",
+      "param_id": 1076,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
       "tag": "ReverbWidth",
       "param_id": 1054,
       "view": "ChickenKnob",
@@ -3852,6 +3962,15 @@
         "scale_cyan.png",
         "glow_amber.png",
         "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbNormalize",
+      "param_id": 1072,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
       ],
       "audio_parameter": true
     },

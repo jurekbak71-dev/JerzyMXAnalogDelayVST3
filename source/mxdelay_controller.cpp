@@ -9,6 +9,7 @@
 #include "public.sdk/source/vst/vstparameters.h"
 #include <cstring>
 #include <string>
+#include "pluginterfaces/vst/ivstmessage.h"
 using namespace Steinberg;using namespace Steinberg::Vst;
 namespace JerzyAudio {
 namespace {
@@ -21,6 +22,18 @@ public:
  ParamValue toNormalized(ParamValue p) const SMTG_OVERRIDE {p=std::clamp(p,lo_,hi_);return std::log(p/lo_)/std::log(hi_/lo_);}
 private:double lo_,hi_;
 };
+class ReverbDecayParameter final:public RangeParameter {
+public:
+ ReverbDecayParameter():RangeParameter(STR16("Reverb RT60"),kMXReverbDecayId,STR16("s"),.35,12.35,4.67){setPrecision(2);setNormalized(.6);info.defaultNormalizedValue=.6;}
+ ParamValue toPlain(ParamValue n)const override{return .35+12*n*n;}
+ ParamValue toNormalized(ParamValue v)const override{return std::sqrt(std::clamp((v-.35)/12.,0.,1.));}
+};
+class ReverbDampingParameter final:public RangeParameter {
+public:
+ explicit ReverbDampingParameter(ParamID id,const TChar* name,double value):RangeParameter(name,id,STR16("Hz"),800,20000,value){setPrecision(0);setNormalized(toNormalized(value));info.defaultNormalizedValue=getNormalized();}
+ ParamValue toPlain(ParamValue n)const override{return 20000*std::pow(.04,std::clamp(n,0.,1.));}
+ ParamValue toNormalized(ParamValue v)const override{return std::log(std::clamp(v,800.,20000.)/20000)/std::log(.04);}
+};
 void addPercent(ParameterContainer& ps,const TChar* name,ParamID id,double def){ps.addParameter(rangeParam(name,id,STR16("%"),0,100,def*100,1));}
 }
 tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
@@ -31,13 +44,21 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
  parameters.addParameter(rangeParam(STR16("Spillover"),kMXSpillId,STR16(""),0,1,1,0,1));parameters.addParameter(rangeParam(STR16("Host Tempo"),kMXTempoMeterId,STR16("BPM"),0,300,120,1,0,ParameterInfo::kIsReadOnly));parameters.addParameter(listParam(STR16("Machine Condition"),kMXMachineConditionId,{STR16("SERVICED"),STR16("USED"),STR16("WORN"),STR16("DAMAGED")},0));
  parameters.addParameter(rangeParam(STR16("Reverb On"),kMXReverbEnableId,STR16(""),0,1,0,0,1));
  addPercent(parameters,STR16("Reverb Wet"),kMXReverbWetId,d.reverb.wet);
- addPercent(parameters,STR16("Reverb Decay"),kMXReverbDecayId,d.reverb.decay);
- addPercent(parameters,STR16("Reverb Damping"),kMXReverbDampingId,d.reverb.damping);
- addPercent(parameters,STR16("Reverb Width"),kMXReverbWidthId,d.reverb.width);
- addPercent(parameters,STR16("Reverb Pre-delay"),kMXReverbPreDelayId,d.reverb.preDelay);
+ parameters.addParameter(new ReverbDecayParameter);
+ parameters.addParameter(new ReverbDampingParameter(kMXReverbDampingId,STR16("FDN HF Damping"),20000*std::pow(.04,d.reverb.damping)));
+ parameters.addParameter(rangeParam(STR16("Reverb Width"),kMXReverbWidthId,STR16("%"),0,200,100,1));
+ parameters.addParameter(rangeParam(STR16("Reverb Pre-delay"),kMXReverbPreDelayId,STR16("ms"),0,240,d.reverb.preDelay*240,1));
  parameters.addParameter(rangeParam(STR16("Reverb Freeze"),kMXReverbFreezeId,STR16(""),0,1,0,0,1));
  parameters.addParameter(listParam(STR16("Reverb Mode"),kMXReverbModeId,{STR16("ALGORITHMIC"),STR16("CONVOLUTION"),STR16("HYBRID")},0));
  parameters.addParameter(listParam(STR16("IR Profile"),kMXReverbIRId,{STR16("ROOM"),STR16("PLATE"),STR16("HALL")},0));
+ parameters.addParameter(rangeParam(STR16("External WAV IR"),kMXReverbExternalId,STR16(""),0,1,0,0,1));
+ parameters.addParameter(rangeParam(STR16("IR Length"),kMXReverbIRLengthId,STR16("s"),.02,8,8,2));
+ parameters.addParameter(rangeParam(STR16("IR Normalize"),kMXReverbNormalizeId,STR16(""),0,1,1,0,1));
+ parameters.addParameter(new LogRangeParameter(STR16("FDN Low Cut"),kMXReverbLowCutId,STR16("Hz"),20,500,20,0));
+ addPercent(parameters,STR16("FDN Diffusion"),kMXReverbDiffusionId,d.reverb.diffusion);
+ addPercent(parameters,STR16("Early Reflections"),kMXReverbEarlyId,d.reverb.early);
+ addPercent(parameters,STR16("Hybrid IR Balance"),kMXReverbHybridId,d.reverb.hybrid);
+ parameters.addParameter(new ReverbDampingParameter(kMXReverbIRDampingId,STR16("IR HF Damping"),20000));
  parameters.addParameter(rangeParam(STR16("Output Peak"),kMXPeakMeterId,STR16(""),0,1,0,0,1,ParameterInfo::kIsReadOnly));
  parameters.addParameter(rangeParam(STR16("Input Peak"),kMXInputPeakMeterId,STR16(""),0,1,0,0,1,ParameterInfo::kIsReadOnly));
  parameters.addParameter(rangeParam(STR16("Wet Peak"),kMXWetPeakMeterId,STR16(""),0,1,0,0,1,ParameterInfo::kIsReadOnly));
@@ -97,7 +118,26 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
  }
  return kResultOk;
 }
-tresult PLUGIN_API MXDelayController::setComponentState(IBStream*s){if(!s)return kResultFalse;IBStreamer b(s,kLittleEndian);MXDelayParams p;if(!readMXState(b,p))return kResultFalse;setParamNormalized(kMXMixId,p.mix);setParamNormalized(kMXInputTrimId,p.inputTrim);setParamNormalized(kMXOutputTrimId,p.outputTrim);setParamNormalized(kMXRoutingId,p.routing);setParamNormalized(kMXBypassId,p.bypass);setParamNormalized(kMXSpillId,p.spill);setParamNormalized(kMXMachineConditionId,p.machineCondition);setParamNormalized(kMXReverbEnableId,p.reverb.enable);setParamNormalized(kMXReverbWetId,p.reverb.wet);setParamNormalized(kMXReverbDecayId,p.reverb.decay);setParamNormalized(kMXReverbDampingId,p.reverb.damping);setParamNormalized(kMXReverbWidthId,p.reverb.width);setParamNormalized(kMXReverbPreDelayId,p.reverb.preDelay);setParamNormalized(kMXReverbFreezeId,p.reverb.freeze);setParamNormalized(kMXReverbModeId,p.reverb.mode);setParamNormalized(kMXReverbIRId,p.reverb.ir);for(int fx=0;fx<4;++fx){const auto&q=p.fx[fx];setParamNormalized(wetFxParam(fx,kWetFxType),q.type);setParamNormalized(wetFxParam(fx,kWetFxAmount),q.amount);setParamNormalized(wetFxParam(fx,kWetFxRate),q.rate);setParamNormalized(wetFxParam(fx,kWetFxDepth),q.depth);setParamNormalized(wetFxParam(fx,kWetFxDrive),q.drive);setParamNormalized(wetFxParam(fx,kWetFxRoute),q.route);}for(int x=0;x<2;++x){auto&q=p.slot[x];setParamNormalized(slotParam(x,kSlotAlgorithm),q.algorithm);setParamNormalized(slotParam(x,kSlotEnable),q.enable);setParamNormalized(slotParam(x,kSlotSync),q.sync);setParamNormalized(slotParam(x,kSlotDivision),q.division);setParamNormalized(slotParam(x,kSlotTime),q.time);setParamNormalized(slotParam(x,kSlotFeedback),q.feedback);setParamNormalized(slotParam(x,kSlotLevel),q.level);setParamNormalized(slotParam(x,kSlotPan),q.pan);setParamNormalized(slotParam(x,kSlotDuck),q.duck);for(int h=0;h<4;++h)setParamNormalized(slotParam(x,kSlotHeadPan1+h),q.headPan[h]);for(int a=0;a<kAlgorithmCount;++a)for(int k=0;k<kAlgoControls;++k)if(parameters.getParameter(algoParam(x,a,k)))setParamNormalized(algoParam(x,a,k),q.c[a][k]);}return kResultOk;}
+tresult PLUGIN_API MXDelayController::setComponentState(IBStream*s){if(!s)return kResultFalse;IBStreamer b(s,kLittleEndian);MXDelayParams p;if(!readMXState(b,p))return kResultFalse;setParamNormalized(kMXMixId,p.mix);setParamNormalized(kMXInputTrimId,p.inputTrim);setParamNormalized(kMXOutputTrimId,p.outputTrim);setParamNormalized(kMXRoutingId,p.routing);setParamNormalized(kMXBypassId,p.bypass);setParamNormalized(kMXSpillId,p.spill);setParamNormalized(kMXMachineConditionId,p.machineCondition);setParamNormalized(kMXReverbEnableId,p.reverb.enable);setParamNormalized(kMXReverbWetId,p.reverb.wet);setParamNormalized(kMXReverbDecayId,p.reverb.decay);setParamNormalized(kMXReverbDampingId,p.reverb.damping);setParamNormalized(kMXReverbWidthId,p.reverb.width);setParamNormalized(kMXReverbPreDelayId,p.reverb.preDelay);setParamNormalized(kMXReverbFreezeId,p.reverb.freeze);setParamNormalized(kMXReverbModeId,p.reverb.mode);setParamNormalized(kMXReverbIRId,p.reverb.ir);setParamNormalized(kMXReverbExternalId,p.reverb.external);setParamNormalized(kMXReverbIRLengthId,p.reverb.irLength);setParamNormalized(kMXReverbNormalizeId,p.reverb.normalize);setParamNormalized(kMXReverbLowCutId,p.reverb.lowCut);setParamNormalized(kMXReverbDiffusionId,p.reverb.diffusion);setParamNormalized(kMXReverbEarlyId,p.reverb.early);setParamNormalized(kMXReverbHybridId,p.reverb.hybrid);setParamNormalized(kMXReverbIRDampingId,p.reverb.irDamping);for(int fx=0;fx<4;++fx){const auto&q=p.fx[fx];setParamNormalized(wetFxParam(fx,kWetFxType),q.type);setParamNormalized(wetFxParam(fx,kWetFxAmount),q.amount);setParamNormalized(wetFxParam(fx,kWetFxRate),q.rate);setParamNormalized(wetFxParam(fx,kWetFxDepth),q.depth);setParamNormalized(wetFxParam(fx,kWetFxDrive),q.drive);setParamNormalized(wetFxParam(fx,kWetFxRoute),q.route);}for(int x=0;x<2;++x){auto&q=p.slot[x];setParamNormalized(slotParam(x,kSlotAlgorithm),q.algorithm);setParamNormalized(slotParam(x,kSlotEnable),q.enable);setParamNormalized(slotParam(x,kSlotSync),q.sync);setParamNormalized(slotParam(x,kSlotDivision),q.division);setParamNormalized(slotParam(x,kSlotTime),q.time);setParamNormalized(slotParam(x,kSlotFeedback),q.feedback);setParamNormalized(slotParam(x,kSlotLevel),q.level);setParamNormalized(slotParam(x,kSlotPan),q.pan);setParamNormalized(slotParam(x,kSlotDuck),q.duck);for(int h=0;h<4;++h)setParamNormalized(slotParam(x,kSlotHeadPan1+h),q.headPan[h]);for(int a=0;a<kAlgorithmCount;++a)for(int k=0;k<kAlgoControls;++k)if(parameters.getParameter(algoParam(x,a,k)))setParamNormalized(algoParam(x,a,k),q.c[a][k]);}return kResultOk;}
+bool MXDelayController::loadIRFile(const char* path){
+ if(!path)return false;const size_t length=std::strlen(path);if(length==0||length>32768)return false;
+ auto message=owned(allocateMessage());if(!message)return false;message->setMessageID("MXIRLoad");
+ message->getAttributes()->setBinary("path",path,uint32(length));if(sendMessage(message)!=kResultOk)return false;
+ beginEdit(kMXReverbExternalId);setParamNormalized(kMXReverbExternalId,1);performEdit(kMXReverbExternalId,1);endEdit(kMXReverbExternalId);
+ {std::lock_guard<std::mutex> lock(irMutex);irMetadata.state=1;irMetadata.error.clear();}return true;
+}
+void MXDelayController::requestIRStatus(){if(auto message=owned(allocateMessage())){message->setMessageID("MXIRStatusRequest");sendMessage(message);}}
+tresult PLUGIN_API MXDelayController::notify(IMessage* message){
+ if(message&&std::strcmp(message->getMessageID(),"MXIRStatus")==0){
+  IRStatus next;const void* data=nullptr;uint32 size=0;int64 state=0;
+  auto* a=message->getAttributes();
+  if(a->getBinary("name",data,size)==kResultOk&&size<=32768&&data)next.name.assign(static_cast<const char*>(data),size);
+  if(a->getBinary("error",data,size)==kResultOk&&size<=32768&&data)next.error.assign(static_cast<const char*>(data),size);
+  if(a->getInt("state",state)==kResultOk)next.state=int(state);
+  std::lock_guard<std::mutex> lock(irMutex);irMetadata=std::move(next);return kResultOk;
+ }
+ return EditControllerEx1::notify(message);
+}
 IPlugView* PLUGIN_API MXDelayController::createView(const char*n){if(n&&std::strcmp(n,ViewType::kEditor)==0){auto*e=new MXDelayEditor(this,"view","mxdelay.uidesc");e->setAllowedZoomFactors({0.75,1.0,1.25,1.5});return e;}return nullptr;}
 tresult PLUGIN_API MXDelayController::getMidiControllerAssignment(int32 bus,int16,CtrlNumber cc,ParamID&id){if(bus!=0)return kResultFalse;switch((int)cc){case 1:id=slotParam(0,kSlotFeedback);break;case 7:id=kMXMixId;break;case 11:id=kMXInputTrimId;break;case 64:id=kMXBypassId;break;case 71:id=slotParam(0,kSlotFeedback);break;case 72:id=slotParam(1,kSlotFeedback);break;case 73:id=slotParam(1,kSlotTime);break;case 74:id=slotParam(0,kSlotTime);break;case 76:id=slotParam(0,kSlotPan);break;case 77:id=slotParam(1,kSlotPan);break;case 20:id=slotParam(0,kSlotHeadPan1);break;case 21:id=slotParam(0,kSlotHeadPan2);break;case 22:id=slotParam(0,kSlotHeadPan3);break;case 23:id=slotParam(0,kSlotHeadPan4);break;
 case 24:id=slotParam(1,kSlotHeadPan1);break;case 25:id=slotParam(1,kSlotHeadPan2);break;case 26:id=slotParam(1,kSlotHeadPan3);break;case 27:id=slotParam(1,kSlotHeadPan4);break;

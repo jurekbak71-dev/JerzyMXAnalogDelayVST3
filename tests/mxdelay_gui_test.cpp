@@ -69,7 +69,12 @@ int main(int argc,char**argv){try{
   auto has=[&](double x,double y,ParamID expected){return finder->findParameter((int32)std::lround(x*r.getWidth()/1280.),(int32)std::lround(y*r.getHeight()/790.),found)==kResultTrue&&found==expected;};
   if(tab==0)checkFinder(view);
   if(tab==1)require(has(155,247,wetFxParam(0,kWetFxType)),"FX page binding missing");
-  if(tab==2)require(!has(221,255,slotParam(0,kSlotTime)),"Hidden A/B controls remain hittable");
+  if(tab==2){require(!has(221,255,slotParam(0,kSlotTime)),"Hidden A/B controls remain hittable");
+   require(has(286,398,kMXReverbDecayId)&&has(486,543,kMXReverbHybridId),"Reverb knob bindings missing");
+   setParam(controller,kMXReverbDecayId,.9);right(view,frame.window,286,398);require(std::abs(controller->getParamNormalized(kMXReverbDecayId)-.6)<.002,"Reverb default reset incorrect");
+   double on=controller->getParamNormalized(kMXReverbEnableId);left(view,frame.window,1014,244);require(controller->getParamNormalized(kMXReverbEnableId)!=on,"Reverb ON toggle not bound");
+   for(int mode=0;mode<3;++mode){setParam(controller,kMXReverbModeId,mode*.5);setParam(controller,kMXReverbHybridId,mode*.5);pump();require(renderProbe(view,("mxdelay2-render-reverb-mode-"+std::to_string(mode)+".png").c_str())==1,"Reverb state render failed");}
+  }
   if(tab==3)require(has(580,281,kMXRoutingId),"Routing page binding missing");
   require(has(224,730,kMXMixId),"Persistent mix missing");
   require(renderProbe(view,("mxdelay2-render-tab-"+std::to_string(tab)+".png").c_str())==1,"Console page render failed");

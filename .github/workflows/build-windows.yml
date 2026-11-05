@@ -33,11 +33,11 @@ jobs:
         run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DSMTG_CREATE_PLUGIN_LINK=0
       - name: Build Release
         shell: pwsh
-        run: cmake --build build --config Release --target JerzyMXAnalogDelay2 MXDelayDSPTests MXDelayCompatibilityTests MXDelayGUITests --parallel
+        run: cmake --build build --config Release --target JerzyMXAnalogDelay2 MXDelayDSPTests MXDelayCompatibilityTests MXReverbTests MXReverbHostTests MXDelayGUITests --parallel
       - name: Test DSP and GUI
         shell: pwsh
         run: |
-          ctest --test-dir build -C Release --verbose --output-on-failure -R "^(MXDelayDSP|MXDelayCompatibility|MXDelayGUI)$"
+          ctest --test-dir build -C Release --verbose --output-on-failure -R "^(MXDelayDSP|MXDelayCompatibility|MXReverb|MXReverbHost|MXDelayGUI)$"
           $testExit = $LASTEXITCODE
           if ($testExit -ne 0) {
             # Expose test diagnostics in check annotations as well as runner logs.
@@ -52,6 +52,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          try {
           Invoke-WebRequest 'https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_Windows.zip' -OutFile pluginval.zip
           if ((Get-FileHash pluginval.zip -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c08e61ce3b96db41636f8ec7e76f4c7e2c13ebdac7fa1b5a1f52b4f32ec715ab') { throw 'pluginval checksum mismatch' }
           Expand-Archive pluginval.zip -DestinationPath pluginval
@@ -62,6 +63,11 @@ jobs:
             $message = (Get-Content build/pluginval-console.txt -Raw).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
             Write-Output "::error title=pluginval::$message"
             throw "pluginval failed: $valExit"
+          }
+          } catch {
+            $message = ($_ | Out-String).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Output "::error title=pluginval setup or execution::$message"
+            throw
           }
       - name: Package
         shell: pwsh
@@ -78,6 +84,8 @@ jobs:
           if (-not $module) { throw "VST3 processor binary missing" }
           python scripts/verify_bundle.py $bundle
           if ($LASTEXITCODE -ne 0) { throw 'Incomplete GUI resources' }
+          Copy-Item build/reverb-results artifact/reverb-results -Recurse
+          Copy-Item docs/REVERB_VALIDATION.md artifact/
           Copy-Item docs/INSTALL_FL_STUDIO.md artifact/
           Copy-Item docs/GUI3D_ASSET_AUDIT.md artifact/
           Copy-Item docs/GUI3D_VALIDATION.md artifact/
@@ -122,6 +130,7 @@ jobs:
         with:
           name: MX-Delay-2-diagnostics
           path: |
+            build/reverb-results
             build/Testing/Temporary/*.log
             build/pluginval-logs
             build/pluginval-console.txt

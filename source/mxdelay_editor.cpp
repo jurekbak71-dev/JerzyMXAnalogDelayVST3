@@ -1,4 +1,6 @@
 #include "mxdelay_editor.h"
+#include "mxdelay_controller.h"
+#include "vstgui/lib/controls/ctextlabel.h"
 #include "mxdelay_editor_geometry.h"
 #include "vstgui/lib/cframe.h"
 #include "vstgui/lib/cgraphicstransform.h"
@@ -29,6 +31,7 @@ VSTGUI::CView* MXDelayEditor::verifyView(VSTGUI::CView* view,const VSTGUI::UIAtt
         view->setVisible(index==consolePage);
     }
     if(auto* control=dynamic_cast<VSTGUI::CControl*>(view)){
+        if(control->getTag()>=9300&&control->getTag()<=9302){if(control->getTag()==9300)control->setListener(this);return view;}
         if(control->getTag()>=firstConsoleTab&&control->getTag()<=lastConsoleTab){
             control->setListener(this);
             control->setValueNormalized(control->getTag()-firstConsoleTab==consolePage?1.f:0.f);
@@ -116,8 +119,8 @@ struct MXDelayEditor::NativeResizeWatcher {
     NativeResizeWatcher(MXDelayEditor&,void*,void*){}
 #endif
 };
-MXDelayEditor::~MXDelayEditor(){delete nativeWatcher;}
-void PLUGIN_API MXDelayEditor::close(){delete nativeWatcher;nativeWatcher=nullptr;VSTGUI::VST3Editor::close();}
+MXDelayEditor::~MXDelayEditor(){irStatusTimer=nullptr;if(irSelector)irSelector->cancel();irSelector=nullptr;delete nativeWatcher;}
+void PLUGIN_API MXDelayEditor::close(){irStatusTimer=nullptr;if(irSelector)irSelector->cancel();irSelector=nullptr;delete nativeWatcher;nativeWatcher=nullptr;VSTGUI::VST3Editor::close();}
 bool PLUGIN_API MXDelayEditor::open(void* parent,const VSTGUI::PlatformType& type){
 #if defined(_WIN32)
     // Host compatibility: GPU DirectComposition surfaces can remain black in FL Studio
@@ -132,6 +135,8 @@ bool PLUGIN_API MXDelayEditor::open(void* parent,const VSTGUI::PlatformType& typ
 #endif
     if(!VSTGUI::VST3Editor::open(parent,type))return false;
     selectConsolePage(consolePage);
+    refreshIRStatus();
+    irStatusTimer=VSTGUI::owned(new VSTGUI::CVSTGUITimer([this](VSTGUI::CVSTGUITimer*){refreshIRStatus();},200));
     fitHostSize(getRect());
 #if defined(_WIN32)
     delete nativeWatcher;
@@ -208,7 +213,34 @@ void MXDelayEditor::onMouseEvent(VSTGUI::MouseEvent& event,VSTGUI::CFrame* frame
     }
     VSTGUI::VST3Editor::onMouseEvent(event,frame);
 }
+void MXDelayEditor::refreshIRStatus(){
+    auto* controller=dynamic_cast<MXDelayController*>(getController());auto* frame=getFrame();if(!controller||!frame)return;
+    controller->requestIRStatus();const auto status=controller->irStatus();
+    const std::string name="IR: "+status.name+(status.state==1?" (preparing...)":"");
+    const std::string error=status.error.empty()?"WAV PCM16/24/32 or float32, mono/stereo; max 8 seconds. Prepared off the audio thread.":"IR error: "+status.error;
+    const auto update=[&](const auto& self,VSTGUI::CViewContainer* parent)->void{
+        parent->forEachChild([&](const auto& view){
+            if(auto* label=dynamic_cast<VSTGUI::CTextLabel*>(view.get())){
+                if(label->getTag()==9301&&label->getText().getString()!=name)label->setText(name.c_str());
+                if(label->getTag()==9302&&label->getText().getString()!=error)label->setText(error.c_str());
+            }
+            if(auto* child=view->asViewContainer())self(self,child);
+        });
+    };update(update,frame);
+}
 void MXDelayEditor::valueChanged(VSTGUI::CControl* control){
+    if(control&&control->getTag()==9300){
+        if(control->getValueNormalized()>.5f){
+            auto* controller=dynamic_cast<MXDelayController*>(getController());
+            if(controller&&getFrame()){
+                irSelector=VSTGUI::owned(VSTGUI::CNewFileSelector::create(getFrame(),VSTGUI::CNewFileSelector::kSelectFile));
+                if(irSelector){irSelector->setTitle("Load reverb WAV impulse response");irSelector->addFileExtension(VSTGUI::CFileExtension("WAVE IR","wav","audio/wav"));
+                    Steinberg::IPtr<MXDelayController> keep(controller);
+                    irSelector->run([keep](VSTGUI::CNewFileSelector* selection){if(selection->getNumSelectedFiles())keep->loadIRFile(selection->getSelectedFile(0));});
+                }
+            }
+        }return;
+    }
     if(control&&control->getTag()>=firstConsoleTab&&control->getTag()<=lastConsoleTab){
         // VSTGUI also reports zero-valued initialization/tag-binding changes.
         // Only a selected button requests navigation; clicking the current tab
