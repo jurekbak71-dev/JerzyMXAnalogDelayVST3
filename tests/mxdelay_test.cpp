@@ -13,7 +13,47 @@ static double energy(const std::vector<float>& a,const std::vector<float>& b,int
     return e;
 }
 
+// Meter taps must follow their controls without changing the audio path.
+template<class T> static void meterTrimAndMix(){
+    constexpr int count=4096;
+    MXDelayDSP<T> dsp;dsp.prepare(48000,2);
+    std::vector<T> il(count),ir(count),ol(count),orr(count);
+    il[0]=T(.2);ir[0]=T(-.4);
+    T* in[]={il.data(),ir.data()};T* out[]={ol.data(),orr.data()};
+    for(int channels:{1,2})for(int routing=0;routing<3;++routing){
+        double previousInput=0;
+        for(double trim:{1./3.,.5,2./3.}){ // -6, 0, +6 dB
+            MXDelayParams p;p.inputTrim=trim;p.outputTrim=.6;p.routing=routing*.5;
+            p.slot[1].enable=0;p.slot[0].algorithm=double(DelayAlgorithm::DIG)/(kAlgorithmCount-1);
+            p.slot[0].sync=0;p.slot[0].time=0;p.slot[0].feedback=0;
+            double fullWet=0;
+            for(double mix:{1.,.25,0.}){
+                p.mix=mix;dsp.reset();typename MXDelayDSP<T>::MeterPeaks m{};double peak=0;
+                dsp.process(in,out,channels,count,p,120,peak,&m);
+                const double expected=std::abs(double(channels==2?ir[0]:il[0]))*gainFromNorm(trim,-18,18);
+                assert(std::abs(m.input-expected)<1e-6);
+                if(mix==1.){fullWet=m.wet;assert(fullWet>1e-5);assert(m.input>previousInput);previousInput=m.input;}
+                assert(std::abs(m.wet-mix*fullWet)<1e-6);
+                double measuredOutput=0;for(int i=0;i<count;++i){measuredOutput=std::max(measuredOutput,std::abs(double(ol[i])));if(channels==2)measuredOutput=std::max(measuredOutput,std::abs(double(orr[i])));}
+                assert(std::abs(m.output-peak)<1e-6);
+                if(channels==2)assert(std::abs(m.output-measuredOutput)<1e-6);
+                else assert(m.output+1e-6>=measuredOutput); // Preserve the existing stereo-peak convention for mono.
+                const auto savedL=ol,savedR=orr;dsp.reset();
+                dsp.process(in,out,channels,count,p,120,peak);
+                assert(savedL==ol&&(channels==1||savedR==orr));
+            }
+            // WET follows MIX before OUT gain; OUT still follows actual output.
+            p.mix=1.;p.outputTrim=0.;dsp.reset();typename MXDelayDSP<T>::MeterPeaks quiet{};double peak=0;
+            dsp.process(in,out,channels,count,p,120,peak,&quiet);
+            assert(std::abs(quiet.wet-fullWet)<1e-6);
+            assert(std::abs(quiet.output-fullWet*gainFromNorm(p.outputTrim,-18,12))<1e-6);
+        }
+    }
+    std::cout<<"Post-IN/post-MIX metering, mono/stereo routings, unchanged OUTPUT and audio passed\n";
+}
+
 int main(){
+    meterTrimAndMix<float>();meterTrimAndMix<double>();
     constexpr int N=48000;
     std::vector<float> inL(N),inR(N),outL(N),outR(N);
     inL[0]=inR[0]=1.0f;
@@ -43,7 +83,7 @@ int main(){
         std::cout<<"algo "<<algo<<" peak="<<peak<<" energy="<<e<<"\n";
     }
 
-    // INPUT and WET must be measured before final dry/wet mixing.
+    // INPUT follows IN trim; WET reports the wet contribution after MIX.
     // OUTPUT must report the actual summed audio, not the wet-only signal.
     {
         dsp.reset();

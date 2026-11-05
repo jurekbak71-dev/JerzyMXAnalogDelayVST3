@@ -28,7 +28,11 @@ adjustable HYBRID. Read `REVERB_VALIDATION.md` for the audit, supported formats,
 new IDs/state, audio evidence and measured long-IR performance limitations.
 The three imported delay adapters remain preserved; these GUI/reverb tests do
 not certify their standalone sound/oversampling/precision equivalence. Existing
-input/wet/output meters display real telemetry; no independent A/B peak data is
+input/wet/output meters display real telemetry. INPUT follows IN trim before
+INPUT/PRE effects; WET follows the wet contribution after MIX and before OUT;
+OUTPUT remains the actual final signal. The meter-tap regression checks both
+precisions, mono/stereo, all routing modes and bit-identical audio with telemetry
+enabled or disabled; no independent A/B peak data is
 invented. Standalone Filter is not added as a fake FX slot type.
 
 FL Studio is not installed in this Linux environment. Actual FL Studio project

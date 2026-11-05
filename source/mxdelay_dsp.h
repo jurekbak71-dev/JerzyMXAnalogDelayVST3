@@ -473,7 +473,8 @@ public:
             const T rawL=(T)(in&&in[0]&&std::isfinite(double(in[0][i]))?in[0][i]:0);
             const T rawR=(channels>1&&in&&in[1])?(std::isfinite(double(in[1][i]))?(T)in[1][i]:T{}):rawL;
 
-            if(meters)meters->input=std::max({meters->input,std::abs(double(rawL)),std::abs(double(rawR))});
+            // INPUT displays the signal after IN trim, before INPUT/PRE effects.
+            if(meters)meters->input=std::max({meters->input,std::abs(double(rawL)*inGain),std::abs(double(rawR)*inGain)});
             if(bypass&&!trails){
                 if(out&&out[0])out[0][i]=(Sample)rawL;
                 if(channels>1&&out&&out[1])out[1][i]=(Sample)rawR;
@@ -513,7 +514,8 @@ public:
             }
 
             for(int fx=0;fx<4;++fx)if(p.fx[fx].route>=.5)wet=wetFx[fx].process(wet,p.fx[fx]);
-            if(meters)meters->wet=std::max({meters->wet,std::abs(double(wet.l)),std::abs(double(wet.r))});
+            // WET displays its contribution after MIX, before the OUT stage.
+            if(meters)meters->wet=std::max({meters->wet,std::abs(wetG*double(wet.l)),std::abs(wetG*double(wet.r))});
             T yL{},yR{};
             if(bypass&&trails){
                 yL=(T)(double(rawL)+wetG*double(wet.l)*outGain);
