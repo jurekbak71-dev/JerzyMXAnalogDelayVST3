@@ -18,7 +18,7 @@ template<typename T> class MXOriginalEngines {
     static double clamp01(double v){return std::clamp(std::isfinite(v)?v:0.0,0.0,1.0);}
 public:
     void prepare(double sr){memory.prepare(sr);reel.prepare(sr);oil.prepare(sr);}
-    void reset(){memory.reset();reel.reset();oil.prepare(sampleRate);}
+    void reset(){memory.reset();reel.reset();oil.reset();}
     double sampleRate=48000;
     void initialize(double sr){sampleRate=sr;prepare(sr);}
     void process(int algorithm,T& l,T& r,const SlotParams& s,double bpm){
