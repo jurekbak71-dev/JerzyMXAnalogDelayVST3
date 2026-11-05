@@ -853,11 +853,11 @@
 <view class="HardwarePanel" origin="866, 690" size="214, 92" mouse-enabled="false"/>
 <view class="HardwarePanel" origin="1088, 690" size="184, 92" mouse-enabled="false"/>
 <view class="CTextLabel" origin="15, 694" size="110, 16" title="INPUT" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="50, 711" size="42, 42" control-tag="InputTrim" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="32, 753" size="78, 17" control-tag="InputTrim" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="52, 711" size="38, 38" control-tag="InputTrim" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="32, 754" size="78, 16" control-tag="InputTrim" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="270, 694" size="110, 16" title="GLOBAL MIX" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
-<view class="ChickenKnob" origin="305, 711" size="42, 42" control-tag="Mix" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
-<view class="CTextLabel" origin="287, 753" size="78, 17" control-tag="Mix" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="205, 711" size="38, 38" control-tag="Mix" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="185, 754" size="78, 16" control-tag="Mix" font="Value" font-color="Amber" back-color="ValueBack" frame-color="Border" frame-width="1" transparent="false" text-alignment="center" mouse-enabled="false"/>
 <view class="CTextLabel" origin="342, 707" size="33, 17" title="IN" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
 <view class="LedBarMeter" origin="378, 707" size="146, 17" control-tag="InputPeak" mouse-enabled="false"/>
 <view class="CTextLabel" origin="342, 729" size="33, 17" title="WET" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
