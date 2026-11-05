@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 project(JerzyMXAnalogDelay2 VERSION 2.1.2.0 DESCRIPTION "Jerzy MX Analog Delay 2 VST3")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(JERZY_BUILD_PLUGIN "Build the native VST3 and editor (OFF for portable DSP/state tests)" ON)
 
@@ -26,7 +26,7 @@ smtg_enable_vst3_sdk()
 
 smtg_add_vst3plugin(JerzyMXAnalogDelay2
     source/mxdelay_version.h source/mxdelay_ids.h source/mxdelay_params.h source/mxdelay_mechanics.h source/mxdelay_state.h
-    source/mxdelay_dsp.h source/mxdelay_processor.h source/mxdelay_processor.cpp
+    source/engines/reel/TapeEngine.cpp source/mxdelay_dsp.h source/mxdelay_processor.h source/mxdelay_processor.cpp
     source/mxdelay_editor_geometry.h source/mxdelay_editor.h source/mxdelay_editor.cpp
     source/jerzy_vst_gui_kit.h source/jerzy_vst_gui_kit.cpp
     source/mxdelay_gui_views.h source/mxdelay_gui_views.cpp
@@ -42,7 +42,7 @@ endif()
 if(WIN32)
     target_link_libraries(JerzyMXAnalogDelay2 PRIVATE comctl32)
 endif()
-target_compile_features(JerzyMXAnalogDelay2 PUBLIC cxx_std_17)
+target_compile_features(JerzyMXAnalogDelay2 PUBLIC cxx_std_20)
 smtg_target_configure_version_file(JerzyMXAnalogDelay2)
 smtg_target_add_plugin_resources(JerzyMXAnalogDelay2 RESOURCES resource/mxdelay.uidesc)
 if(SMTG_MAC)
@@ -52,7 +52,7 @@ endif()
 endif() # JERZY_BUILD_PLUGIN
 include(CTest)
 if(BUILD_TESTING)
-    add_executable(MXDelayDSPTests tests/mxdelay_test.cpp)
+    add_executable(MXDelayDSPTests tests/mxdelay_test.cpp source/engines/reel/TapeEngine.cpp)
     target_include_directories(MXDelayDSPTests PRIVATE source)
     add_test(NAME MXDelayDSP COMMAND MXDelayDSPTests)
     add_executable(MXDelayCompatibilityTests tests/mxdelay_compatibility_test.cpp)
