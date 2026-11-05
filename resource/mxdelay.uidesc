@@ -824,7 +824,7 @@
       <view class="LedToggleSwitch" origin="760, 68" size="52, 52" control-tag="ReverbExternal" />
       <view class="CTextLabel" origin="932, 48" size="150, 22" title="REVERB ON" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
       <view class="LedToggleSwitch" origin="976, 68" size="52, 52" control-tag="ReverbEnable" />
-      <view class="CTextLabel" origin="1100, 48" size="150, 22" title="FREEZE" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
+      <view class="CTextLabel" origin="1100, 48" size="150, 22" title="FDN FREEZE" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" />
       <view class="LedToggleSwitch" origin="1144, 68" size="52, 52" control-tag="ReverbFreeze" />
       <view class="CTextLabel" origin="36, 123" size="1190, 22" title="IR: Factory Room" font="Section" font-color="Amber" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="9301" />
       <view class="CTextLabel" origin="36, 151" size="1190, 22" title="IR status" font="Label" font-color="Cream" transparent="true" frame-width="0" mouse-enabled="false" text-alignment="center" control-tag="9302" />

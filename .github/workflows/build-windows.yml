@@ -57,10 +57,15 @@ jobs:
           if ((Get-FileHash pluginval.zip -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c08e61ce3b96db41636f8ec7e76f4c7e2c13ebdac7fa1b5a1f52b4f32ec715ab') { throw 'pluginval checksum mismatch' }
           Expand-Archive pluginval.zip -DestinationPath pluginval
           $plugin = Get-ChildItem build -Recurse -Directory -Filter 'MX Delay 2.vst3' | Select-Object -First 1
-          & ./pluginval/pluginval.exe --strictness-level 5 --random-seed 1971 --sample-rates 44100,48000,96000 --block-sizes 64,128,257,1024 --output-dir build/pluginval-logs --validate $plugin.FullName *> build/pluginval-console.txt
-          $valExit = $LASTEXITCODE
+          # pluginval is a Windows GUI-subsystem executable. PowerShell's direct
+          # invocation may return before it exits, leaving LASTEXITCODE unset.
+          $arguments = @('--strictness-level', '5', '--random-seed', '1971', '--sample-rates', '44100,48000,96000', '--block-sizes', '64,128,257,1024', '--output-dir', 'build/pluginval-logs', '--validate', ('"' + $plugin.FullName + '"'))
+          $process = Start-Process -FilePath (Resolve-Path './pluginval/pluginval.exe').Path -ArgumentList $arguments -Wait -PassThru -RedirectStandardOutput build/pluginval-console.txt -RedirectStandardError build/pluginval-stderr.txt
+          $valExit = $process.ExitCode
           if ($valExit -ne 0) {
-            $message = (Get-Content build/pluginval-console.txt -Raw).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            $logs = [string](Get-Content build/pluginval-console.txt -Raw) + [string](Get-Content build/pluginval-stderr.txt -Raw)
+            Get-ChildItem build/pluginval-logs -File -ErrorAction SilentlyContinue | ForEach-Object { $logs += [string](Get-Content $_.FullName -Raw) }
+            $message = $logs.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
             Write-Output "::error title=pluginval::$message"
             throw "pluginval failed: $valExit"
           }
@@ -134,5 +139,6 @@ jobs:
             build/Testing/Temporary/*.log
             build/pluginval-logs
             build/pluginval-console.txt
+            build/pluginval-stderr.txt
             build/mxdelay2-render-*.png
           if-no-files-found: warn

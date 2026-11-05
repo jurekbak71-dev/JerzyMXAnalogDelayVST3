@@ -38,7 +38,7 @@ public:
                         if(stopping.load()||options.load()!=request||pathRevision.load()!=revision)continue;
                         delete pending.exchange(bank.release(),std::memory_order_acq_rel);
                         std::lock_guard<std::mutex> lock(stateMutex);name=source->name;state=2;error.clear();
-                    }catch(const std::exception& e){std::lock_guard<std::mutex> lock(stateMutex);state=3;error=e.what();}
+                    }catch(const std::exception& e){if(options.load()==request&&pathRevision.load()==revision){std::lock_guard<std::mutex> lock(stateMutex);state=3;error=e.what();}}
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(20));
             }

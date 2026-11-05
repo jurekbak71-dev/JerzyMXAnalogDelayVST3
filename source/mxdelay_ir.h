@@ -96,34 +96,67 @@ public:
     }
 };
 class MXPartitionTier {
-    size_t block=0,count=0,pos=0,head=0;uint64_t epoch=1;
+    size_t block=0,count=0,pos=0,head=0,macIndex=0,macHead=0;uint64_t epoch=1;
+    bool stagger=false,scheduled=false;
     MXFFT fft;
     std::array<std::vector<std::complex<float>>,2> filters,history,work;
     std::array<std::vector<float>,2> input,output,overlap;
     std::vector<uint64_t> valid;
 public:
     void prepare(const MXIRAudio& ir,size_t offset,size_t b,size_t end){
-        block=b;count=end>offset?(end-offset+b-1)/b:0;fft.prepare(2*b);valid.assign(count,0);
+        block=b;stagger=offset==2*b;count=end>offset?(end-offset+b-1)/b:0;fft.prepare(2*b);valid.assign(count,0);
         for(int c=0;c<2;++c){filters[c].assign(count*2*b,{});history[c].assign(count*2*b,{});work[c].assign(2*b,{});input[c].assign(b,0);output[c].assign(b,0);overlap[c].assign(b,0);
             const auto& taps=c?ir.right:ir.left;
             for(size_t q=0;q<count;++q){auto* h=filters[c].data()+q*2*b;for(size_t k=0;k<b&&offset+q*b+k<end;++k)h[k]=taps[offset+q*b+k];fft.transform(h);}}
         reset();
     }
-    void reset(){pos=head=0;if(++epoch==0){std::fill(valid.begin(),valid.end(),0);epoch=1;}for(int c=0;c<2;++c){std::fill(input[c].begin(),input[c].end(),0);std::fill(output[c].begin(),output[c].end(),0);std::fill(overlap[c].begin(),overlap[c].end(),0);}}
+    void reset(){pos=head=macIndex=macHead=0;scheduled=false;for(auto& w:work)std::fill(w.begin(),w.end(),std::complex<float>{});if(++epoch==0){std::fill(valid.begin(),valid.end(),0);epoch=1;}for(int c=0;c<2;++c){std::fill(input[c].begin(),input[c].end(),0);std::fill(output[c].begin(),output[c].end(),0);std::fill(overlap[c].begin(),overlap[c].end(),0);}}
     void process(float l,float r,float& outL,float& outR){
         outL=outR=0;if(!count)return;
         outL=output[0][pos];outR=output[1][pos];input[0][pos]=l;input[1][pos]=r;
-        if(++pos<block)return;pos=0;
-        for(int c=0;c<2;++c){auto* x=history[c].data()+head*2*block;for(size_t i=0;i<block;++i)x[i]=input[c][i];std::fill(x+block,x+2*block,std::complex<float>{});fft.transform(x);}
+        ++pos;
+        // Far partitions start two blocks after the input. The extra block
+        // lets us spread spectral MACs over sixteen 64-sample slices instead
+        // of a large CPU burst at every 1024-sample boundary.
+        if(stagger&&scheduled&&pos%64==0){
+            const size_t until=std::min(count,(count*pos+block-1)/block);
+            accumulate(macIndex,until,macHead);macIndex=until;
+        }
+        if(pos<block)return;pos=0;
+        if(stagger&&scheduled)finish();
+        for(int c=0;c<2;++c){
+            auto* x=history[c].data()+head*2*block;
+            for(size_t i=0;i<block;++i)x[i]=input[c][i];
+            std::fill(x+block,x+2*block,std::complex<float>{});fft.transform(x);
+            std::fill(work[c].begin(),work[c].end(),std::complex<float>{});
+        }
         valid[head]=epoch;
-        for(int c=0;c<2;++c){auto& sum=work[c];std::fill(sum.begin(),sum.end(),std::complex<float>{});
-            for(size_t q=0;q<count;++q){const size_t index=(head+count-q)%count;if(valid[index]!=epoch)continue;const auto* h=filters[c].data()+q*2*block;const auto* x=history[c].data()+index*2*block;for(size_t i=0;i<2*block;++i)sum[i]+=h[i]*x[i];}
-            fft.transform(sum.data(),true);for(size_t i=0;i<block;++i){output[c][i]=sum[i].real()+overlap[c][i];overlap[c][i]=sum[i+block].real();}}
+        if(stagger){scheduled=true;macHead=head;macIndex=0;}
+        else {accumulate(0,count,head);finish();}
         head=(head+1)%count;
+    }
+private:
+    void accumulate(size_t first,size_t last,size_t sourceHead){
+        for(int c=0;c<2;++c){
+            auto* sum=work[c].data();
+            for(size_t q=first;q<last;++q){
+                const size_t index=(sourceHead+count-q)%count;if(valid[index]!=epoch)continue;
+                const auto* h=filters[c].data()+q*2*block;
+                const auto* x=history[c].data()+index*2*block;
+                for(size_t i=0;i<2*block;++i)sum[i]+=h[i]*x[i];
+            }
+        }
+    }
+    void finish(){
+        for(int c=0;c<2;++c){
+            auto& sum=work[c];fft.transform(sum.data(),true);
+            for(size_t i=0;i<block;++i){output[c][i]=sum[i].real()+overlap[c][i];overlap[c][i]=sum[i+block].real();}
+        }
     }
 };
 // Nonuniform zero-added-latency convolution: direct 64-sample head, 64-sample
-// near partitions (offset 64), 1024-sample far partitions (offset 1024).
+// near partitions (offset 64, through 2047), staggered 1024-sample far
+// partitions (offset 2048). The added scheduling delay is in the IR offset.
 class MXPartitionedConvolver {
     std::array<std::array<float,64>,2> head{},ring{};size_t pos=0;
     MXPartitionTier near,far;
@@ -131,11 +164,12 @@ public:
     std::string name;size_t frames=0;double rate=48000;
     explicit MXPartitionedConvolver(const MXIRAudio& ir):name(ir.name),frames(ir.left.size()),rate(ir.rate){
         for(size_t i=0;i<std::min<size_t>(64,frames);++i){head[0][i]=ir.left[i];head[1][i]=ir.right[i];}
-        near.prepare(ir,64,64,std::min<size_t>(1024,frames));far.prepare(ir,1024,1024,frames);reset();
+        near.prepare(ir,64,64,std::min<size_t>(2048,frames));far.prepare(ir,2048,1024,frames);reset();
     }
     void reset(){for(auto& c:ring)c.fill(0);pos=0;near.reset();far.reset();}
     void process(float& l,float& r){
-        ring[0][pos]=std::isfinite(l)?l:0;ring[1][pos]=std::isfinite(r)?r:0;
+        l=std::isfinite(l)?l:0;r=std::isfinite(r)?r:0;
+        ring[0][pos]=l;ring[1][pos]=r;
         double a=0,b=0;for(size_t i=0;i<64;++i){const size_t k=(pos+64-i)%64;a+=double(ring[0][k])*head[0][i];b+=double(ring[1][k])*head[1][i];}
         float nl,nr,fl,fr;near.process(l,r,nl,nr);far.process(l,r,fl,fr);pos=(pos+1)%64;
         l=float(a+nl+fl);r=float(b+nr+fr);

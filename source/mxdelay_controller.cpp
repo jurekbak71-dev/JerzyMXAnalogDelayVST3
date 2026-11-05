@@ -49,7 +49,7 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
  parameters.addParameter(rangeParam(STR16("Reverb Width"),kMXReverbWidthId,STR16("%"),0,200,100,1));
  parameters.addParameter(rangeParam(STR16("Reverb Pre-delay"),kMXReverbPreDelayId,STR16("ms"),0,240,d.reverb.preDelay*240,1));
  parameters.addParameter(rangeParam(STR16("Reverb Freeze"),kMXReverbFreezeId,STR16(""),0,1,0,0,1));
- parameters.addParameter(listParam(STR16("Reverb Mode"),kMXReverbModeId,{STR16("ALGORITHMIC"),STR16("CONVOLUTION"),STR16("HYBRID")},0));
+ parameters.addParameter(listParam(STR16("Reverb Mode"),kMXReverbModeId,{STR16("FDN"),STR16("IR"),STR16("HYBRID")},0));
  parameters.addParameter(listParam(STR16("IR Profile"),kMXReverbIRId,{STR16("ROOM"),STR16("PLATE"),STR16("HALL")},0));
  parameters.addParameter(rangeParam(STR16("External WAV IR"),kMXReverbExternalId,STR16(""),0,1,0,0,1));
  parameters.addParameter(rangeParam(STR16("IR Length"),kMXReverbIRLengthId,STR16("s"),.02,8,8,2));

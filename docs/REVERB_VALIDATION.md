@@ -28,8 +28,9 @@ against invalid input and runaway output.
 
 `mxdelay_ir.h` implements actual stereo diagonal convolution (mono IR is copied
 to both channels; this is not four-channel true-stereo convolution). Samples
-0–63 use a direct FIR, 64–1023 use 64-sample FFT partitions, and the remainder
-uses 1024-sample partitions. These offsets absorb block latency: there is no
+0–63 use a direct FIR, 64–2047 use 64-sample FFT partitions, and the remainder
+uses 1024-sample partitions. Far-partition spectral accumulation is spread over
+sixteen 64-sample slices using the available 2048-sample IR offset. These offsets absorb block latency: there is no
 extra algorithmic latency. Predelay and the IR's own onset remain audible.
 
 Factory Room (0.18 s), Plate (0.45 s), and Hall (1.1 s) are deterministic,

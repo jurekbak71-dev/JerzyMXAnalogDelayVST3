@@ -23,7 +23,7 @@ template<class T> class MXReverbFDN {
     std::array<Line,2> pre;
     std::array<std::array<Line,4>,2> diffuser;
     static constexpr std::array<double,8> delays{{.0297,.0371,.0411,.0437,.0313,.0359,.0399,.0473}};
-    double sr=48000,a=.001,wetSm=0,widthSm=1,delaySm=0,diffSm=.6,earlySm=.25,hpSm=0,lpSm=1;
+    double sr=48000,a=.001,wetSm=0,widthSm=1,delaySm=0,diffSm=.6,earlySm=.25,freezeSm=0,hpSm=0,lpSm=1;
     double lastDecay=-1,lastDamp=-1,lastLow=-1,targetLP=1,targetHP=0;
     std::array<double,8> targetGain{};bool first=true,lastFreeze=false;
     static double finite(double x,double fallback=0){return std::isfinite(x)?x:fallback;}
@@ -51,13 +51,14 @@ public:
         if(damp!=lastDamp){targetLP=1-std::exp(-6.28318530718*(20000*std::pow(.04,damp))/sr);lastDamp=damp;}
         if(low!=lastLow){targetHP=1-std::exp(-6.28318530718*low/sr);lastLow=low;}
         const double targetDelay=std::clamp(finite(p.preDelayMs),0.,240.)*.001*sr;
-        if(first){delaySm=targetDelay;widthSm=std::clamp(finite(p.width,1),0.,2.);diffSm=std::clamp(finite(p.diffusion),0.,1.);earlySm=std::clamp(finite(p.early),0.,1.);lpSm=targetLP;hpSm=targetHP;for(size_t i=0;i<8;++i)lines[i].gain=targetGain[i];first=false;}
+        if(first){freezeSm=p.freeze?1:0;delaySm=targetDelay;widthSm=std::clamp(finite(p.width,1),0.,2.);diffSm=std::clamp(finite(p.diffusion),0.,1.);earlySm=std::clamp(finite(p.early),0.,1.);lpSm=targetLP;hpSm=targetHP;for(size_t i=0;i<8;++i)lines[i].gain=targetGain[i];first=false;}
         delaySm+=a*(targetDelay-delaySm);widthSm+=a*(std::clamp(finite(p.width,1),0.,2.)-widthSm);
         diffSm+=a*(std::clamp(finite(p.diffusion),0.,1.)-diffSm);earlySm+=a*(std::clamp(finite(p.early),0.,1.)-earlySm);
         lpSm+=a*(targetLP-lpSm);hpSm+=a*(targetHP-hpSm);
+        freezeSm+=a*((p.freeze?1.:0.)-freezeSm);
         double injection[2]{},early[2]{};
         for(int c=0;c<2;++c){
-            pre[c].write(p.freeze?0.:input[c]);
+            pre[c].write((1-freezeSm)*input[c]);
             double x=pre[c].tap(delaySm);
             early[c]=.52*pre[c].tap(delaySm+sr*(c?.0037:.0031))-.27*pre[1-c].tap(delaySm+sr*.011)+.18*pre[c].tap(delaySm+sr*.021);
             const double g=.18+.52*diffSm;
@@ -69,7 +70,7 @@ public:
         for(int i=0;i<8;++i){
             auto& l=lines[i];const double mixed=.25*sum-taps[i];
             l.lp+=lpSm*(mixed-l.lp);l.low+=hpSm*(l.lp-l.low);l.gain+=a*(targetGain[i]-l.gain);
-            const double filtered=p.freeze?mixed:l.lp-l.low;
+            const double filtered=(1-freezeSm)*(l.lp-l.low)+freezeSm*mixed;
             l.write((i<4?1.:-1.)*injection[i%2]+l.gain*filtered);
         }
         const double l=.25*(taps[0]-taps[1]+taps[2]-taps[3]+taps[4]-taps[5]+taps[6]-taps[7]);
