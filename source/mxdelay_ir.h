@@ -64,15 +64,18 @@ inline MXIRAudio prepareMXIR(const MXIRAudio& input,double rate,double maxSecond
     const size_t n=std::min(size_t(std::ceil(input.left.size()*rate/input.rate)),size_t(rate*std::clamp(std::isfinite(maxSeconds)?maxSeconds:8.,.02,8.)));
     if(n>1048576)throw std::runtime_error("IR exceeds 1048576 resampled-frame memory limit");
     MXIRAudio out;out.rate=rate;out.name=input.name;out.left.resize(n);out.right.resize(n);
-    const double cutoff=std::min(1.,rate/input.rate)*.94;
+    const double ratio=std::min(1.,rate/input.rate),cutoff=ratio*.94;
+    // Keep the anti-alias transition band narrow when downsampling. A fixed
+    // 33-tap window folds near-ultrasonic IR content into lower-rate hosts.
+    const int halfWidth=int(std::ceil(32/ratio));
     for(size_t i=0;i<n;++i){
         const double pos=i*input.rate/rate;const int64_t centre=int64_t(std::floor(pos));double a=0,b=0,w=0;
         if(rate==input.rate){a=input.left[i];b=input.right[i];w=1;}
-        else for(int k=-16;k<=16;++k){
+        else for(int k=-halfWidth;k<=halfWidth;++k){
             const int64_t index=centre+k;const double x=pos-index;
-            if(std::abs(x)>16)continue;const double xx=3.141592653589793*x*cutoff;
+            if(std::abs(x)>halfWidth)continue;const double xx=3.141592653589793*x*cutoff;
             const double sinc=std::abs(xx)<1e-12?1:std::sin(xx)/xx;
-            const double weight=cutoff*sinc*(.5+.5*std::cos(3.141592653589793*x/16));w+=weight;
+            const double weight=cutoff*sinc*(.5+.5*std::cos(3.141592653589793*x/halfWidth));w+=weight;
             if(index>=0&&uint64_t(index)<input.left.size()){a+=weight*input.left[size_t(index)];b+=weight*input.right[size_t(index)];}
         }
         out.left[i]=float(a/std::max(1e-12,w));out.right[i]=float(b/std::max(1e-12,w));

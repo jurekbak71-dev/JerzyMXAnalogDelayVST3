@@ -43,7 +43,8 @@ procedurally synthesized **impulse responses**, not recordings of commercial
 spaces. The rendered WAVs exported by the test are exactly the factory data at
 48 kHz with normalization. External RIFF/WAV supports PCM16/24/32 and float32,
 mono/stereo, 8–384 kHz, up to eight seconds/64 MiB. Preparation resamples with a
-33-tap windowed sinc, truncates to the requested duration and optionally limits
+windowed sinc (65 taps at equal/upward rate ratios, expanded support for
+downsampling), truncates to the requested duration and optionally limits
 both peak and impulse energy. The additional resampled limit is 1,048,576
 frames (therefore less than eight seconds at the highest processing rates).
 WAVE_FORMAT_EXTENSIBLE, compressed WAV, AIFF, multichannel IR, and embedding
@@ -81,7 +82,7 @@ ctest --test-dir build/portable --output-on-failure
 comparison against direct convolution; logical reset; actual FDN late energy;
 decay extension; late-tail HF loss; exact hybrid combination; predelay offset;
 wet=0 and disabled passthrough; identical sample/block offline output; extreme
-parameters/rates; mono PCM and stereo float WAV; resampling/truncation; missing
+parameters/rates; mono PCM and stereo float WAV; resampling/truncation and ultrasonic anti-alias rejection; missing
 and invalid WAV errors; asynchronous replacement; standalone routing/global Mix;
 bypass; and mode-transition discontinuity. A thread-local allocation guard runs
 around audio processing and permits allocation only on the preparation worker.
@@ -135,7 +136,17 @@ finite-checked and bounded to +/-32 for numerical safety.
 
 ## Acceptance still requiring evidence
 
-Local tests and Windows CI results must be recorded against the final commit.
+Windows run [42030003403](https://github.com/jurekbak71-dev/JerzyMXAnalogDelayVST3/actions/runs/42030003403)
+at `d7a91bd` also passed all required steps, including extraction/verification of
+the final installation ZIP and notices containing module/package SHA-256.
+A subsequent ultrasonic downsampling test exposed aliasing with the original
+fixed 33-tap window; the adaptive-support resampler corrects that defect and
+requires verification against its own final commit.
+
+Local AddressSanitizer/UndefinedBehaviorSanitizer runs are separate from Release
+CTest. LeakSanitizer cannot run under this environment's tracing restrictions
+(it fails with its own ptrace diagnostic), so leak detection is disabled for
+ASan/UBSan verification; no leak-check pass is claimed.
 FL Studio is unavailable in this Linux environment: host-specific FL Studio
 opening, project reload and real-time playback have not been tested here.
 Listening evaluation, perceived realism of the material library, high-rate
