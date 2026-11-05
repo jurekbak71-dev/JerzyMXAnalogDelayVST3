@@ -45,9 +45,26 @@ if(WIN32)
 endif()
 target_compile_features(JerzyMXAnalogDelay2 PUBLIC cxx_std_20)
 smtg_target_configure_version_file(JerzyMXAnalogDelay2)
-smtg_target_add_plugin_resources(JerzyMXAnalogDelay2 RESOURCES resource/mxdelay.uidesc)
 file(GLOB JERZY_GUI3D_RESOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/resource/gui3d/*.png")
-smtg_target_add_plugin_resources(JerzyMXAnalogDelay2 OUTPUT_SUBDIRECTORY gui3d RESOURCES ${JERZY_GUI3D_RESOURCES})
+if(WIN32)
+    # Steinberg's resource helper passes an unquoted package path to MSBuild
+    # with PACKAGE_NAME "MX Delay 2". Use explicit, VERBATIM post-build
+    # commands for paths containing spaces. The Windows VST3 module lives in
+    # Contents/x86_64-win, while resources belong in Contents/Resources.
+    set(JERZY_VST3_RESOURCE_DIR "$<TARGET_FILE_DIR:JerzyMXAnalogDelay2>/../Resources")
+    add_custom_command(TARGET JerzyMXAnalogDelay2 POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${JERZY_VST3_RESOURCE_DIR}"
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/resource/mxdelay.uidesc"
+            "${JERZY_VST3_RESOURCE_DIR}/mxdelay.uidesc"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${JERZY_VST3_RESOURCE_DIR}/gui3d"
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            ${JERZY_GUI3D_RESOURCES} "${JERZY_VST3_RESOURCE_DIR}/gui3d"
+        VERBATIM)
+else()
+    smtg_target_add_plugin_resources(JerzyMXAnalogDelay2 RESOURCES resource/mxdelay.uidesc)
+    smtg_target_add_plugin_resources(JerzyMXAnalogDelay2 OUTPUT_SUBDIRECTORY gui3d RESOURCES ${JERZY_GUI3D_RESOURCES})
+endif()
 if(SMTG_MAC)
     smtg_target_set_bundle(JerzyMXAnalogDelay2 BUNDLE_IDENTIFIER "pl.jerzyaudio.mxanalogdelay2" COMPANY_NAME "Jerzy Audio")
 endif()
