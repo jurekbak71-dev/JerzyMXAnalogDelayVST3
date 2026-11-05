@@ -57,7 +57,8 @@ enum MXGlobalParamIds : unsigned {
     kMXReverbPreDelayId,
     kMXReverbFreezeId,
     kMXReverbModeId,
-    kMXReverbIRId
+    kMXReverbIRId,
+    kMXPeakMeterId
 };
 
 constexpr unsigned wetFxParam(int slot,int field){ return kMXWetFx1TypeId + unsigned(slot*6+field); }
