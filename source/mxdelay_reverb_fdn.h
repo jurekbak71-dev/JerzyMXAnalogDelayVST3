@@ -1,86 +1,88 @@
 #pragma once
-// MX Delay 2: allocation-free stereo algorithmic reverb core.
-// This is the algorithmic foundation, NOT an IR/convolution implementation.
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <cstddef>
 #include <vector>
-
 namespace JerzyAudio {
-template<typename T> class MXReverbFDN {
+// Eight-line Householder FDN. All storage is allocated in prepare; reset is logical.
+template<class T> class MXReverbFDN {
     struct Line {
-        std::vector<T> buffer;
-        std::size_t pos=0;
-        double damp=0;
-        void prepare(std::size_t n){buffer.assign(std::max<std::size_t>(n,8),T{});pos=0;damp=0;}
-        void reset(){std::fill(buffer.begin(),buffer.end(),T{});pos=0;damp=0;}
-        double read() const {return buffer.empty()?0.0:double(buffer[pos]);}
-        void write(double v){
-            if(buffer.empty())return;
-            buffer[pos]=T(std::isfinite(v)?std::clamp(v,-8.0,8.0):0.0);
-            pos=(pos+1)%buffer.size();
+        std::vector<T> buffer;size_t pos=0,written=0;double lp=0,low=0,gain=0;
+        void prepare(size_t n){buffer.assign(std::max<size_t>(n,8),T{});reset();}
+        void reset(){pos=written=0;lp=low=0;gain=0;}
+        double read()const{return written<buffer.size()?0.:double(buffer[pos]);}
+        double tap(double delay)const{
+            if(buffer.empty())return 0.;
+            delay=std::clamp(delay,0.,double(buffer.size()-2));const size_t d=size_t(delay);
+            auto at=[&](size_t lag){return lag>=written?0.:double(buffer[(pos+buffer.size()-1-lag)%buffer.size()]);};
+            return at(d)+(at(d+1)-at(d))*(delay-d);
         }
+        void write(double x){buffer[pos]=T(std::isfinite(x)?std::clamp(x,-16.,16.):0.);pos=(pos+1)%buffer.size();written=std::min(written+1,buffer.size());}
     };
-    std::array<Line,8> lines{};
-    std::array<Line,2> pre{};
-    double sr=48000;
-    double wetSm=0,feedbackSm=0;
-    static constexpr std::array<double,8> delays{{0.0297,0.0371,0.0411,0.0437,0.0313,0.0359,0.0399,0.0473}};
+    std::array<Line,8> lines;
+    std::array<Line,2> pre;
+    std::array<std::array<Line,4>,2> diffuser;
+    static constexpr std::array<double,8> delays{{.0297,.0371,.0411,.0437,.0313,.0359,.0399,.0473}};
+    double sr=48000,a=.001,wetSm=0,widthSm=1,delaySm=0,diffSm=.6,earlySm=.25,hpSm=0,lpSm=1;
+    double lastDecay=-1,lastDamp=-1,lastLow=-1,targetLP=1,targetHP=0;
+    std::array<double,8> targetGain{};bool first=true,lastFreeze=false;
+    static double finite(double x,double fallback=0){return std::isfinite(x)?x:fallback;}
 public:
-    struct Params {
-        bool enabled=false;
-        double wet=0.25, decay=0.6, damping=0.5, width=1.0, preDelayMs=18.0;
-        bool freeze=false;
-    };
-    void prepare(double sampleRate){
-        sr=std::clamp(std::isfinite(sampleRate)?sampleRate:48000.0,8000.0,384000.0);
-        for(std::size_t i=0;i<lines.size();++i)
-            lines[i].prepare(std::size_t(std::ceil(sr*delays[i]))+1);
-        for(auto& p:pre)p.prepare(std::size_t(std::ceil(sr*0.25))+2);
+    struct Params {bool enabled=false;double wet=.25,decay=.6,damping=.5,width=1,preDelayMs=18,lowCutHz=20,diffusion=.6,early=.25;bool freeze=false;};
+    void prepare(double rate){
+        sr=std::clamp(finite(rate,48000),8000.,384000.);a=1-std::exp(-1/(.025*sr));
+        for(size_t i=0;i<8;++i)lines[i].prepare(size_t(std::ceil(sr*delays[i]))+1);
+        for(auto& l:pre)l.prepare(size_t(sr*.30)+4);
+        constexpr double d[]={.0047,.0073,.0113,.0131};
+        for(int c=0;c<2;++c)for(int i=0;i<4;++i)diffuser[c][i].prepare(size_t(sr*(d[i]+c*.00017))+1);
         reset();
     }
-    void reset(){for(auto& l:lines)l.reset();for(auto& l:pre)l.reset();wetSm=feedbackSm=0;}
-    // Reverb processes stereo input and returns dry/wet output. No allocations in process.
-    void process(T& left,T& right,const Params& p){
-        if(!p.enabled)return;
-        const double dryL=std::isfinite(double(left))?double(left):0.0;
-        const double dryR=std::isfinite(double(right))?double(right):0.0;
-        const double a=1.0-std::exp(-1.0/(0.015*sr));
-        wetSm+=a*(std::clamp(p.wet,0.0,1.0)-wetSm);
-        const double decay=std::clamp(p.decay,0.0,1.0);
-        const double t60=0.35+12.0*decay*decay;
-        const double damp=std::clamp(p.damping,0.0,1.0);
-        const double inputGain=p.freeze?0.0:0.22;
-        const double inL=inputGain*dryL,inR=inputGain*dryR;
-        // Predelay is a ring with variable read position; preallocation is at prepare().
-        const std::size_t preSamples=std::size_t(std::clamp(p.preDelayMs,0.0,240.0)*sr/1000.0);
-        double preOut[2]{};
-        const double inputs[2]={inL,inR};
-        for(int ch=0;ch<2;++ch){
-            auto& l=pre[ch];
-            if(l.buffer.empty())continue;
-            const auto idx=(l.pos+l.buffer.size()-std::min(preSamples,l.buffer.size()-1))%l.buffer.size();
-            preOut[ch]=preSamples?double(l.buffer[idx]):inputs[ch];
-            l.write(inputs[ch]);
+    void reset(){for(auto& l:lines)l.reset();for(auto& l:pre)l.reset();for(auto& c:diffuser)for(auto& l:c)l.reset();first=true;lastDecay=lastDamp=lastLow=-1;}
+    void processWet(T& left,T& right,const Params& p){
+        if(lines[0].buffer.empty()){left=right=0;return;}
+        const double input[2]={finite(double(left)),finite(double(right))};
+        const double decay=std::clamp(finite(p.decay),0.,1.),damp=std::clamp(finite(p.damping),0.,1.);
+        const double low=std::clamp(finite(p.lowCutHz,20),20.,500.);
+        if(decay!=lastDecay||p.freeze!=lastFreeze){
+            const double rt60=.35+12*decay*decay;
+            for(size_t i=0;i<8;++i)targetGain[i]=p.freeze?.9995:std::pow(10.,-3*double(lines[i].buffer.size())/(sr*rt60));
+            lastDecay=decay;lastFreeze=p.freeze;
+        }
+        if(damp!=lastDamp){targetLP=1-std::exp(-6.28318530718*(20000*std::pow(.04,damp))/sr);lastDamp=damp;}
+        if(low!=lastLow){targetHP=1-std::exp(-6.28318530718*low/sr);lastLow=low;}
+        const double targetDelay=std::clamp(finite(p.preDelayMs),0.,240.)*.001*sr;
+        if(first){delaySm=targetDelay;widthSm=std::clamp(finite(p.width,1),0.,2.);diffSm=std::clamp(finite(p.diffusion),0.,1.);earlySm=std::clamp(finite(p.early),0.,1.);lpSm=targetLP;hpSm=targetHP;for(size_t i=0;i<8;++i)lines[i].gain=targetGain[i];first=false;}
+        delaySm+=a*(targetDelay-delaySm);widthSm+=a*(std::clamp(finite(p.width,1),0.,2.)-widthSm);
+        diffSm+=a*(std::clamp(finite(p.diffusion),0.,1.)-diffSm);earlySm+=a*(std::clamp(finite(p.early),0.,1.)-earlySm);
+        lpSm+=a*(targetLP-lpSm);hpSm+=a*(targetHP-hpSm);
+        double injection[2]{},early[2]{};
+        for(int c=0;c<2;++c){
+            pre[c].write(p.freeze?0.:input[c]);
+            double x=pre[c].tap(delaySm);
+            early[c]=.52*pre[c].tap(delaySm+sr*(c?.0037:.0031))-.27*pre[1-c].tap(delaySm+sr*.011)+.18*pre[c].tap(delaySm+sr*.021);
+            const double g=.18+.52*diffSm;
+            for(auto& l:diffuser[c]){const double delayed=l.read();const double y=delayed-g*x;l.write(x+g*y);x=y;}
+            injection[c]=x*.22;
         }
         double taps[8]{},sum=0;
         for(int i=0;i<8;++i){taps[i]=lines[i].read();sum+=taps[i];}
-        const double house=sum*0.25; // Householder feedback: y_i = 2/N * sum(y) - y_i.
         for(int i=0;i<8;++i){
-            const double mixed=house-taps[i];
-            const double target=p.freeze?0.9995:std::pow(10.0,-3.0*delays[i]/t60);
-            const double alpha=1.0-std::exp(-1.0/(sr*(0.0003+0.008*damp)));
-            lines[i].damp+=alpha*(mixed-lines[i].damp);
-            const double injection=(i%2?preOut[1]:preOut[0])*(i<4?1.0:-1.0);
-            lines[i].write(injection+target*((1.0-damp*0.35)*mixed+damp*0.35*lines[i].damp));
+            auto& l=lines[i];const double mixed=.25*sum-taps[i];
+            l.lp+=lpSm*(mixed-l.lp);l.low+=hpSm*(l.lp-l.low);l.gain+=a*(targetGain[i]-l.gain);
+            const double filtered=p.freeze?mixed:l.lp-l.low;
+            l.write((i<4?1.:-1.)*injection[i%2]+l.gain*filtered);
         }
-        const double l=(taps[0]-taps[1]+taps[2]-taps[3]+taps[4]-taps[5]+taps[6]-taps[7])*0.25;
-        const double r=(taps[0]+taps[1]-taps[2]-taps[3]-taps[4]-taps[5]+taps[6]+taps[7])*0.25;
-        const double width=std::clamp(p.width,0.0,2.0);
-        const double mid=(l+r)*0.5,side=(l-r)*0.5*width;
-        left=T((1.0-wetSm)*dryL+wetSm*(mid+side));
-        right=T((1.0-wetSm)*dryR+wetSm*(mid-side));
+        const double l=.25*(taps[0]-taps[1]+taps[2]-taps[3]+taps[4]-taps[5]+taps[6]-taps[7]);
+        const double r=.25*(taps[0]+taps[1]-taps[2]-taps[3]-taps[4]-taps[5]+taps[6]+taps[7]);
+        const double mid=(l+r)*.5,side=(l-r)*.5*widthSm;
+        left=T(finite((1-.5*earlySm)*(mid+side)+earlySm*early[0]));right=T(finite((1-.5*earlySm)*(mid-side)+earlySm*early[1]));
+    }
+    void process(T& l,T& r,const Params& p){
+        const double dryL=finite(double(l)),dryR=finite(double(r));
+        if(!p.enabled)return;
+        if(first)wetSm=std::clamp(finite(p.wet),0.,1.);
+        wetSm+=a*(std::clamp(finite(p.wet),0.,1.)-wetSm);processWet(l,r,p);
+        l=T((1-wetSm)*dryL+wetSm*double(l));r=T((1-wetSm)*dryR+wetSm*double(r));
     }
 };
-} // namespace JerzyAudio
+}

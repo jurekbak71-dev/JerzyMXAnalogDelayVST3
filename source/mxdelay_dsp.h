@@ -3,6 +3,7 @@
 #include "mxdelay_mechanics.h"
 #include "mxdelay_reverb_fdn.h"
 #include "mxdelay_reverb_convolution.h"
+#include "mxdelay_reverb_module.h"
 #include "mxdelay_original_engines.h"
 #include <algorithm>
 #include <array>
@@ -436,21 +437,22 @@ template<class T> class MXDelayDSP {
 
     SlotDSP s[2];
     std::array<WetFxDSP,4> wetFx;
-    MXReverbFDN<T> reverb;
-    MXReverbConvolution<T> convolution;
+    MXReverbModule<T> reverb;
     MXOriginalEngines<T> originals[2];
     double sr=44100.0;
 public:
-    void prepare(double sampleRate,int=2){
+    void prepare(double sampleRate,int=2,const ReverbParams* initialReverb=nullptr){
         sr=sampleRate;
         s[0].prepare(sampleRate,0x13579bdfu);
         s[1].prepare(sampleRate,0x2468ace1u);
         for(auto& fx:wetFx)fx.prepare(sampleRate);
-        reverb.prepare(sampleRate);
-        convolution.prepare(sampleRate);
+        reverb.prepare(sampleRate,initialReverb);
         for(auto& engine:originals)engine.initialize(sampleRate);
     }
-    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();convolution.reset();for(auto& engine:originals)engine.reset();}
+    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();for(auto& engine:originals)engine.reset();}
+
+    void requestIRPath(const std::string& path,bool select=true){reverb.requestPath(path,select);}
+    MXIRLoader::Status irStatus()const{return reverb.status();}
 
     struct MeterPeaks {double input=0.0,wet=0.0,output=0.0;};
     template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak,MeterPeaks* meters=nullptr){
@@ -465,8 +467,8 @@ public:
         if(bypass&&!trails){s[0].reset();s[1].reset();}
 
         for(int i=0;i<n;++i){
-            const T rawL=(T)(in&&in[0]?in[0][i]:0);
-            const T rawR=(channels>1&&in&&in[1])?(T)in[1][i]:rawL;
+            const T rawL=(T)(in&&in[0]&&std::isfinite(double(in[0][i]))?in[0][i]:0);
+            const T rawR=(channels>1&&in&&in[1])?(std::isfinite(double(in[1][i]))?(T)in[1][i]:T{}):rawL;
 
             if(meters)meters->input=std::max({meters->input,std::abs(double(rawL)),std::abs(double(rawR))});
             if(bypass&&!trails){
@@ -517,27 +519,9 @@ public:
                 yL=(T)((dryG*double(inL)+wetG*double(wet.l))*outGain);
                 yR=(T)((dryG*double(inR)+wetG*double(wet.r))*outGain);
             }
-            if(p.reverb.enable>=.5){
-                typename MXReverbFDN<T>::Params rv;
-                rv.enabled=true;rv.wet=p.reverb.wet;rv.decay=p.reverb.decay;
-                rv.damping=p.reverb.damping;rv.width=2.0*p.reverb.width;
-                rv.preDelayMs=240.0*p.reverb.preDelay;rv.freeze=p.reverb.freeze>=.5;
-                const int mode=normIndex(p.reverb.mode,3);
-                if(mode==0)reverb.process(yL,yR,rv);
-                else {
-                    T irL=yL,irR=yR;
-                    convolution.process(irL,irR,normIndex(p.reverb.ir,3));
-                    const double wet=std::clamp(p.reverb.wet,0.0,1.0);
-                    irL=T((1.0-wet)*double(yL)+wet*double(irL));
-                    irR=T((1.0-wet)*double(yR)+wet*double(irR));
-                    if(mode==1){yL=irL;yR=irR;}
-                    else {
-                        reverb.process(yL,yR,rv);
-                        yL=T(0.5*(double(yL)+double(irL)));
-                        yR=T(0.5*(double(yR)+double(irR)));
-                    }
-                }
-            }
+            const bool reverbOnly=p.slot[0].enable<.5&&p.slot[1].enable<.5;
+            const T rvL=reverbOnly?T(double(inL)*outGain):yL,rvR=reverbOnly?T(double(inR)*outGain):yR;
+            reverb.process(yL,yR,p.reverb,rvL,rvR);
             if(out&&out[0])out[0][i]=(Sample)yL;
             if(channels>1&&out&&out[1])out[1][i]=(Sample)yR;
             peak=std::max({peak,std::abs((double)yL),std::abs((double)yR)});

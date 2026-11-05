@@ -2,6 +2,8 @@
 #include "public.sdk/source/vst/vstaudioeffect.h"
 #include "mxdelay_dsp.h"
 #include "mxdelay_params.h"
+#include "pluginterfaces/vst/ivstparameterchanges.h"
+#include <array>
 namespace JerzyAudio {
 class MXDelayProcessor : public Steinberg::Vst::AudioEffect {
 public:
@@ -15,11 +17,15 @@ public:
     Steinberg::tresult PLUGIN_API process(Steinberg::Vst::ProcessData&) SMTG_OVERRIDE;
     Steinberg::tresult PLUGIN_API setState(Steinberg::IBStream*) SMTG_OVERRIDE;
     Steinberg::tresult PLUGIN_API getState(Steinberg::IBStream*) SMTG_OVERRIDE;
+    Steinberg::tresult PLUGIN_API notify(Steinberg::Vst::IMessage*) SMTG_OVERRIDE;
     Steinberg::uint32 PLUGIN_API getTailSamples() SMTG_OVERRIDE { return Steinberg::Vst::kInfiniteTail; }
 private:
     void readChanges(Steinberg::Vst::IParameterChanges*);
     void setNormalized(Steinberg::Vst::ParamID,double);
     void sendTempo(Steinberg::Vst::ProcessData&);
+    struct QueueCursor {Steinberg::Vst::IParamValueQueue* queue=nullptr;Steinberg::int32 point=0,offset=0;double value=0;bool valid=false;};
+    std::array<QueueCursor,1024> automation{};
+    bool processing64=false;
     MXDelayParams p{};
     MXDelayDSP<float> dsp32; MXDelayDSP<double> dsp64;
     double sampleRate=44100.0,bpm=120.0,lastPeak=0.0;

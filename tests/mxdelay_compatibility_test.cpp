@@ -50,7 +50,15 @@ void stateChecks(){
             MXDelayParams q;q.mix=.873;q.reverb.wet=.613;check(!readMXState(cut,q),"truncated state accepted");check(q.mix==.873&&q.reverb.wet==.613,"truncated preset partially changed live state");
         }
     }
-    for(int version:{0,8}){Stream bad;bad.writeInt32(version);MXDelayParams p;check(!readMXState(bad,p),"unknown version accepted");}
+    {
+        MXDelayParams p;p.reverb.enable=1;p.reverb.mode=1;p.reverb.external=1;p.reverb.irPath="C:/IR/room-utf8-\xc5\x82.wav";p.reverb.irLength=.31;p.reverb.normalize=0;p.reverb.lowCut=.4;p.reverb.diffusion=.72;p.reverb.early=.21;p.reverb.hybrid=.37;p.reverb.irDamping=.63;
+        Stream saved;check(writeMXState(saved,p),"v9 save failed");MXDelayParams q;check(readMXState(saved,q),"v9 reload failed");check(q.reverb.irPath==p.reverb.irPath&&std::abs(q.reverb.hybrid-.37)<1e-6&&std::abs(q.reverb.irDamping-.63)<1e-6&&q.reverb.external==1,"v9 reverb settings lost");
+        for(size_t n=0;n<saved.bytes.size();++n){Stream cut;cut.bytes.assign(saved.bytes.begin(),saved.bytes.begin()+n);MXDelayParams unchanged;unchanged.reverb.irPath="unchanged";check(!readMXState(cut,unchanged)&&unchanged.reverb.irPath=="unchanged","v9 truncation altered live state");}
+        // v7/v8 used 12 algorithms: v8 appended mode/profile to the v7 tail.
+        for(int version:{7,8}){Stream old=saved;old.bytes[0]=version;old.bytes.resize(saved.bytes.size()-4*p.reverb.irPath.size()-4-8*4-(version==7?8:0));old.cursor=0;MXDelayParams restored;check(readMXState(old,restored)&&restored.reverb.irPath.empty(),"v7/v8 migration failed");}
+    }
+    {auto old=legacy(5);old.bytes[0]=6;for(int i=0;i<7;++i)old.writeFloat(.4f);MXDelayParams restored;check(readMXState(old,restored)&&std::abs(restored.reverb.decay-.4)<1e-6,"v6 migration failed");}
+    for(int version:{0,kMXStateVersion+1}){Stream bad;bad.writeInt32(version);MXDelayParams p;check(!readMXState(bad,p),"unknown version accepted");}
     auto bad=legacy(5);float nan=std::numeric_limits<float>::quiet_NaN();std::memcpy(bad.bytes.data()+4,&nan,4);
     MXDelayParams p;check(!readMXState(bad,p),"non-finite state accepted");
 }
