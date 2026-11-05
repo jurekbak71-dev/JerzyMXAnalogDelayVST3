@@ -28,7 +28,7 @@ template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
     return true;
 }
 
-template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
+template<class Stream> bool readMXStateUnchecked(Stream& b,MXDelayParams& p){
     p=MXDelayParams{};
     int32_t version=0; if(!b.readInt32(version)) return false;
     if(version<1 || version>kMXStateVersion) return false;
@@ -62,4 +62,12 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
     if(version>=8){if(!rd(p.reverb.mode)||!rd(p.reverb.ir))return false;}
     return true;
 }
+// Transactional load: a truncated or malformed preset never mutates live DSP state.
+template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
+    MXDelayParams candidate;
+    if(!readMXStateUnchecked(b,candidate))return false;
+    p=candidate;
+    return true;
+}
+
 }
