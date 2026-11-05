@@ -57,3 +57,23 @@ for tag in ("EngineAActive","EngineBActive","EngineBothActive"):
     leds=[v for v in main.iter("view") if v.attrib.get("control-tag")==tag]
     assert len(leds)==1 and leds[0].attrib.get("mouse-enabled")=="false", tag
 print("Three horizontal LED bars inside Global Mix and three A/B activity LEDs validated")
+
+# Footer visual regression: knob/value rectangles stay fully inside the
+# hardware-panel inner area, clear of the bottom decorative screw line.
+footer_panels=[(8,150),(166,370),(544,314),(866,214),(1088,184)]
+for tag, panel_x, panel_w in (("InputTrim",8,150),("Mix",166,370),("OutputTrim",1088,184)):
+    elements=[v for v in main.iter("view") if v.attrib.get("control-tag")==tag]
+    assert len(elements)==2, f"{tag}: expected knob and numeric value"
+    knob=next(v for v in elements if v.attrib.get("class")=="ChickenKnob")
+    value=next(v for v in elements if v.attrib.get("class")=="CTextLabel")
+    def bounds(v):
+        x,y=map(int,v.attrib["origin"].split(", "))
+        w,h=map(int,v.attrib["size"].split(", "))
+        return x,y,x+w,y+h
+    k=bounds(knob);v=bounds(value)
+    assert panel_x+8<=k[0] and k[2]<=panel_x+panel_w-8
+    assert panel_x+8<=v[0] and v[2]<=panel_x+panel_w-8
+    assert k[1]>=708 and k[3]<=754
+    assert v[1]>=752 and v[3]<=770, f"{tag}: value touches panel bottom screws"
+    assert k[2]<=v[0] or v[2]<=k[0] or k[3]<=v[1], f"{tag}: knob overlaps numeric frame"
+print("Footer knobs, numeric frames and panel screw clearance validated")
