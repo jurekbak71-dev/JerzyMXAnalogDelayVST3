@@ -53,7 +53,7 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
   addPercent(parameters,nDrive,wetFxParam(fx,kWetFxDrive),q.drive);
   parameters.addParameter(listParam(nRoute,wetFxParam(fx,kWetFxRoute),{STR16("INPUT / PRE"),STR16("WET ONLY")},1));
  }
- const char* algNames[]={"MultiHead Reel","Tape Echo","Oil Can","Tube Echo","BBD","Doubletrack","Dual Digital","Space Echo 202","BBD Machine 101"};
+ const char* algNames[]={"MultiHead Reel","Tape Echo","Oil Can","Tube Echo","BBD","Doubletrack","Dual Digital","Space Echo 202","BBD Machine 101","Memory Delay","Reel Echo","Oil Drum Echo"};
  const char* ctl[kAlgorithmCount][kAlgoControls]={
  {"Mechanics","Wear","Spacing","Low Cut","Head Spread","Saturation","Play Head 1","Play Head 2","Play Head 3","Play Head 4","Feedback Head 1","Feedback Head 2","Feedback Head 3","Feedback Head 4","Unused 15","Unused 16"},
  {"Tape Age","Wow","Flutter","Crinkle","Bias","Low Contour","Spring","Machine Mode","Unused 9","Unused 10","Unused 11","Unused 12","Unused 13","Unused 14","Unused 15","Unused 16"},
@@ -63,7 +63,10 @@ tresult PLUGIN_API MXDelayController::initialize(FUnknown*c){
  {"Saturation","Wobble","Blend","Blend Type","Stereo Width","Auto-Flange","Unused 7","Unused 8","Unused 9","Unused 10","Unused 11","Unused 12","Unused 13","Unused 14","Unused 15","Unused 16"},
  {"Converter","Delay 2 Ratio","Mod Depth","Cross Feedback","Repeat Dynamics","Tone","Unused 7","Unused 8","Unused 9","Unused 10","Unused 11","Unused 12","Unused 13","Unused 14","Unused 15","Unused 16"},
  {"Saturation","Wow Flutter","Tape Age","Bass","Treble","Reverb","Head Spread","Twist","Head 1","Head 2","Head 3","Head 4","Unused 13","Unused 14","Unused 15","Unused 16"},
- {"Mode","Variation","Mod Depth","Mod Rate","Tone","Stereo","Companding","BBD Grit","Unused 9","Unused 10","Unused 11","Unused 12","Unused 13","Unused 14","Unused 15","Unused 16"}};
+ {"Mode","Variation","Mod Depth","Mod Rate","Tone","Stereo","Companding","BBD Grit","Unused 9","Unused 10","Unused 11","Unused 12","Unused 13","Unused 14","Unused 15","Unused 16"},
+ {"Model","Mod Depth","Mod Rate","Wave","Boost","Squelch","Mod Enable","Unused 8","Unused 9","Unused 10","Unused 11","Unused 12","Unused 13","Unused 14","Unused 15","Unused 16"},
+ {"Wow","Flutter","Tape Age","Motor Wear","Saturation","Dropout","Splice","Unused 8","Unused 9","Unused 10","Unused 11","Unused 12","Unused 13","Unused 14","Unused 15","Unused 16"},
+ {"Oil","Wear","Wow","Flutter","Spring","Mechanics","Four Heads","Unused 8","Unused 9","Unused 10","Unused 11","Unused 12","Unused 13","Unused 14","Unused 15","Unused 16"}};
  for(int s=0;s<2;++s){
   const auto prefix=s==0?"A · ":"B · ";
   auto* ap=new StringListParameter(s==0?STR16("A · Algorithm"):STR16("B · Algorithm"),slotParam(s,kSlotAlgorithm));for(auto*n:algNames){String128 t{};Steinberg::UString(t,128).fromAscii(n);ap->appendString(t);}ap->setNormalized(d.slot[s].algorithm);parameters.addParameter(ap);
