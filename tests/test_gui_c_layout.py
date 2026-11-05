@@ -42,3 +42,18 @@ for chassis_x, deck_x, time_tag in (("8, 0", "20, 50", "ATime"),
     assert children[knob].attrib["size"] == "84, 84", "Primary knob hierarchy regressed"
 assert main.find("view[@gui-c-page='0']").attrib["origin"] == "0, 120"
 print("GUI C primary knob sizing and paint order passed")
+
+# Permanent three-stage metering strip: no analog meter may overlap output trim.
+meter_tags=("InputPeak","WetPeak","OutputPeak")
+meters=[v for v in main.iter("view") if v.attrib.get("control-tag") in meter_tags]
+assert len(meters)==3 and all(v.attrib.get("class")=="AnalogMeter" for v in meters)
+for v in meters:
+    x,y=map(int,v.attrib["origin"].split(", "))
+    w,h=map(int,v.attrib["size"].split(", "))
+    assert 319<=x and x+w<=772, "Meter escapes central inset or overlaps trim"
+    assert 695<=y and y+h<=782, "Meter escapes footer vertically"
+assert [v.attrib["control-tag"] for v in meters]==list(meter_tags), "Meter order must be INPUT, WET, OUTPUT"
+for tag in ("EngineAActive","EngineBActive","EngineBothActive"):
+    leds=[v for v in main.iter("view") if v.attrib.get("control-tag")==tag]
+    assert len(leds)==1 and leds[0].attrib.get("mouse-enabled")=="false", tag
+print("Three aligned live meters and three read-only A/B activity LEDs validated")
