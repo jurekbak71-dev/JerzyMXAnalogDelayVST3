@@ -4,7 +4,7 @@
 #include <cmath>
 
 namespace JerzyAudio {
-constexpr int kMXStateVersion=6;
+constexpr int kMXStateVersion=7;
 
 template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
     if(!b.writeInt32(kMXStateVersion)) return false;
@@ -53,7 +53,8 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
         double* common[]={&x.algorithm,&x.enable,&x.sync,&x.division,&x.time,&x.feedback,&x.level,&x.pan,&x.duck};
         for(auto* v:common) if(!rd(*v)) return false;
         if(version<4){const int oldIndex=std::clamp((int)std::lround(x.algorithm*6.0),0,6);x.algorithm=double(oldIndex)/double(kAlgorithmCount-1);}
-        const int storedAlgorithms = version>=4 ? kAlgorithmCount : 7;
+        else if(version<=6){const int oldIndex=std::clamp((int)std::lround(x.algorithm*8.0),0,8);x.algorithm=double(oldIndex)/double(kAlgorithmCount-1);}
+        const int storedAlgorithms = version>=7 ? kAlgorithmCount : (version>=4 ? 9 : 7);
         for(int a=0;a<storedAlgorithms;++a) for(int c=0;c<kAlgoControls;++c) if(!rd(x.c[a][c])) return false;
         if(version>=2) for(auto& v:x.headPan) if(!rd(v)) return false;
     }
