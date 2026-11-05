@@ -10,9 +10,9 @@ from PIL import Image,ImageDraw,ImageFilter
 OUT=Path(__file__).resolve().parents[1]/'resource/gui3d'
 OUT.mkdir(parents=True,exist_ok=True)
 assets=[]
-def save(name,im,frames=1,usage='',mapping=''):
+def save(name,im,frames=1,usage='',mapping='',columns=1):
     path=OUT/(name+'.png');im.save(path,optimize=False,compress_level=9)
-    assets.append(dict(file=path.name,width=im.width,height=im.height,frames=frames,frame_width=im.width,frame_height=im.height//frames,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),usage=usage,binding=mapping))
+    assets.append(dict(file=path.name,width=im.width,height=im.height,frames=frames,columns=columns,rows=math.ceil(frames/columns),frame_width=im.width//columns,frame_height=im.height//math.ceil(frames/columns),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),usage=usage,binding=mapping))
 def radial(size):
     y,x=np.mgrid[:size,:size].astype(float);x=(x+.5-size/2)/(size/2);y=(y+.5-size/2)/(size/2)
     return x,y,np.sqrt(x*x+y*y),np.arctan2(y,x)
@@ -37,9 +37,9 @@ def cap(size,n):
     d.line([p(.13),p(.30)],fill=(245,242,224,255),width=max(1,size//96))
     return im
 for size in [96,144,192]:
-    strip=Image.new('RGBA',(size,size*101))
-    for i in range(101):strip.paste(cap(size,i/100),(0,i*size))
-    save('knob_'+str(size),strip,101,'101-frame turned aluminium cap; moving pointer','ChickenKnob: normalized [0,1], 135..405 degrees')
+    strip=Image.new('RGBA',(size*11,size*10))
+    for i in range(101):strip.paste(cap(size,i/100),((i%11)*size,(i//11)*size))
+    save('knob_'+str(size),strip,101,'101-frame turned aluminium cap; moving pointer','ChickenKnob: normalized [0,1], 135..405 degrees',columns=11)
 # Independent soft-contact shadow and cover-glass highlights.
 x,y,r,a=radial(192)
 shadow=rgba(np.zeros((192,192,3)),180*np.exp(-((np.sqrt(x*x+(y-.08)**2)-.73)/.12)**2))

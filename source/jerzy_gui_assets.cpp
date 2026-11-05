@@ -20,8 +20,10 @@ std::shared_ptr<Jerzy3DAssets> acquireJerzy3DAssets(){
 }
 void drawJerzyAsset(CDrawContext* c,CBitmap* bitmap,const CRect& r,int frame,int frames,float alpha){
     if(!bitmap||!bitmap->isLoaded()||r.getWidth()<=0||r.getHeight()<=0)return;
-    const double width=bitmap->getWidth(),height=bitmap->getHeight()/frames;
+    const int columns=frames==101?11:1;
+    const int rows=(frames+columns-1)/columns;
+    const double width=bitmap->getWidth()/columns,height=bitmap->getHeight()/rows;
     CDrawContext::Transform transform(*c,CGraphicsTransform(r.getWidth()/width,0,0,r.getHeight()/height,r.left,r.top));
-    bitmap->draw(c,CRect(0,0,width,height),CPoint(0,frame*height),alpha);
+    bitmap->draw(c,CRect(0,0,width,height),CPoint((frame%columns)*width,(frame/columns)*height),alpha);
 }
 }

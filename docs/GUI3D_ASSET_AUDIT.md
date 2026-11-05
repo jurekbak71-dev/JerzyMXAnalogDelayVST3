@@ -39,3 +39,5 @@ The generator creates a material interpretation of the reference. Exact photorea
 Supplied archive SHA-256:
 - `MX_Delay_2_Biblioteka_3D.zip`: `86ba02e105596fa13cf9e5a735bf18f33c10292aed26914899c36f8fa080a501`.
 - `MX_Delay_2_V2_z_generatorem.zip`: `d55c3a8ccd00b5b4a15c69280c197d4b2f8eb2fb5de3abaa2f885e4319230e52`.
+
+Knob filmstrips use an 11-column atlas (101 populated frames, up to 2112×1920 px) instead of a 19,392-pixel vertical bitmap that can exceed Direct2D limits. The manifest records frame dimensions, rows and columns; runtime source offsets follow that grid. No runtime resampling or frame extraction allocates new bitmaps.

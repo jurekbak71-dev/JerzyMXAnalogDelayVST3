@@ -10,10 +10,11 @@ for a in m['assets']:
  with Image.open(p) as im:
   assert im.format=='PNG' and im.mode=='RGBA',p
   assert im.size==(a['width'],a['height']),p
-  assert a['height']==a['frames']*a['frame_height'],p
+  assert a['height']==a['rows']*a['frame_height'] and a['width']==a['columns']*a['frame_width'],p
+  assert max(im.size)<=4096,p
   im.load();decoded+=im.width*im.height*4
   if a['frames']>1:
-   size=a['frame_height'];frames=[im.crop((0,i*size,im.width,(i+1)*size)) for i in [0,a['frames']//2,a['frames']-1]]
+   size=a['frame_height'];width=a['frame_width'];cols=a['columns'];frames=[im.crop(((i%cols)*width,(i//cols)*size,(i%cols+1)*width,(i//cols+1)*size)) for i in [0,a['frames']//2,a['frames']-1]]
    assert len({x.tobytes() for x in frames})==3,p
    assert all(x.getpixel((0,0))[3]==0 for x in frames),p
   if a['file'].startswith('knob_') and a['frames']>1:assert a['frames']>=101
