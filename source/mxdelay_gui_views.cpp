@@ -20,6 +20,7 @@ private:
 
 SimpleCreator<ChickenKnob> knob("ChickenKnob");
 SimpleCreator<AnalogMeter> meter("AnalogMeter");
+SimpleCreator<JerzyLedBarMeter> ledBar("LedBarMeter");
 SimpleCreator<ToggleSwitch> toggle("ToggleSwitch");
 SimpleCreator<ThreeWaySwitch> three("ThreeWaySwitch");
 SimpleCreator<LedToggleSwitch> ledToggle("LedToggleSwitch");
