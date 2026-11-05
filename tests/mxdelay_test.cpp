@@ -198,5 +198,22 @@ int main(){
         assert(energy>.001);
       }
     }
+    // Reverb works independently of both delay engines, in all three modes.
+    for(int mode=0;mode<3;++mode){
+        dsp.reset();
+        p=MXDelayParams{};
+        p.slot[0].enable=p.slot[1].enable=0.0;
+        p.mix=0.0;p.reverb.enable=1.0;p.reverb.wet=1.0;
+        p.reverb.mode=double(mode)/2.0;
+        p.reverb.ir=0.5;
+        std::fill(inL.begin(),inL.end(),0.f);
+        std::fill(inR.begin(),inR.end(),0.f);
+        inL[0]=inR[0]=0.25f;
+        std::fill(outL.begin(),outL.end(),0.f);
+        std::fill(outR.begin(),outR.end(),0.f);
+        dsp.process(in,out,2,N,p,120.0,peak);
+        assert(std::isfinite(peak)&&peak<8.0);
+        assert(energy(outL,outR,1)>1e-5);
+    }
     return 0;
 }
