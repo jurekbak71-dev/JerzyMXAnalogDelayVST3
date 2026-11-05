@@ -1,5 +1,6 @@
 #include "mxdelay_dsp.h"
 #include "mxdelay_reverb_fdn.h"
+#include "mxdelay_reverb_convolution.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -190,5 +191,12 @@ int main(){
         assert(integrated>0.01 && maxPeak<8.0);
     }
     { MXReverbFDN<float> reverb; reverb.prepare(48000); MXReverbFDN<float>::Params cfg; cfg.enabled=true; cfg.wet=1.0; cfg.preDelayMs=12; double e=0; for(int i=0;i<96000;++i){float l=i==0?1.f:0.f,r=l;reverb.process(l,r,cfg);assert(std::isfinite(l)&&std::isfinite(r));if(i>4000)e+=std::abs(l)+std::abs(r);} assert(e>0.01); }
+    { MXReverbConvolution<float> ir;ir.prepare(48000);
+      for(int preset=0;preset<3;++preset){
+        ir.reset();double energy=0;
+        for(int i=0;i<2048;++i){float l=i==0?1.f:0.f,r=l;ir.process(l,r,preset);assert(std::isfinite(l)&&std::isfinite(r));energy+=std::abs(l)+std::abs(r);}
+        assert(energy>.001);
+      }
+    }
     return 0;
 }
