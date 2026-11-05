@@ -24,11 +24,12 @@ endif()
 
 smtg_enable_vst3_sdk()
 
-smtg_add_vst3plugin(JerzyMXAnalogDelay2
+smtg_add_vst3plugin(JerzyMXAnalogDelay2 PACKAGE_NAME "MX Delay 2" SOURCES_LIST
     source/mxdelay_version.h source/mxdelay_ids.h source/mxdelay_params.h source/mxdelay_mechanics.h source/mxdelay_state.h
     source/engines/reel/TapeEngine.cpp source/mxdelay_dsp.h source/mxdelay_processor.h source/mxdelay_processor.cpp
     source/mxdelay_editor_geometry.h source/mxdelay_editor.h source/mxdelay_editor.cpp
     source/jerzy_vst_gui_kit.h source/jerzy_vst_gui_kit.cpp
+    source/jerzy_gui_assets.h source/jerzy_gui_assets.cpp
     source/mxdelay_gui_views.h source/mxdelay_gui_views.cpp
     source/mxdelay_controller.h source/mxdelay_controller.cpp
     source/mxdelay_entry.cpp resource/mxdelay.uidesc
@@ -45,6 +46,8 @@ endif()
 target_compile_features(JerzyMXAnalogDelay2 PUBLIC cxx_std_20)
 smtg_target_configure_version_file(JerzyMXAnalogDelay2)
 smtg_target_add_plugin_resources(JerzyMXAnalogDelay2 RESOURCES resource/mxdelay.uidesc)
+file(GLOB JERZY_GUI3D_RESOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/resource/gui3d/*.png")
+smtg_target_add_plugin_resources(JerzyMXAnalogDelay2 OUTPUT_SUBDIRECTORY gui3d RESOURCES ${JERZY_GUI3D_RESOURCES})
 if(SMTG_MAC)
     smtg_target_set_bundle(JerzyMXAnalogDelay2 BUNDLE_IDENTIFIER "pl.jerzyaudio.mxanalogdelay2" COMPANY_NAME "Jerzy Audio")
 endif()

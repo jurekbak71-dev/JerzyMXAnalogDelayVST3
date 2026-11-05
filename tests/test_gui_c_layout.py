@@ -45,7 +45,7 @@ print("GUI C primary knob sizing and paint order passed")
 
 # Permanent three-stage metering strip: no analog meter may overlap output trim.
 meter_tags=("InputPeak","WetPeak","OutputPeak")
-meters=[v for v in main.iter("view") if v.attrib.get("control-tag") in meter_tags]
+meters=[v for v in main.findall("view") if v.attrib.get("control-tag") in meter_tags]
 assert len(meters)==3 and all(v.attrib.get("class")=="LedBarMeter" for v in meters)
 for v in meters:
     x,y=map(int,v.attrib["origin"].split(", "))
@@ -100,3 +100,6 @@ assert footer_rect(mix_knob)[2] < 270, "GLOBAL MIX knob was not moved left"
 assert footer_rect(mix_value)[2] < 270, "GLOBAL MIX value frame was not moved with its knob"
 assert footer_rect(mix_value)[2] + 50 < 342, "GLOBAL MIX value overlaps meter labels"
 print("GLOBAL MIX control moved left; INPUT/MIX value frames clear artwork and chassis borders")
+
+side_meters=[v for v in page if v.attrib.get("class")=="LedBarMeter"]
+assert len(side_meters)==2 and all(v.attrib.get("mouse-enabled")=="false" for v in side_meters)

@@ -18,6 +18,14 @@ private:
     const char* name;
 };
 
+class ConsoleButtonCreator : public ViewCreatorAdapter {
+public:
+    ConsoleButtonCreator(){UIViewFactory::registerViewCreator(*this);}
+    IdStringPtr getViewName()const override{return "ConsoleButton";}
+    IdStringPtr getBaseViewName()const override{return "CTextButton";}
+    CView* create(const UIAttributes&,const IUIDescription*)const override{return new JerzyConsoleButton(CRect(0,0,100,32));}
+} consoleButtonCreator;
+
 SimpleCreator<ChickenKnob> knob("ChickenKnob");
 SimpleCreator<AnalogMeter> meter("AnalogMeter");
 SimpleCreator<JerzyLedBarMeter> ledBar("LedBarMeter");
@@ -26,6 +34,7 @@ SimpleCreator<ThreeWaySwitch> three("ThreeWaySwitch");
 SimpleCreator<LedToggleSwitch> ledToggle("LedToggleSwitch");
 SimpleCreator<LedThreeWaySwitch> ledThree("LedThreeWaySwitch");
 SimpleCreator<BypassButton> bypass("BypassButton");
+SimpleCreator<JerzyGlassPanel> glassPanel("GlassPanel");
 SimpleCreator<HardwarePanel> panel("HardwarePanel");
 SimpleCreator<ConsoleInsetPanel> insetPanel("ConsoleInsetPanel");
 SimpleCreator<OxidizedPanel> oxidePanel("OxidizedPanel");

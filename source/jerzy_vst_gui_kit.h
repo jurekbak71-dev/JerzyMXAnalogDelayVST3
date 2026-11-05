@@ -1,6 +1,8 @@
 #pragma once
 #include "vstgui/lib/controls/cknob.h"
 #include "vstgui/lib/ccolor.h"
+#include "jerzy_gui_assets.h"
+#include "vstgui/lib/controls/cbuttons.h"
 
 namespace JerzyAudio {
 
@@ -28,6 +30,7 @@ const JerzyGuiTheme& getJerzyGuiTheme();
 
 class JerzyKnob : public VSTGUI::CKnob {
 public:
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
     JerzyKnob(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
     void draw(VSTGUI::CDrawContext*) override;
     VSTGUI::CMouseEventResult onMouseDown(VSTGUI::CPoint&,const VSTGUI::CButtonState&) override;
@@ -40,6 +43,13 @@ public:
     void draw(VSTGUI::CDrawContext*) override;
 };
 
+class JerzyConsoleButton : public VSTGUI::CTextButton {
+public:
+    using VSTGUI::CTextButton::CTextButton;
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
 class JerzyAnalogMeter : public VSTGUI::CKnob {
 public:
     JerzyAnalogMeter(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
@@ -47,7 +57,10 @@ public:
 };
 
 class JerzyToggle : public VSTGUI::CKnob {
+    float visualPosition=-1.f;
 public:
+    void onIdle() override;
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
     JerzyToggle(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
     void draw(VSTGUI::CDrawContext*) override;
     VSTGUI::CMouseEventResult onMouseDown(VSTGUI::CPoint&,const VSTGUI::CButtonState&) override;
@@ -80,7 +93,14 @@ public:
 
 class JerzyHardwarePanel : public VSTGUI::CKnob {
 public:
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
     JerzyHardwarePanel(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
+class JerzyGlassPanel : public JerzyHardwarePanel {
+public:
+    using JerzyHardwarePanel::JerzyHardwarePanel;
     void draw(VSTGUI::CDrawContext*) override;
 };
 
@@ -93,6 +113,7 @@ public:
 
 class JerzyChassis : public VSTGUI::CKnob {
 public:
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
     JerzyChassis(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
     void draw(VSTGUI::CDrawContext*) override;
 };

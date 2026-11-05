@@ -16,9 +16,15 @@ using namespace Steinberg;using namespace Steinberg::Vst;using namespace JerzyAu
 using RenderProbe=int(__cdecl*)(IPlugView*,const char*);
 RenderProbe renderProbe=nullptr;
 void require(bool v,const char*m){if(!v)throw std::runtime_error(m);}
-class HostFrame final:public U::Implements<U::Directly<IPlugFrame>>{
-public:HWND window=nullptr;tresult PLUGIN_API resizeView(IPlugView* view,ViewRect* size) override{MoveWindow(window,0,0,size->getWidth(),size->getHeight(),FALSE);return view->onSize(size);}};
-void pump(){MSG msg;while(PeekMessageW(&msg,nullptr,0,0,PM_REMOVE)){TranslateMessage(&msg);DispatchMessageW(&msg);}}
+class HostFrame final:public U::Implements<U::Directly<IPlugFrame,IComponentHandler>>{
+public:
+ int gestures=0,edits=0;ParamID lastEdit=0;
+ tresult PLUGIN_API beginEdit(ParamID id)override{require(id<9000,"UI-only tag automated");++gestures;return kResultOk;}
+ tresult PLUGIN_API performEdit(ParamID id,ParamValue)override{require(id<9000,"UI-only tag automated");lastEdit=id;++edits;return kResultOk;}
+ tresult PLUGIN_API endEdit(ParamID)override{--gestures;return kResultOk;}
+ tresult PLUGIN_API restartComponent(int32)override{return kResultOk;}
+ HWND window=nullptr;tresult PLUGIN_API resizeView(IPlugView* view,ViewRect* size) override{MoveWindow(window,0,0,size->getWidth(),size->getHeight(),FALSE);return view->onSize(size);}};
+void pump(){const auto until=GetTickCount64()+60;do{MSG msg;while(PeekMessageW(&msg,nullptr,0,0,PM_REMOVE)){TranslateMessage(&msg);DispatchMessageW(&msg);}Sleep(1);}while(GetTickCount64()<until);}
 HWND editorWindow(HWND parent){HWND largest=nullptr;long area=0;for(HWND child=GetWindow(parent,GW_CHILD);child;child=GetWindow(child,GW_HWNDNEXT)){RECT r{};GetClientRect(child,&r);long a=r.right*r.bottom;if(a>area){area=a;largest=child;}}require(largest,"Native editor child missing");return largest;}
 ViewRect sizeOf(IPlugView* view){ViewRect r;require(view->getSize(&r)==kResultTrue,"getSize failed");return r;}
 void mouse(IPlugView* view,HWND parent,double x,double y,UINT down,UINT up,WPARAM state){
@@ -37,7 +43,7 @@ void checkFinder(IPlugView*view){
   if(result!=kResultTrue||id!=expected)std::cerr<<"Finder at "<<x<<","<<y<<" size "<<r.getWidth()<<"x"<<r.getHeight()<<" expected "<<expected<<" actual "<<id<<" result "<<result<<"\n";
   require(result==kResultTrue&&id==expected,"Scaled hit area mismatch");
  };
- find(325,738,kMXMixId);find(103,528,slotParam(0,kSlotHeadPan1));find(221,255,slotParam(0,kSlotTime));find(309,255,slotParam(0,kSlotFeedback));
+ find(224,730,kMXMixId);find(103,528,slotParam(0,kSlotHeadPan1));find(221,255,slotParam(0,kSlotTime));find(309,255,slotParam(0,kSlotFeedback));
 }
 int main(int argc,char**argv){try{
  require(argc==2,"Pass JerzyMXAnalogDelay2.vst3 path");std::cerr<<"mxgui: start\n";SetProcessDPIAware();CoInitializeEx(nullptr,COINIT_APARTMENTTHREADED);
@@ -49,27 +55,35 @@ int main(int argc,char**argv){try{
  int automatable=0;for(int32 i=0;i<controller->getParameterCount();++i){ParameterInfo info{};require(controller->getParameterInfo(i,info)==kResultTrue,"ParameterInfo failed");if(info.flags&ParameterInfo::kCanAutomate)++automatable;}require(automatable>80,"Too few FL-automatable parameters");
  setParam(controller,kMXMachineConditionId,1.0);require(std::abs(controller->getParamNormalized(kMXMachineConditionId)-1.0)<.002,"Machine Condition parameter missing");setParam(controller,kMXMachineConditionId,0.0);setParam(controller,wetFxParam(0,kWetFxType),0.4);setParam(controller,wetFxParam(0,kWetFxAmount),0.6);require(std::abs(controller->getParamNormalized(wetFxParam(0,kWetFxAmount))-0.6)<.002,"FX1 parameter missing");setParam(controller,wetFxParam(3,kWetFxRoute),1.0);require(std::abs(controller->getParamNormalized(wetFxParam(3,kWetFxRoute))-1.0)<.002,"FX4 route missing");
  std::cerr<<"mxgui: params checked\n";FUnknownPtr<IMidiMapping> midi(controller);require(midi!=nullptr,"IMidiMapping missing");ParamID mapped=0;require(midi->getMidiControllerAssignment(0,0,20,mapped)==kResultTrue&&mapped==slotParam(0,kSlotHeadPan1),"CC20 head pan mapping missing");require(midi->getMidiControllerAssignment(0,0,43,mapped)==kResultTrue&&mapped==algoParam(1,(int)DelayAlgorithm::Volante,13),"CC43 feedback-head mapping missing");
- std::cerr<<"mxgui: midi checked\n";auto view=owned(controller->createView(ViewType::kEditor));require(view,"createView failed");HostFrame frame;frame.window=CreateWindowExW(0,L"STATIC",L"MX GUI test",WS_POPUP,0,0,1280,790,nullptr,nullptr,GetModuleHandleW(nullptr),nullptr);require(frame.window,"Host window failed");
+ std::cerr<<"mxgui: midi checked\n";auto view=owned(controller->createView(ViewType::kEditor));require(view,"createView failed");HostFrame frame;frame.window=CreateWindowExW(0,L"STATIC",L"MX GUI test",WS_POPUP,0,0,1280,790,nullptr,nullptr,GetModuleHandleW(nullptr),nullptr);require(frame.window,"Host window failed");controller->setComponentHandler(&frame);
  std::cerr<<"mxgui: host hwnd ready\n";FUnknownPtr<IPlugViewContentScaleSupport> scale(view);require(scale!=nullptr,"No DPI support");std::cerr<<"mxgui: setting preattach dpi\n";require(scale->setContentScaleFactor(1.25f)==kResultTrue,"Pre-attach DPI failed");std::cerr<<"mxgui: preattach dpi ok\n";auto initial=sizeOf(view);require(initial.getWidth()==1600&&initial.getHeight()==988,"Wrong pre-attach scale");
  MoveWindow(frame.window,0,0,initial.getWidth(),initial.getHeight(),FALSE);view->setFrame(&frame);std::cerr<<"mxgui: attaching\n";require(view->attached(frame.window,kPlatformTypeHWND)==kResultTrue,"Attach failed");std::cerr<<"mxgui: attached\n";pump();checkFinder(view);std::cerr<<"mxgui: finder ok\n";
- std::cerr<<"mxgui: interaction start\n";setParam(controller,kMXMixId,0.82);pump();require(std::abs(controller->getParamNormalized(kMXMixId)-0.82)<.002,"VST3 parameter change did not reach controller");right(view,frame.window,325,738);require(std::abs(controller->getParamNormalized(kMXMixId)-0.35)<.002,"Right-click did not reset knob to default");
+ std::cerr<<"mxgui: interaction start\n";setParam(controller,kMXMixId,0.82);pump();require(std::abs(controller->getParamNormalized(kMXMixId)-0.82)<.002,"VST3 parameter change did not reach controller");right(view,frame.window,224,730);require(std::abs(controller->getParamNormalized(kMXMixId)-0.35)<.002,"Right-click did not reset knob to default");
+ require(frame.edits>0&&frame.lastEdit==kMXMixId&&frame.gestures==0,"GUI reset did not deliver balanced host automation");
  std::cerr<<"mxgui: right reset ok\n";double en=controller->getParamNormalized(slotParam(0,kSlotEnable));left(view,frame.window,476,146);require(controller->getParamNormalized(slotParam(0,kSlotEnable))!=en,"LED switch click failed");left(view,frame.window,201,225);
  std::cerr<<"mxgui: led ok\n";for(const auto& z: {std::pair<double,double>{914,59}, {958,59}, {1004,59}, {1050,59}}){left(view,frame.window,z.first,z.second);checkFinder(view);}
  // Navigation must reveal existing parameters and never automate UI-only tags.
  for(int tab=0;tab<4;++tab){
-  left(view,frame.window,366+140*tab,40);
+  const int editsBefore=frame.edits;left(view,frame.window,366+140*tab,40);require(frame.edits==editsBefore,"Page switch automated audio");
   FUnknownPtr<IParameterFinder> finder(view);auto r=sizeOf(view);ParamID found=0;
   auto has=[&](double x,double y,ParamID expected){return finder->findParameter((int32)std::lround(x*r.getWidth()/1280.),(int32)std::lround(y*r.getHeight()/790.),found)==kResultTrue&&found==expected;};
   if(tab==0)checkFinder(view);
   if(tab==1)require(has(155,247,wetFxParam(0,kWetFxType)),"FX page binding missing");
   if(tab==2)require(!has(221,255,slotParam(0,kSlotTime)),"Hidden A/B controls remain hittable");
   if(tab==3)require(has(580,281,kMXRoutingId),"Routing page binding missing");
-  require(has(325,738,kMXMixId),"Persistent mix missing");
+  require(has(224,730,kMXMixId),"Persistent mix missing");
   require(renderProbe(view,("mxdelay2-render-tab-"+std::to_string(tab)+".png").c_str())==1,"Console page render failed");
  }
  left(view,frame.window,366,40);checkFinder(view);
+ for(double value:{0.0,0.5,1.0}){
+  setParam(controller,slotParam(0,kSlotFeedback),value);
+  setParam(controller,slotParam(1,kSlotEnable),value>.5?1.0:0.0);pump();
+  require(renderProbe(view,("mxdelay2-render-state-"+std::to_string(int(value*100))+".png").c_str())==1,"Control state render failed");
+ }
+ setParam(controller,slotParam(0,kSlotFeedback),.42);setParam(controller,slotParam(1,kSlotEnable),1.0);
+
  std::cerr<<"mxgui: zooms ok\n";ViewRect restored(0,0,1024,632);require(frame.resizeView(view,&restored)==kResultTrue,"Host resize rejected");checkFinder(view);require(renderProbe(view,"mxdelay2-render-1024x632.png")==1,"Rendered MX GUI has blank/unpainted edges");
  std::cerr<<"mxgui: render small ok\n";restored=ViewRect(0,0,1920,1185);require(frame.resizeView(view,&restored)==kResultTrue,"Large host resize rejected");checkFinder(view);require(renderProbe(view,"mxdelay2-render-1920x1185.png")==1,"Large MX render invalid");
- std::cerr<<"mxgui: render large ok\n";view->removed();view->setFrame(nullptr);scale=nullptr;view=nullptr;DestroyWindow(frame.window);midi=nullptr;controller->terminate();controller=nullptr;module.reset();CoUninitialize();
+ std::cerr<<"mxgui: render large ok\n";view->removed();view->setFrame(nullptr);scale=nullptr;view=nullptr;DestroyWindow(frame.window);midi=nullptr;controller->setComponentHandler(nullptr);controller->terminate();controller=nullptr;module.reset();CoUninitialize();
  std::cout<<"MX GUI scaling, automation, MIDI, hit areas, LED switch and right-click reset OK\n";
 }catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
