@@ -654,10 +654,27 @@
 </view>
 <view class="CViewContainer" origin="0, 148" size="1280, 534" transparent="true" gui-c-page="2" visible="false">
 <view class="HardwarePanel" origin="8, 0" size="1264, 534" mouse-enabled="false"/>
-<view class="CTextLabel" origin="36, 32" size="1100, 30" title="REVERB - NOT IMPLEMENTED" font="Section" font-color="Amber" transparent="true" mouse-enabled="false"/>
-<view class="CTextLabel" origin="36, 80" size="1200, 24" title="Planned independent final module: Algorithmic / Convolution IR / Hybrid." font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
-<view class="CTextLabel" origin="36, 124" size="1200, 24" title="No reverb controls are active. Existing delay spring / echo taps remain in the A/B pages." font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
-<view class="CTextLabel" origin="36, 168" size="1200, 24" title="Future requirement: work with A/B disabled, independent bypass and preserved tails." font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="36, 28" size="1180, 32" title="REVERB / ALGORITHMIC FDN" font="Title" font-color="Amber" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="36, 70" size="1180, 22" title="Independent stereo output reverb - after delays and FX. Convolution IR and hybrid are not yet implemented." font="Label" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="44, 122" size="160, 22" title="REVERB ON" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="LedToggleSwitch" origin="64, 153" size="52, 52" control-tag="ReverbEnable"/>
+<view class="CTextLabel" origin="230, 122" size="160, 22" title="FREEZE" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="LedToggleSwitch" origin="252, 153" size="52, 52" control-tag="ReverbFreeze"/>
+<view class="CTextLabel" origin="90, 260" size="170, 24" title="WET" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="136, 292" size="78, 78" control-tag="ReverbWet" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="114, 382" size="122, 25" control-tag="ReverbWet" font="Value" font-color="Amber" back-color="ValueBack" text-alignment="center" mouse-enabled="false"/>
+<view class="CTextLabel" origin="315, 260" size="170, 24" title="DECAY" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="361, 292" size="78, 78" control-tag="ReverbDecay" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="339, 382" size="122, 25" control-tag="ReverbDecay" font="Value" font-color="Amber" back-color="ValueBack" text-alignment="center" mouse-enabled="false"/>
+<view class="CTextLabel" origin="540, 260" size="170, 24" title="DAMPING" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="586, 292" size="78, 78" control-tag="ReverbDamping" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="564, 382" size="122, 25" control-tag="ReverbDamping" font="Value" font-color="Amber" back-color="ValueBack" text-alignment="center" mouse-enabled="false"/>
+<view class="CTextLabel" origin="765, 260" size="170, 24" title="WIDTH" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="811, 292" size="78, 78" control-tag="ReverbWidth" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="789, 382" size="122, 25" control-tag="ReverbWidth" font="Value" font-color="Amber" back-color="ValueBack" text-alignment="center" mouse-enabled="false"/>
+<view class="CTextLabel" origin="990, 260" size="170, 24" title="PRE-DELAY" font="Label" font-color="Cream" transparent="true" text-alignment="center" mouse-enabled="false"/>
+<view class="ChickenKnob" origin="1036, 292" size="78, 78" control-tag="ReverbPreDelay" wheel-inc-value="0.01" tooltip="Right-click: reset to default"/>
+<view class="CTextLabel" origin="1014, 382" size="122, 25" control-tag="ReverbPreDelay" font="Value" font-color="Amber" back-color="ValueBack" text-alignment="center" mouse-enabled="false"/>
 </view>
 <view class="CViewContainer" origin="0, 148" size="1280, 534" transparent="true" gui-c-page="3" visible="false">
 <view class="HardwarePanel" origin="8, 0" size="1264, 534" mouse-enabled="false"/>
@@ -695,6 +712,13 @@
 <view class="CTextLabel" origin="810, 702" size="240, 22" title="REVERB" font="Section" font-color="Amber" transparent="true" mouse-enabled="false"/>
 <view class="CTextLabel" origin="810, 737" size="240, 22" title="ALGORITHMIC / IR / HYBRID — PLANNED" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 </template><control-tags>
+<control-tag name="ReverbEnable" tag="1050"/>
+<control-tag name="ReverbWet" tag="1051"/>
+<control-tag name="ReverbDecay" tag="1052"/>
+<control-tag name="ReverbDamping" tag="1053"/>
+<control-tag name="ReverbWidth" tag="1054"/>
+<control-tag name="ReverbPreDelay" tag="1055"/>
+<control-tag name="ReverbFreeze" tag="1056"/>
 <control-tag name="GuiPage0" tag="9200"/>
 <control-tag name="GuiPage1" tag="9201"/>
 <control-tag name="GuiPage2" tag="9202"/>
