@@ -27,6 +27,7 @@ public:
 } consoleButtonCreator;
 
 SimpleCreator<ChickenKnob> knob("ChickenKnob");
+SimpleCreator<JerzySignalLED> signalLED("SignalLED");
 SimpleCreator<AnalogMeter> meter("AnalogMeter");
 SimpleCreator<JerzyLedBarMeter> ledBar("LedBarMeter");
 SimpleCreator<ToggleSwitch> toggle("ToggleSwitch");

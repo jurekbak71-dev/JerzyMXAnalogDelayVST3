@@ -50,6 +50,13 @@ public:
     void draw(VSTGUI::CDrawContext*) override;
 };
 
+class JerzySignalLED : public VSTGUI::CKnob {
+public:
+    JerzySignalLED(const VSTGUI::CRect& r,VSTGUI::IControlListener* l,int32_t t):CKnob(r,l,t,nullptr,nullptr){setMouseEnabled(false);}
+    std::shared_ptr<Jerzy3DAssets> guiAssets=acquireJerzy3DAssets();
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
 class JerzyAnalogMeter : public VSTGUI::CKnob {
 public:
     JerzyAnalogMeter(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);

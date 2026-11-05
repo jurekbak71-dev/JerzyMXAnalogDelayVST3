@@ -127,6 +127,11 @@ void JerzyLedBarMeter::draw(CDrawContext* c){
     setDirty(false);
 }
 
+void JerzySignalLED::draw(CDrawContext* c){
+    CBitmap* lit=getTag()==1062?guiAssets->ledAmber.get():getTag()==1063?guiAssets->ledCyan.get():guiAssets->ledGreen.get();
+    drawJerzyAsset(c,getValueNormalized()>.5f?lit:guiAssets->ledOff.get(),getViewSize());setDirty(false);
+}
+
 JerzyAnalogMeter::JerzyAnalogMeter(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
 void JerzyAnalogMeter::draw(CDrawContext* c){
     const auto& t=getJerzyGuiTheme();const CRect r(getViewSize());

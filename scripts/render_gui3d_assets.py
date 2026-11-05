@@ -16,7 +16,7 @@ def save(name,im,frames=1,usage='',mapping='',columns=1):
 def radial(size):
     y,x=np.mgrid[:size,:size].astype(float);x=(x+.5-size/2)/(size/2);y=(y+.5-size/2)/(size/2)
     return x,y,np.sqrt(x*x+y*y),np.arctan2(y,x)
-def rgba(rgb,alpha):return Image.fromarray(np.dstack([np.clip(rgb,0,255).astype('uint8'),np.clip(alpha,0,255).astype('uint8')]),'RGBA')
+def rgba(rgb,alpha):return Image.fromarray(np.dstack([np.clip(rgb,0,255).astype('uint8'),np.clip(alpha,0,255).astype('uint8')]))
 def cap(size,n):
     x,y,r,a=radial(size);mask=np.clip((.82-r)*size,0,1)
     # Bevel normals and anisotropic circular turning marks, fixed studio light.
@@ -93,6 +93,14 @@ for state,col in [('off',(40,44,46)),('amber',(181,109,31)),('cyan',(28,125,139)
         d.line([(9,j),(247,j)],fill=(*c,255))
     d.line([(12,9),(244,9)],fill=(245,236,211,130),width=2)
     save('button_'+state,im,usage='Unlabelled key; active emission selected at runtime')
+# Bevelled physical indicator lenses; emission remains a separate intensity layer.
+for name,color in [('off',(22,29,26)),('amber',(255,166,45)),('cyan',(65,225,240)),('green',(65,240,98)),('red',(255,62,40))]:
+    x,y,r,a=radial(64)
+    rim=50+95*np.maximum(0,-x-y)
+    lens=np.broadcast_to(color,(64,64,3)).astype(float)*(1-.45*np.minimum(r,1))[...,None]
+    lens+=np.exp(-((x+.20)**2+(y+.23)**2)/.018)[...,None]*150
+    rgb=np.where((r>.55)[...,None],np.stack([rim,rim,rim],-1),lens)
+    save('led_'+name,rgba(rgb,np.clip((.74-r)*64,0,1)*255),usage='Independent physical indicator lens, no text')
 # Separate line icons, transparent backgrounds.
 for name in ['filter','drive','mod','lofi','routing','reverb']:
     im=Image.new('RGBA',(96,64));d=ImageDraw.Draw(im)
@@ -104,5 +112,21 @@ for name in ['filter','drive','mod','lofi','routing','reverb']:
         for i in range(4):d.line([(18+i*15,15),(18+i*15,49-i*6)],fill=(244,178,75,255),width=3)
     save('icon_'+name,im,usage='Independent module icon, not a simulated audio display')
 manifest={'generator':'scripts/render_gui3d_assets.py','render':'Deterministic analytic geometry and anisotropic material shading; 2D orthographic assets, no recovered original 3D scene','assets':assets}
+# The manifest records actual stable VSTGUI tags, not labels invented from the mockup.
+import xml.etree.ElementTree as ET
+ui=ET.parse(OUT.parent/'mxdelay.uidesc').getroot()
+tags={t.attrib['name']:int(t.attrib['tag']) for t in ui.find('control-tags')}
+class_assets={
+ 'ChickenKnob':['knob_192.png','knob_96.png','knob_shadow.png','scale_amber.png','scale_cyan.png','glow_amber.png','glow_cyan.png'],
+ 'ToggleSwitch':['toggle.png'],'ThreeWaySwitch':['toggle.png'],'LedToggleSwitch':['toggle.png'],'LedThreeWaySwitch':['toggle.png'],'BypassButton':['toggle.png'],
+ 'ConsoleButton':['button_off.png','button_amber.png','button_cyan.png'],'SignalLED':['led_off.png','led_amber.png','led_cyan.png','led_green.png'],
+ 'COptionMenu':[],'LedBarMeter':[]}
+manifest['control_map']=[]
+seen=set()
+for v in ui.iter('view'):
+    tag=v.attrib.get('control-tag');kind=v.attrib.get('class')
+    if not tag or kind not in class_assets or (tag,kind) in seen:continue
+    seen.add((tag,kind))
+    manifest['control_map'].append(dict(tag=tag,param_id=tags.get(tag,int(tag) if tag.isdigit() else None),view=kind,assets=class_assets[kind],audio_parameter=(tags.get(tag,int(tag) if tag.isdigit() else 9999)<9000)))
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 print(f'{len(assets)} assets; {sum((OUT/a["file"]).stat().st_size for a in assets)/1024/1024:.2f} MiB PNG')

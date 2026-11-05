@@ -880,11 +880,11 @@
     <view class="CTextLabel" origin="552, 749" size="294, 18" title="REVERB  /  FDN - IR - HYBRID" font="Label" font-color="Black" transparent="true" mouse-enabled="false" frame-width="0" />
     <view class="CTextLabel" origin="877, 696" size="192, 18" title="ACTIVE ENGINES" font="Section" font-color="Black" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
     <view class="CTextLabel" origin="890, 719" size="46, 16" title="A" font="Label" font-color="Black" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
-    <view class="LedToggleSwitch" origin="895, 738" size="34, 34" control-tag="EngineAActive" mouse-enabled="false" />
+    <view class="SignalLED" origin="895, 738" size="34, 34" control-tag="EngineAActive" mouse-enabled="false" />
     <view class="CTextLabel" origin="953, 719" size="46, 16" title="B" font="Label" font-color="Black" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
-    <view class="LedToggleSwitch" origin="958, 738" size="34, 34" control-tag="EngineBActive" mouse-enabled="false" />
+    <view class="SignalLED" origin="958, 738" size="34, 34" control-tag="EngineBActive" mouse-enabled="false" />
     <view class="CTextLabel" origin="1016, 719" size="46, 16" title="A+B" font="Label" font-color="Black" transparent="true" text-alignment="center" mouse-enabled="false" frame-width="0" />
-    <view class="LedToggleSwitch" origin="1021, 738" size="34, 34" control-tag="EngineBothActive" mouse-enabled="false" />
+    <view class="SignalLED" origin="1021, 738" size="34, 34" control-tag="EngineBothActive" mouse-enabled="false" />
     <view class="CTextLabel" origin="1112, 694" size="142, 16" title="OUTPUT" font="Section" font-color="Black" transparent="true" mouse-enabled="false" frame-width="0" />
     <view class="ChickenKnob" origin="1166, 711" size="42, 42" control-tag="OutputTrim" wheel-inc-value="0.01" tooltip="Right-click: reset to default" />
     <view class="CTextLabel" origin="1148, 753" size="78, 17" control-tag="OutputTrim" font="Value" font-color="Black" frame-width="0" transparent="true" text-alignment="center" mouse-enabled="false" />

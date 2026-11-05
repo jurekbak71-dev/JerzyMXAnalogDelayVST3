@@ -45,6 +45,9 @@ jobs:
             Write-Output "::error title=CTest::$message"
             exit $testExit
           }
+      - name: Validate rendered control states
+        shell: pwsh
+        run: python scripts/verify_gui_renders.py build
       - name: Independent pluginval validation
         shell: pwsh
         run: |
@@ -83,6 +86,8 @@ jobs:
           git rev-parse HEAD | Set-Content artifact/COMMIT.txt
           git archive --format=zip --output=artifact/MX_Delay_2-source.zip HEAD
           Copy-Item source/engines/AGPL-3.0-LICENSE.txt artifact/
+          Copy-Item build/_deps/vst3sdk-src/LICENSE.txt artifact/VST3-SDK-LICENSE.txt
+          Copy-Item build/_deps/vst3sdk-src/vstgui4/LICENSE artifact/VSTGUI-LICENSE.txt
           Compress-Archive -Path artifact/* -DestinationPath MX_Delay_2_Windows_x64.zip -Force
           Get-FileHash MX_Delay_2_Windows_x64.zip -Algorithm SHA256 | Format-List | Out-File MX_Delay_2_SHA256.txt
           Compress-Archive -Path resource/gui3d,scripts/render_gui3d_assets.py,scripts/gui3d-requirements.txt -DestinationPath MX_Delay_2_GUI3D_Library.zip -Force

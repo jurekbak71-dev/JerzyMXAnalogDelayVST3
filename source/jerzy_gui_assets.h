@@ -3,7 +3,7 @@
 #include <memory>
 namespace JerzyAudio {
 struct Jerzy3DAssets {
-    VSTGUI::SharedPointer<VSTGUI::CBitmap> knob,smallKnob,shadow,amber,cyan,scaleAmber,scaleCyan,toggle,panel,inset,chassis,screw,glass,buttonOff,buttonAmber,buttonCyan;
+    VSTGUI::SharedPointer<VSTGUI::CBitmap> knob,smallKnob,shadow,amber,cyan,scaleAmber,scaleCyan,toggle,panel,inset,chassis,screw,glass,buttonOff,buttonAmber,buttonCyan,ledOff,ledAmber,ledCyan,ledGreen;
     Jerzy3DAssets();
     bool loaded() const;
 };
