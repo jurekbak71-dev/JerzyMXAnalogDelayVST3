@@ -2,6 +2,7 @@
 #include "mxdelay_params.h"
 #include "mxdelay_mechanics.h"
 #include "mxdelay_reverb_fdn.h"
+#include "mxdelay_reverb_convolution.h"
 #include "mxdelay_original_engines.h"
 #include <algorithm>
 #include <array>
@@ -436,6 +437,7 @@ template<class T> class MXDelayDSP {
     SlotDSP s[2];
     std::array<WetFxDSP,4> wetFx;
     MXReverbFDN<T> reverb;
+    MXReverbConvolution<T> convolution;
     MXOriginalEngines<T> originals[2];
     double sr=44100.0;
 public:
@@ -445,9 +447,10 @@ public:
         s[1].prepare(sampleRate,0x2468ace1u);
         for(auto& fx:wetFx)fx.prepare(sampleRate);
         reverb.prepare(sampleRate);
+        convolution.prepare(sampleRate);
         for(auto& engine:originals)engine.initialize(sampleRate);
     }
-    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();for(auto& engine:originals)engine.reset();}
+    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();convolution.reset();for(auto& engine:originals)engine.reset();}
 
     template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak){
         const double inGain=gainFromNorm(p.inputTrim,-18,18);
@@ -516,7 +519,21 @@ public:
                 rv.enabled=true;rv.wet=p.reverb.wet;rv.decay=p.reverb.decay;
                 rv.damping=p.reverb.damping;rv.width=2.0*p.reverb.width;
                 rv.preDelayMs=240.0*p.reverb.preDelay;rv.freeze=p.reverb.freeze>=.5;
-                reverb.process(yL,yR,rv);
+                const int mode=normIndex(p.reverb.mode,3);
+                if(mode==0)reverb.process(yL,yR,rv);
+                else {
+                    T irL=yL,irR=yR;
+                    convolution.process(irL,irR,normIndex(p.reverb.ir,3));
+                    const double wet=std::clamp(p.reverb.wet,0.0,1.0);
+                    irL=T((1.0-wet)*double(yL)+wet*double(irL));
+                    irR=T((1.0-wet)*double(yR)+wet*double(irR));
+                    if(mode==1){yL=irL;yR=irR;}
+                    else {
+                        reverb.process(yL,yR,rv);
+                        yL=T(0.5*(double(yL)+double(irL)));
+                        yR=T(0.5*(double(yR)+double(irR)));
+                    }
+                }
             }
             if(out&&out[0])out[0][i]=(Sample)yL;
             if(channels>1&&out&&out[1])out[1][i]=(Sample)yR;
