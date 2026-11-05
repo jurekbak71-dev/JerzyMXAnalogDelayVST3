@@ -119,6 +119,31 @@ CMouseEventResult JerzyKnob::onMouseDown(CPoint& where,const CButtonState& butto
     return CKnob::onMouseDown(where,buttons);
 }
 
+JerzyLedBarMeter::JerzyLedBarMeter(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
+void JerzyLedBarMeter::draw(CDrawContext* c){
+    const CRect r(getViewSize());
+    c->setDrawMode(kAntiAliasing|kNonIntegralMode);
+    c->setFillColor(CColor(4,10,13));c->setFrameColor(CColor(71,82,84));c->setLineWidth(1);
+    c->drawRect(r,kDrawFilledAndStroked);
+    constexpr int count=24;
+    const double pad=4.0,gap=2.0;
+    const double width=std::max(1.0,(r.getWidth()-2*pad-(count-1)*gap)/count);
+    const double amplitude=std::clamp(double(getValueNormalized()),0.0,1.0);
+    // 60 dB display range; linear amplitude enters from the audio processor.
+    const double db=20.0*std::log10(std::max(1e-9,amplitude));
+    const int lit=amplitude>0?std::clamp(int(std::ceil((db+60.0)/60.0*count)),0,count):0;
+    for(int n=0;n<count;++n){
+        const double x=r.left+pad+n*(width+gap);
+        const CRect led(x,r.top+4,x+width,r.bottom-4);
+        const bool on=n<lit;
+        const CColor color=n<17?(on?CColor(56,231,107):CColor(14,48,31)):
+            n<21?(on?CColor(255,188,53):CColor(57,39,16)):
+                  (on?CColor(255,68,46):CColor(62,20,16));
+        c->setFillColor(color);c->drawRect(led,kDrawFilled);
+    }
+    setDirty(false);
+}
+
 JerzyAnalogMeter::JerzyAnalogMeter(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
 void JerzyAnalogMeter::draw(CDrawContext* c){
     const auto& t=getJerzyGuiTheme();const CRect r(getViewSize());
