@@ -33,6 +33,13 @@ public:
     VSTGUI::CMouseEventResult onMouseDown(VSTGUI::CPoint&,const VSTGUI::CButtonState&) override;
 };
 
+// Segmented horizontal peak meter. The control value is linear amplitude (0..1).
+class JerzyLedBarMeter : public VSTGUI::CKnob {
+public:
+    JerzyLedBarMeter(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
+    void draw(VSTGUI::CDrawContext*) override;
+};
+
 class JerzyAnalogMeter : public VSTGUI::CKnob {
 public:
     JerzyAnalogMeter(const VSTGUI::CRect&,VSTGUI::IControlListener*,int32_t);
