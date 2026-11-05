@@ -61,10 +61,32 @@ jobs:
           New-Item -ItemType Directory -Force build/pluginval-logs | Out-Null
           # Native pluginval may exit with no stdout when a child VST3 host crashes.
           # Preserve the exit code and dump diagnostic files before failing CI.
-          & ./pluginval/pluginval.exe --strictness-level 5 --random-seed 1971 --sample-rates 44100,48000,96000 --block-sizes 64,128,257,1024 --output-dir build/pluginval-logs --validate $plugin.FullName *> build/pluginval-console.txt
-          $valExit = $LASTEXITCODE
-          $console = if (Test-Path build/pluginval-console.txt) { Get-Content build/pluginval-console.txt -Raw } else { '' }
-          if ($console) { Write-Output $console }
+          # A GUI-subsystem native executable can leave PowerShell's
+          # LASTEXITCODE unset. Launch pluginval with an explicit Windows
+          # Process, await its exit and capture BOTH standard streams.
+          $validator = (Resolve-Path './pluginval/pluginval.exe').Path
+          $pinfo = [System.Diagnostics.ProcessStartInfo]::new()
+          $pinfo.FileName = $validator
+          $pinfo.WorkingDirectory = (Get-Location).Path
+          $pinfo.UseShellExecute = $false
+          $pinfo.RedirectStandardOutput = $true
+          $pinfo.RedirectStandardError = $true
+          foreach ($arg in @('--strictness-level','5','--random-seed','1971','--sample-rates','44100,48000,96000','--block-sizes','64,128,257,1024','--output-dir',((Resolve-Path 'build/pluginval-logs').Path),'--validate',$plugin.FullName)) {
+            [void]$pinfo.ArgumentList.Add($arg)
+          }
+          $process = [System.Diagnostics.Process]::new()
+          $process.StartInfo = $pinfo
+          if (-not $process.Start()) { throw 'Failed to start pluginval process' }
+          $output = $process.StandardOutput.ReadToEndAsync()
+          $errors = $process.StandardError.ReadToEndAsync()
+          if (-not $process.WaitForExit(180000)) {
+            $process.Kill($true)
+            throw 'pluginval timed out after 180 seconds'
+          }
+          $valExit = $process.ExitCode
+          $console = $output.GetAwaiter().GetResult() + [Environment]::NewLine + $errors.GetAwaiter().GetResult()
+          $console | Set-Content build/pluginval-console.txt
+          if ($console.Trim()) { Write-Output $console }
           $reports = @(Get-ChildItem build/pluginval-logs -Recurse -File -ErrorAction SilentlyContinue)
           foreach ($report in $reports) {
             Write-Output "pluginval report: $($report.FullName)"
