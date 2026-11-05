@@ -1,6 +1,7 @@
 #pragma once
 #include "mxdelay_params.h"
 #include "mxdelay_mechanics.h"
+#include "mxdelay_reverb_fdn.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -433,6 +434,7 @@ template<class T> class MXDelayDSP {
 
     SlotDSP s[2];
     std::array<WetFxDSP,4> wetFx;
+    MXReverbFDN<T> reverb;
     double sr=44100.0;
 public:
     void prepare(double sampleRate,int=2){
@@ -440,8 +442,9 @@ public:
         s[0].prepare(sampleRate,0x13579bdfu);
         s[1].prepare(sampleRate,0x2468ace1u);
         for(auto& fx:wetFx)fx.prepare(sampleRate);
+        reverb.prepare(sampleRate);
     }
-    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();}
+    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();}
 
     template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak){
         const double inGain=gainFromNorm(p.inputTrim,-18,18);
@@ -496,6 +499,13 @@ public:
             }else{
                 yL=(T)((dryG*double(inL)+wetG*double(wet.l))*outGain);
                 yR=(T)((dryG*double(inR)+wetG*double(wet.r))*outGain);
+            }
+            if(p.reverb.enable>=.5){
+                typename MXReverbFDN<T>::Params rv;
+                rv.enabled=true;rv.wet=p.reverb.wet;rv.decay=p.reverb.decay;
+                rv.damping=p.reverb.damping;rv.width=2.0*p.reverb.width;
+                rv.preDelayMs=240.0*p.reverb.preDelay;rv.freeze=p.reverb.freeze>=.5;
+                reverb.process(yL,yR,rv);
             }
             if(out&&out[0])out[0][i]=(Sample)yL;
             if(channels>1&&out&&out[1])out[1][i]=(Sample)yR;
