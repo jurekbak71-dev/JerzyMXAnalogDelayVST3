@@ -27,45 +27,6 @@ void gradientRect(CDrawContext* c,const CRect& r,CColor a,CColor b){
 void label(CDrawContext* c,const char* s,const CRect& r,double size,CColor color){
     c->setFont(kNormalFont,size);c->setFontColor(color);c->drawString(s,r,kCenterText);
 }
-void metalKnob(CDrawContext* c,const CRect& r,double value){
-    const auto& t=getJerzyGuiTheme();
-    const double x=r.getCenter().x,y=r.getCenter().y;
-    const double radius=std::min(r.getWidth(),r.getHeight())*.36;
-    c->setDrawMode(kAntiAliasing|kNonIntegralMode);
-    for(int i=0;i<=20;++i){
-        const double a=(135.0+13.5*i)*Constants::pi/180.0;
-        const double rr=i%5==0?1.8:1.15;
-        const auto minor=CColor(
-            static_cast<uint8_t>(t.accent.red*.82),
-            static_cast<uint8_t>(t.accent.green*.82),
-            static_cast<uint8_t>(t.accent.blue*.82));
-        ellipse(c,x+std::cos(a)*radius*1.34,y+std::sin(a)*radius*1.34,rr,i%5==0?t.accent:minor,CColor(80,57,27));
-    }
-    ellipse(c,x+2.8,y+4.2,radius+3.2,CColor(0,0,0,150),CColor(0,0,0,80));
-    ellipse(c,x,y,radius+1.7,CColor(17,20,18),CColor(125,112,88));
-    for(int i=0;i<28;++i){
-        const double a=2.0*Constants::pi*i/28.0;
-        c->setFrameColor(i%2?CColor(31,32,29):CColor(77,72,61));c->setLineWidth(1.0);
-        c->drawLine({x+radius*.92*std::cos(a),y+radius*.92*std::sin(a)},
-                    {x+radius*1.10*std::cos(a),y+radius*1.10*std::sin(a)});
-    }
-    const double cap=radius*.78;
-    CDrawContext::PointList wedge;
-    for(int i=0;i<144;++i){
-        const double a=2.0*Constants::pi*i/144.0,next=a+2.0*Constants::pi/144.0;
-        const double light=.58+.30*std::cos(a-.75)+.10*std::cos(5*a);
-        const auto shade=static_cast<uint8_t>(std::clamp(70.0+145.0*light,72.0,225.0));
-        c->setFillColor(CColor(shade,static_cast<uint8_t>(shade*.97),static_cast<uint8_t>(shade*.88)));
-        wedge={{x,y},{x+cap*std::cos(a),y+cap*std::sin(a)},{x+cap*std::cos(next),y+cap*std::sin(next)}};
-        c->drawPolygon(wedge,kDrawFilled);
-    }
-    ellipse(c,x,y,cap,CColor(0,0,0,0),CColor(222,210,183));
-    ellipse(c,x-cap*.25,y-cap*.28,cap*.20,CColor(255,255,255,34),CColor(255,255,255,0));
-    const double a=(135.0+270.0*std::clamp(value,0.0,1.0))*Constants::pi/180.0;
-    c->setFrameColor(CColor(255,232,185));c->setLineWidth(std::max(2.0,radius*.075));
-    c->drawLine({x+radius*.18*std::cos(a),y+radius*.18*std::sin(a)},
-                {x+radius*.78*std::cos(a),y+radius*.78*std::sin(a)});
-}
 
 } // anonymous
 
@@ -87,6 +48,12 @@ const JerzyGuiTheme& jerzyThemeSteel(){
         CColor(115,200,232),CColor(216,229,233),CColor(117,142,156),CColor(83,220,118),CColor(115,200,232)};
     return t;
 }
+const JerzyGuiTheme& jerzyThemeConsole(){
+    static const JerzyGuiTheme t{
+        CColor(83,84,86),CColor(29,30,32),CColor(47,48,50),CColor(15,16,18),
+        CColor(241,166,73),CColor(232,237,240),CColor(139,144,148),CColor(68,220,96),CColor(241,166,73)};
+    return t;
+}
 const JerzyGuiTheme& jerzyThemeBurgundy(){
     static const JerzyGuiTheme t{
         CColor(110,37,33),CColor(22,12,10),CColor(53,24,21),CColor(28,13,12),
@@ -105,10 +72,64 @@ const JerzyGuiTheme& getJerzyGuiTheme(){return activeTheme;}
 JerzyKnob::JerzyKnob(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){
     setStartAngle(static_cast<float>(Constants::pi*.75));setRangeAngle(static_cast<float>(Constants::pi*1.5));setWheelInc(.01f);
 }
-void JerzyKnob::draw(CDrawContext* c){metalKnob(c,getViewSize(),getValueNormalized());setDirty(false);}
+void JerzyKnob::draw(CDrawContext* c){
+    const CRect r(getViewSize());const auto tag=getTag();const bool b=tag>=1400&&tag<1700;
+    const auto& a=*guiAssets;
+    drawJerzyAsset(c,b?a.scaleCyan.get():a.scaleAmber.get(),r);
+    drawJerzyAsset(c,a.shadow,r);
+    drawJerzyAsset(c,b?a.cyan.get():a.amber.get(),r,0,1,.12f+.25f*getValueNormalized());
+    drawJerzyAsset(c,r.getWidth()<60?a.smallKnob.get():a.knob.get(),r,int(std::lround(std::clamp(getValueNormalized(),0.f,1.f)*100)),101);
+    // Fixed reference marker: centred for signed gain/pan, minimum for unipolar controls.
+    const bool centre=tag==1001||tag==1002||tag==1107||tag==1407||(tag>=1110&&tag<=1113)||(tag>=1410&&tag<=1413);
+    const double n=tag==1002?.6:centre?.5:0.;const double angle=(135+270*n)*Constants::pi/180.;
+    const auto p=r.getCenter();const double radius=std::min(r.getWidth(),r.getHeight())*.49;
+    c->setFrameColor(CColor(237,238,220));c->setLineWidth(2);
+    c->drawLine({p.x+radius*.87*std::cos(angle),p.y+radius*.87*std::sin(angle)},{p.x+radius*std::cos(angle),p.y+radius*std::sin(angle)});
+    setDirty(false);
+}
 CMouseEventResult JerzyKnob::onMouseDown(CPoint& where,const CButtonState& buttons){
     if(buttons.isRightButton()){beginEdit();setValue(getDefaultValue());valueChanged();invalid();endEdit();return kMouseDownEventHandledButDontNeedMovedOrUpEvents;}
     return CKnob::onMouseDown(where,buttons);
+}
+
+void JerzyConsoleButton::draw(CDrawContext* c){
+    const bool on=getValueNormalized()>.5f;
+    drawJerzyAsset(c,on?(getTag()==9201?guiAssets->buttonCyan.get():guiAssets->buttonAmber.get()):guiAssets->buttonOff.get(),getViewSize());
+    c->setFont(getFont());c->setFontColor(on?getTextColorHighlighted():getTextColor());
+    c->drawString(getTitle().data(),getViewSize(),kCenterText);setDirty(false);
+}
+
+JerzyLedBarMeter::JerzyLedBarMeter(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
+void JerzyLedBarMeter::draw(CDrawContext* c){
+    const CRect r(getViewSize());
+    c->setDrawMode(kAntiAliasing|kNonIntegralMode);
+    c->setFillColor(CColor(4,10,13));c->setFrameColor(CColor(71,82,84));c->setLineWidth(1);
+    c->drawRect(r,kDrawFilledAndStroked);
+    constexpr int count=24;
+    const double pad=4.0,gap=2.0;
+    const bool vertical=r.getHeight()>r.getWidth();
+    const double length=vertical?r.getHeight():r.getWidth();
+    const double width=std::max(1.0,(length-2*pad-(count-1)*gap)/count);
+    const double amplitude=std::clamp(double(getValueNormalized()),0.0,1.0);
+    // 60 dB display range; linear amplitude enters from the audio processor.
+    const double db=20.0*std::log10(std::max(1e-9,amplitude));
+    const int lit=amplitude>0?std::clamp(int(std::ceil((db+60.0)/60.0*count)),0,count):0;
+    for(int n=0;n<count;++n){
+        const double x=r.left+pad+n*(width+gap);
+        const double y=r.bottom-pad-(n+1)*width-n*gap;
+        const CRect led=vertical?CRect(r.left+4,y,r.right-4,y+width):CRect(x,r.top+4,x+width,r.bottom-4);
+        const bool on=n<lit;
+        const CColor color=n<17?(on?CColor(56,231,107):CColor(14,48,31)):
+            n<21?(on?CColor(255,188,53):CColor(57,39,16)):
+                  (on?CColor(255,68,46):CColor(62,20,16));
+        c->setFillColor(color);c->drawRect(led,kDrawFilled);
+    }
+    setDirty(false);
+}
+
+void JerzySignalLED::draw(CDrawContext* c){
+    CBitmap* lit=getTag()==1062?guiAssets->ledAmber.get():getTag()==1063?guiAssets->ledCyan.get():guiAssets->ledGreen.get();
+    drawJerzyAsset(c,getValueNormalized()>.5f?lit:guiAssets->ledOff.get(),getViewSize());setDirty(false);
 }
 
 JerzyAnalogMeter::JerzyAnalogMeter(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
@@ -122,36 +143,39 @@ void JerzyAnalogMeter::draw(CDrawContext* c){
     const double a=(210+120*std::clamp(static_cast<double>(getValueNormalized()),0.0,1.0))*Constants::pi/180.0;c->setFrameColor(CColor(81,27,15));c->setLineWidth(2);c->drawLine({cx,cy},{cx+rad*.87*std::cos(a),cy+rad*.87*std::sin(a)});ellipse(c,cx,cy,3,CColor(63,38,18),CColor(63,38,18));setDirty(false);
 }
 
-JerzyToggle::JerzyToggle(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMin(0);setMax(1);setWheelInc(1);}
+JerzyToggle::JerzyToggle(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMin(0);setMax(1);setWheelInc(1);setWantsIdle(true);}
 CMouseEventResult JerzyToggle::onMouseDown(CPoint&,const CButtonState& buttons){
     if(buttons.isRightButton()){beginEdit();setValue(getDefaultValue());valueChanged();invalid();endEdit();return kMouseDownEventHandledButDontNeedMovedOrUpEvents;}
     if(!buttons.isLeftButton())return kMouseEventNotHandled;beginEdit();setValueNormalized(getValueNormalized()<.5f?1.f:0.f);valueChanged();invalid();endEdit();return kMouseDownEventHandledButDontNeedMovedOrUpEvents;
 }
+void JerzyToggle::onIdle(){
+    if(visualPosition<0)visualPosition=getValueNormalized();
+    const float delta=getValueNormalized()-visualPosition;
+    if(std::abs(delta)>.001f){visualPosition+=delta*.45f;invalid();}
+    else visualPosition=getValueNormalized();
+}
 void JerzyToggle::draw(CDrawContext* c){
-    const auto& t=getJerzyGuiTheme();const CRect r(getViewSize());const auto p=r.getCenter();c->setDrawMode(kAntiAliasing|kNonIntegralMode);
-    ellipse(c,p.x,p.y,15,CColor(91,80,63),t.edge);ellipse(c,p.x,p.y,11,CColor(8,18,18),t.text);const double end=p.y+(getValueNormalized()>=.5f?-11:11);c->setLineWidth(7);c->setFrameColor(CColor(182,167,142));c->drawLine(p,{p.x,end});ellipse(c,p.x,end,6,CColor(221,207,179),t.edge);setDirty(false);
+    if(visualPosition<0)visualPosition=getValueNormalized();
+    drawJerzyAsset(c,guiAssets->toggle,getViewSize(),int(std::lround(visualPosition*16)),17);setDirty(false);
 }
 JerzyThreeWay::JerzyThreeWay(const CRect& r,IControlListener* l,int32_t tag):JerzyToggle(r,l,tag){setMax(2);}
 CMouseEventResult JerzyThreeWay::onMouseDown(CPoint& where,const CButtonState& buttons){
     if(buttons.isRightButton())return JerzyToggle::onMouseDown(where,buttons);if(!buttons.isLeftButton())return kMouseEventNotHandled;const int current=static_cast<int>(std::lround(getValueNormalized()*2.f));beginEdit();setValueNormalized(static_cast<float>((current+1)%3)*.5f);valueChanged();invalid();endEdit();return kMouseDownEventHandledButDontNeedMovedOrUpEvents;
 }
-void JerzyThreeWay::draw(CDrawContext* c){
-    const auto& t=getJerzyGuiTheme();const CRect r(getViewSize());const auto p=r.getCenter();c->setDrawMode(kAntiAliasing|kNonIntegralMode);ellipse(c,p.x,p.y,15,CColor(91,80,63),t.edge);ellipse(c,p.x,p.y,11,CColor(8,18,18),t.text);const double end=p.y+11*(1.0-2.0*getValueNormalized());c->setLineWidth(7);c->setFrameColor(CColor(182,167,142));c->drawLine(p,{p.x,end});ellipse(c,p.x,end,6,CColor(221,207,179),t.edge);setDirty(false);
-}
+void JerzyThreeWay::draw(CDrawContext* c){JerzyToggle::draw(c);}
 void JerzyLedToggle::draw(CDrawContext* c){JerzyToggle::draw(c);const auto& t=getJerzyGuiTheme();const auto r=getViewSize();const bool on=getValueNormalized()>=.5f;ellipse(c,r.left+8,r.top+8,5,on?t.ledOn:CColor(42,58,64),CColor(18,25,28));if(on)ellipse(c,r.left+8,r.top+8,2.4,CColor(255,255,210),CColor(255,255,210));setDirty(false);}
 void JerzyLedThreeWay::draw(CDrawContext* c){JerzyThreeWay::draw(c);const auto& t=getJerzyGuiTheme();const auto r=getViewSize();const int pos=std::clamp((int)std::lround(getValueNormalized()*2.f),0,2);for(int i=0;i<3;++i)ellipse(c,r.left+8.0+i*10.0,r.top+8,3.6,i==pos?t.display:CColor(33,51,58),CColor(15,23,27));setDirty(false);}
-void JerzyBypassButton::draw(CDrawContext* c){const auto& t=getJerzyGuiTheme();CRect r(getViewSize());const double x=r.getCenter().x,y=r.getCenter().y+7,rad=std::min(r.getWidth(),r.getHeight())*.29;c->setDrawMode(kAntiAliasing|kNonIntegralMode);const bool bypass=getValueNormalized()>=.5f;ellipse(c,x,r.top+9,7,CColor(85,41,15),t.edge);ellipse(c,x,r.top+9,4,bypass?t.accent:CColor(63,42,24),t.edge);metalKnob(c,{x-rad*1.25,y-rad*1.25,x+rad*1.25,y+rad*1.25},.5);setDirty(false);}
+void JerzyBypassButton::draw(CDrawContext* c){JerzyToggle::draw(c);const auto r=getViewSize();ellipse(c,r.left+7,r.top+7,3,getValueNormalized()>.5?CColor(255,75,40):CColor(40,48,42),CColor(8,10,11));}
 
 JerzyHardwarePanel::JerzyHardwarePanel(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
 void JerzyHardwarePanel::draw(CDrawContext* c){
-    const auto& t=getJerzyGuiTheme();const CRect r(getViewSize());c->setDrawMode(kAntiAliasing|kNonIntegralMode);gradientRect(c,r,t.panelTop,t.panelBottom);c->setFrameColor(t.accent);c->setLineWidth(1.2);c->drawRect(r,kDrawStroked);CRect inner(r);inner.inset(4,4);c->setFrameColor(t.edge);c->setLineWidth(1);c->drawRect(inner,kDrawStroked);
-    const CPoint screws[4]={{r.left+10,r.top+10},{r.right-10,r.top+10},{r.left+10,r.bottom-10},{r.right-10,r.bottom-10}};for(const auto& p:screws){ellipse(c,p.x+1,p.y+1,5.5,CColor(0,0,0,120),CColor(0,0,0,80));ellipse(c,p.x,p.y,4.8,CColor(114,113,100),CColor(210,198,166));c->setFrameColor(CColor(37,36,32));c->setLineWidth(1.2);c->drawLine({p.x-3,p.y+2},{p.x+3,p.y-2});}setDirty(false);
+    const CRect r(getViewSize());drawJerzyAsset(c,guiAssets->panel,r);
+    for(auto p:{CPoint(r.left+10,r.top+10),CPoint(r.right-10,r.top+10),CPoint(r.left+10,r.bottom-10),CPoint(r.right-10,r.bottom-10)})
+        drawJerzyAsset(c,guiAssets->screw,CRect(p.x-6,p.y-6,p.x+6,p.y+6));
+    setDirty(false);
 }
+void JerzyGlassPanel::draw(CDrawContext* c){drawJerzyAsset(c,guiAssets->inset,getViewSize());drawJerzyAsset(c,guiAssets->glass,getViewSize());setDirty(false);}
+void JerzyConsoleInsetPanel::draw(CDrawContext* c){drawJerzyAsset(c,guiAssets->inset,getViewSize());setDirty(false);}
 JerzyChassis::JerzyChassis(const CRect& r,IControlListener* l,int32_t tag):CKnob(r,l,tag,nullptr,nullptr){setMouseEnabled(false);}
-void JerzyChassis::draw(CDrawContext* c){
-    const auto& t=getJerzyGuiTheme();const CRect r(getViewSize());c->setDrawMode(kAntiAliasing|kNonIntegralMode);gradientRect(c,r,t.chassisTop,t.chassisBottom);
-    for(int i=0;i<70;++i){const double y=r.top+(i+.5)*r.getHeight()/70.0;c->setFrameColor(i%3?CColor(t.text.red,t.text.green,t.text.blue,11):CColor(t.accent.red,t.accent.green,t.accent.blue,8));c->setLineWidth(.6);c->drawLine({r.left+4,y},{r.right-4,y});}
-    for(int i=0;i<55;++i){const double fx=.5+.49*std::sin(5.71*i+.4),fy=.5+.48*std::sin(9.37*i+1.1),rr=.6+1.6*(.5+.5*std::sin(2.9*i));ellipse(c,r.left+fx*r.getWidth(),r.top+fy*r.getHeight(),rr,CColor(t.text.red,t.text.green,t.text.blue,18),CColor(0,0,0,0));}
-    c->setFrameColor(CColor(t.text.red,t.text.green,t.text.blue,100));c->setLineWidth(2);c->drawRect(r,kDrawStroked);CRect inner(r);inner.inset(5,5);c->setFrameColor(CColor(7,18,20));c->setLineWidth(2);c->drawRect(inner,kDrawStroked);setDirty(false);
-}
+void JerzyChassis::draw(CDrawContext* c){drawJerzyAsset(c,guiAssets->chassis,getViewSize());setDirty(false);}
 } // namespace JerzyAudio

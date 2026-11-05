@@ -1,4 +1,5 @@
 #include "../source/mxdelay_editor.h"
+#include "../source/jerzy_gui_assets.h"
 #include "vstgui/lib/cframe.h"
 #include "vstgui/lib/coffscreencontext.h"
 #include "vstgui/lib/cbitmap.h"
@@ -11,7 +12,7 @@
 
 extern "C" __declspec(dllexport) int __cdecl JerzyRenderMXEditorForTest(Steinberg::IPlugView* view,const char* path){
     auto* editor=dynamic_cast<JerzyAudio::MXDelayEditor*>(view);
-    if(!editor||!editor->getFrame())return 0;
+    if(!editor||!editor->getFrame()||!JerzyAudio::acquireJerzy3DAssets()->loaded())return 0;
     // Ensure this FL Studio fallback really uses the non-composited Windows renderer.
     const auto* winFactory=VSTGUI::getPlatformFactory().asWin32Factory();
     if(!winFactory || winFactory->getDirectCompositionFactory())return 0;

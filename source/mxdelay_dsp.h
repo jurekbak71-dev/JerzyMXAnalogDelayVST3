@@ -1,6 +1,9 @@
 #pragma once
 #include "mxdelay_params.h"
 #include "mxdelay_mechanics.h"
+#include "mxdelay_reverb_fdn.h"
+#include "mxdelay_reverb_convolution.h"
+#include "mxdelay_original_engines.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -433,6 +436,9 @@ template<class T> class MXDelayDSP {
 
     SlotDSP s[2];
     std::array<WetFxDSP,4> wetFx;
+    MXReverbFDN<T> reverb;
+    MXReverbConvolution<T> convolution;
+    MXOriginalEngines<T> originals[2];
     double sr=44100.0;
 public:
     void prepare(double sampleRate,int=2){
@@ -440,10 +446,14 @@ public:
         s[0].prepare(sampleRate,0x13579bdfu);
         s[1].prepare(sampleRate,0x2468ace1u);
         for(auto& fx:wetFx)fx.prepare(sampleRate);
+        reverb.prepare(sampleRate);
+        convolution.prepare(sampleRate);
+        for(auto& engine:originals)engine.initialize(sampleRate);
     }
-    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();}
+    void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();convolution.reset();for(auto& engine:originals)engine.reset();}
 
-    template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak){
+    struct MeterPeaks {double input=0.0,wet=0.0,output=0.0;};
+    template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak,MeterPeaks* meters=nullptr){
         const double inGain=gainFromNorm(p.inputTrim,-18,18);
         const double outGain=gainFromNorm(p.outputTrim,-18,12);
         const double mix=std::clamp(p.mix,0.0,1.0);
@@ -458,6 +468,7 @@ public:
             const T rawL=(T)(in&&in[0]?in[0][i]:0);
             const T rawR=(channels>1&&in&&in[1])?(T)in[1][i]:rawL;
 
+            if(meters)meters->input=std::max({meters->input,std::abs(double(rawL)),std::abs(double(rawR))});
             if(bypass&&!trails){
                 if(out&&out[0])out[0][i]=(Sample)rawL;
                 if(channels>1&&out&&out[1])out[1][i]=(Sample)rawR;
@@ -474,21 +485,30 @@ public:
             }
             Stereo a{},b{},wet{};
 
+            auto runSlot=[&](int slot,T left,T right)->Stereo {
+                const int algorithm=normIndex(p.slot[slot].algorithm,kAlgorithmCount);
+                if(algorithm>=(int)DelayAlgorithm::MemoryDelay){
+                    originals[slot].process(algorithm,left,right,p.slot[slot],bpm);
+                    return {left,right};
+                }
+                return s[slot].process(left,right,p.slot[slot],bpm,p.machineCondition);
+            };
             if(routing==(int)DelayRouting::Parallel){
-                a=s[0].process(inL,inR,p.slot[0],bpm,p.machineCondition);
-                b=s[1].process(inL,inR,p.slot[1],bpm,p.machineCondition);
+                a=runSlot(0,inL,inR);
+                b=runSlot(1,inL,inR);
                 wet={(T)((double(a.l)+double(b.l))*0.70710678118),(T)((double(a.r)+double(b.r))*0.70710678118)};
             }else if(routing==(int)DelayRouting::Series){
-                a=s[0].process(inL,inR,p.slot[0],bpm,p.machineCondition);
-                b=s[1].process((T)(double(inL)+.72*double(a.l)),(T)(double(inR)+.72*double(a.r)),p.slot[1],bpm,p.machineCondition);
+                a=runSlot(0,inL,inR);
+                b=runSlot(1,(T)(double(inL)+.72*double(a.l)),(T)(double(inR)+.72*double(a.r)));
                 wet={(T)(.72*(.48*double(a.l)+double(b.l))),(T)(.72*(.48*double(a.r)+double(b.r)))};
             }else{
-                a=s[0].process(inL,inL,p.slot[0],bpm,p.machineCondition);
-                b=s[1].process(inR,inR,p.slot[1],bpm,p.machineCondition);
+                a=runSlot(0,inL,inL);
+                b=runSlot(1,inR,inR);
                 wet={a.l,b.r};
             }
 
             for(int fx=0;fx<4;++fx)if(p.fx[fx].route>=.5)wet=wetFx[fx].process(wet,p.fx[fx]);
+            if(meters)meters->wet=std::max({meters->wet,std::abs(double(wet.l)),std::abs(double(wet.r))});
             T yL{},yR{};
             if(bypass&&trails){
                 yL=(T)(double(rawL)+wetG*double(wet.l)*outGain);
@@ -497,9 +517,31 @@ public:
                 yL=(T)((dryG*double(inL)+wetG*double(wet.l))*outGain);
                 yR=(T)((dryG*double(inR)+wetG*double(wet.r))*outGain);
             }
+            if(p.reverb.enable>=.5){
+                typename MXReverbFDN<T>::Params rv;
+                rv.enabled=true;rv.wet=p.reverb.wet;rv.decay=p.reverb.decay;
+                rv.damping=p.reverb.damping;rv.width=2.0*p.reverb.width;
+                rv.preDelayMs=240.0*p.reverb.preDelay;rv.freeze=p.reverb.freeze>=.5;
+                const int mode=normIndex(p.reverb.mode,3);
+                if(mode==0)reverb.process(yL,yR,rv);
+                else {
+                    T irL=yL,irR=yR;
+                    convolution.process(irL,irR,normIndex(p.reverb.ir,3));
+                    const double wet=std::clamp(p.reverb.wet,0.0,1.0);
+                    irL=T((1.0-wet)*double(yL)+wet*double(irL));
+                    irR=T((1.0-wet)*double(yR)+wet*double(irR));
+                    if(mode==1){yL=irL;yR=irR;}
+                    else {
+                        reverb.process(yL,yR,rv);
+                        yL=T(0.5*(double(yL)+double(irL)));
+                        yR=T(0.5*(double(yR)+double(irR)));
+                    }
+                }
+            }
             if(out&&out[0])out[0][i]=(Sample)yL;
             if(channels>1&&out&&out[1])out[1][i]=(Sample)yR;
             peak=std::max({peak,std::abs((double)yL),std::abs((double)yR)});
+            if(meters)meters->output=std::max(meters->output,peak);
         }
     }
 };

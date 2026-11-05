@@ -3,6 +3,7 @@
 #include "vstgui/lib/cframe.h"
 #include "vstgui/lib/cgraphicstransform.h"
 #include "vstgui/lib/controls/ccontrol.h"
+#include "vstgui/uidescription/uiattributes.h"
 #include "vstgui/lib/platform/iplatformframe.h"
 #if defined(_WIN32)
 #include "vstgui/lib/platform/platformfactory.h"
@@ -17,6 +18,47 @@
 #endif
 
 namespace JerzyAudio {
+namespace {
+constexpr VSTGUI::CViewAttributeID consolePageAttribute=0x4d587067; // MXpg
+constexpr int firstConsoleTab=9200,lastConsoleTab=9203;
+}
+VSTGUI::CView* MXDelayEditor::verifyView(VSTGUI::CView* view,const VSTGUI::UIAttributes& attributes,const VSTGUI::IUIDescription* description){
+    if(const auto* page=attributes.getAttributeValue("gui-c-page")){
+        const int index=(*page=="0"?0:*page=="1"?1:*page=="2"?2:3);
+        view->setAttribute(consolePageAttribute,index);
+        view->setVisible(index==consolePage);
+    }
+    if(auto* control=dynamic_cast<VSTGUI::CControl*>(view)){
+        if(control->getTag()>=firstConsoleTab&&control->getTag()<=lastConsoleTab){
+            control->setListener(this);
+            control->setValueNormalized(control->getTag()-firstConsoleTab==consolePage?1.f:0.f);
+            return view; // UI-only: do not create a VST parameter binding.
+        }
+    }
+    return VSTGUI::VST3Editor::verifyView(view,attributes,description);
+}
+void MXDelayEditor::selectConsolePage(int page){
+    if(page<0||page>lastConsoleTab-firstConsoleTab)return;
+    consolePage=page;
+    if(auto* frame=getFrame()){
+        // Inspect live views, rather than retaining pointers across editor recreation.
+        const auto update=[&](const auto& self,VSTGUI::CViewContainer* container)->void{
+            container->forEachChild([&](const auto& child){
+                int index=0;
+                if(child->getAttribute(consolePageAttribute,index))child->setVisible(index==consolePage);
+                if(auto* control=dynamic_cast<VSTGUI::CControl*>(child.get())){
+                    if(control->getTag()>=firstConsoleTab&&control->getTag()<=lastConsoleTab){
+                        control->setValueNormalized(control->getTag()-firstConsoleTab==consolePage?1.f:0.f);
+                        control->invalid();
+                    }
+                }
+                if(auto* nested=child->asViewContainer())self(self,nested);
+            });
+        };
+        update(update,frame);
+        frame->invalid();
+    }
+}
 struct MXDelayEditor::NativeResizeWatcher {
 #if defined(_WIN32)
     MXDelayEditor& editor;
@@ -89,6 +131,7 @@ bool PLUGIN_API MXDelayEditor::open(void* parent,const VSTGUI::PlatformType& typ
     });
 #endif
     if(!VSTGUI::VST3Editor::open(parent,type))return false;
+    selectConsolePage(consolePage);
     fitHostSize(getRect());
 #if defined(_WIN32)
     delete nativeWatcher;
@@ -166,6 +209,14 @@ void MXDelayEditor::onMouseEvent(VSTGUI::MouseEvent& event,VSTGUI::CFrame* frame
     VSTGUI::VST3Editor::onMouseEvent(event,frame);
 }
 void MXDelayEditor::valueChanged(VSTGUI::CControl* control){
+    if(control&&control->getTag()>=firstConsoleTab&&control->getTag()<=lastConsoleTab){
+        // VSTGUI also reports zero-valued initialization/tag-binding changes.
+        // Only a selected button requests navigation; clicking the current tab
+        // keeps it selected rather than leaving the console without an active tab.
+        if(control->getValueNormalized()>.5f)selectConsolePage(control->getTag()-firstConsoleTab);
+        else if(control->getTag()-firstConsoleTab==consolePage)control->setValueNormalized(1.f);
+        return;
+    }
     if(control&&control->getTag()>=9101&&control->getTag()<=9104){
         if(control->getValueNormalized()>0.5f){const double factors[]={0.75,1.0,1.25,1.5};applyZoom(factors[control->getTag()-9101]);}
         return;

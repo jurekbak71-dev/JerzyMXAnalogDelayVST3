@@ -4,7 +4,7 @@
 #include <cmath>
 
 namespace JerzyAudio {
-constexpr int kMXStateVersion=5;
+constexpr int kMXStateVersion=8;
 
 template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
     if(!b.writeInt32(kMXStateVersion)) return false;
@@ -23,10 +23,12 @@ template<class Stream> bool writeMXState(Stream& b,const MXDelayParams& p){
             if(!b.writeFloat((float)x.c[a][c])) return false;
         for(double v:x.headPan) if(!b.writeFloat((float)v)) return false;
     }
+    const double rv[]={p.reverb.enable,p.reverb.wet,p.reverb.decay,p.reverb.damping,p.reverb.width,p.reverb.preDelay,p.reverb.freeze,p.reverb.mode,p.reverb.ir};
+    for(double v:rv)if(!b.writeFloat((float)v))return false;
     return true;
 }
 
-template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
+template<class Stream> bool readMXStateUnchecked(Stream& b,MXDelayParams& p){
     p=MXDelayParams{};
     int32_t version=0; if(!b.readInt32(version)) return false;
     if(version<1 || version>kMXStateVersion) return false;
@@ -51,10 +53,21 @@ template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
         double* common[]={&x.algorithm,&x.enable,&x.sync,&x.division,&x.time,&x.feedback,&x.level,&x.pan,&x.duck};
         for(auto* v:common) if(!rd(*v)) return false;
         if(version<4){const int oldIndex=std::clamp((int)std::lround(x.algorithm*6.0),0,6);x.algorithm=double(oldIndex)/double(kAlgorithmCount-1);}
-        const int storedAlgorithms = version>=4 ? kAlgorithmCount : 7;
+        else if(version<=6){const int oldIndex=std::clamp((int)std::lround(x.algorithm*8.0),0,8);x.algorithm=double(oldIndex)/double(kAlgorithmCount-1);}
+        const int storedAlgorithms = version>=7 ? kAlgorithmCount : (version>=4 ? 9 : 7);
         for(int a=0;a<storedAlgorithms;++a) for(int c=0;c<kAlgoControls;++c) if(!rd(x.c[a][c])) return false;
         if(version>=2) for(auto& v:x.headPan) if(!rd(v)) return false;
     }
+    if(version>=6){double* rv[]={&p.reverb.enable,&p.reverb.wet,&p.reverb.decay,&p.reverb.damping,&p.reverb.width,&p.reverb.preDelay,&p.reverb.freeze};for(auto* v:rv)if(!rd(*v))return false;}
+    if(version>=8){if(!rd(p.reverb.mode)||!rd(p.reverb.ir))return false;}
     return true;
 }
+// Transactional load: a truncated or malformed preset never mutates live DSP state.
+template<class Stream> bool readMXState(Stream& b,MXDelayParams& p){
+    MXDelayParams candidate;
+    if(!readMXStateUnchecked(b,candidate))return false;
+    p=candidate;
+    return true;
+}
+
 }

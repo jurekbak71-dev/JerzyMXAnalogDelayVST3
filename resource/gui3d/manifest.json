@@ -1,0 +1,3979 @@
+{
+  "generator": "scripts/render_gui3d_assets.py",
+  "render": "Deterministic analytic geometry and anisotropic material shading; 2D orthographic assets, no recovered original 3D scene",
+  "assets": [
+    {
+      "file": "knob_96.png",
+      "width": 1056,
+      "height": 960,
+      "frames": 101,
+      "columns": 11,
+      "rows": 10,
+      "frame_width": 96,
+      "frame_height": 96,
+      "sha256": "6a54ef7f81b6c6eaf16519c71655ad1601d3be665046098aaf1c522e30bb6893",
+      "usage": "101-frame turned aluminium cap; moving pointer",
+      "binding": "ChickenKnob: normalized [0,1], 135..405 degrees"
+    },
+    {
+      "file": "knob_144.png",
+      "width": 1584,
+      "height": 1440,
+      "frames": 101,
+      "columns": 11,
+      "rows": 10,
+      "frame_width": 144,
+      "frame_height": 144,
+      "sha256": "eff31f6b78d984f0faa372a8e807e23235eae6997cb9401870f32545acbdbee0",
+      "usage": "101-frame turned aluminium cap; moving pointer",
+      "binding": "ChickenKnob: normalized [0,1], 135..405 degrees"
+    },
+    {
+      "file": "knob_192.png",
+      "width": 2112,
+      "height": 1920,
+      "frames": 101,
+      "columns": 11,
+      "rows": 10,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "94fd5929607697d6bea5362226ff883bbc6448cfa1bd6db696297a8102509829",
+      "usage": "101-frame turned aluminium cap; moving pointer",
+      "binding": "ChickenKnob: normalized [0,1], 135..405 degrees"
+    },
+    {
+      "file": "knob_shadow.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "0372657f8e534da7eceb12b9568a56b6201a6407e386389123c048f120831988",
+      "usage": "Contact shadow, beneath moving cap",
+      "binding": ""
+    },
+    {
+      "file": "glow_amber.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "b9a31a81cbf66e30f6f89d29e4df0d09eded99d7594b79e0ae97b7c98fa64000",
+      "usage": "Independent emission overlay; runtime alpha",
+      "binding": ""
+    },
+    {
+      "file": "scale_amber.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "2b20703af7e754913051d4ad5367ba94202a56720b8d7757dab770dcf9e9e140",
+      "usage": "Fixed control scale; does not rotate",
+      "binding": ""
+    },
+    {
+      "file": "glow_cyan.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "669c1df3959ddd129f83216fb7433759b66b095036596c702bbd4c4724250613",
+      "usage": "Independent emission overlay; runtime alpha",
+      "binding": ""
+    },
+    {
+      "file": "scale_cyan.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "7989ea3bfed6c330bf4e54f74c8e1e0e4dee1b3cada47b87ecf6520419228f04",
+      "usage": "Fixed control scale; does not rotate",
+      "binding": ""
+    },
+    {
+      "file": "glow_green.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "003c980dfb1fec98bbcfafbabd23770bd3f1254023fda69f4599099c9aa6efa8",
+      "usage": "Independent emission overlay; runtime alpha",
+      "binding": ""
+    },
+    {
+      "file": "scale_green.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "870dcff3bd3650ccbd35f8b03e407cf19f65abd49c0abb6b0209b226bd54bb22",
+      "usage": "Fixed control scale; does not rotate",
+      "binding": ""
+    },
+    {
+      "file": "glow_red.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "e872867663bb387215557cb7170cb737009d2b00d1ffa1840c95c5bfb3063610",
+      "usage": "Independent emission overlay; runtime alpha",
+      "binding": ""
+    },
+    {
+      "file": "scale_red.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "0823a04c262f71a2ea19dd8474beb87d1f6bf13571fd51cf00ce48061f1b02c3",
+      "usage": "Fixed control scale; does not rotate",
+      "binding": ""
+    },
+    {
+      "file": "glow_white.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "1c68a8fcb640c2aa02f091ef70f15d9b48d553057f00a36ba27264bd982dd58e",
+      "usage": "Independent emission overlay; runtime alpha",
+      "binding": ""
+    },
+    {
+      "file": "scale_white.png",
+      "width": 192,
+      "height": 192,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 192,
+      "frame_height": 192,
+      "sha256": "01bf69105f2d6244e07b7a09a048b4934d473a3a2b93bce6e3b7de1644784e2d",
+      "usage": "Fixed control scale; does not rotate",
+      "binding": ""
+    },
+    {
+      "file": "screw.png",
+      "width": 64,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 64,
+      "frame_height": 64,
+      "sha256": "4feaa2bccb2052fb2cd90b54c9d72ff916227062adf8656a9d9890e2fbf6ad29",
+      "usage": "Fixed mounting hardware",
+      "binding": ""
+    },
+    {
+      "file": "chassis.png",
+      "width": 1280,
+      "height": 790,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 1280,
+      "frame_height": 790,
+      "sha256": "d39cec34491d4e4a6cae8b8bbd949d9ac0eb3f7a6fd989c9a7442b9ca3aa4025",
+      "usage": "Brushed steel chassis only, no controls or text",
+      "binding": ""
+    },
+    {
+      "file": "panel.png",
+      "width": 768,
+      "height": 384,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 768,
+      "frame_height": 384,
+      "sha256": "fb416413b5e7f6d5ebfaf0bde5dee79cd49517ff8e710a443be7256bee0cd0dd",
+      "usage": "Independent satin aluminium module plate",
+      "binding": ""
+    },
+    {
+      "file": "inset.png",
+      "width": 768,
+      "height": 384,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 768,
+      "frame_height": 384,
+      "sha256": "037b9cfc5052748d102caed9947edf65213d265bf39a3cc23f32961996bc7518",
+      "usage": "Recessed dark enamel engine face",
+      "binding": ""
+    },
+    {
+      "file": "glass.png",
+      "width": 512,
+      "height": 128,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 512,
+      "frame_height": 128,
+      "sha256": "9c2e88449024bc53d93cb8de19751c6f39e1b426150a76f55435ec416ae62862",
+      "usage": "Display glass reflection overlay",
+      "binding": ""
+    },
+    {
+      "file": "toggle.png",
+      "width": 128,
+      "height": 2176,
+      "frames": 17,
+      "columns": 1,
+      "rows": 17,
+      "frame_width": 128,
+      "frame_height": 128,
+      "sha256": "a14c6890cb9301f744be1ab6793c78cb3a4933a3af3729f5eec0bf3f15408cf9",
+      "usage": "Metal toggle with moving contact shadow",
+      "binding": "ToggleSwitch and ThreeWaySwitch: endpoint/centre frames"
+    },
+    {
+      "file": "button_off.png",
+      "width": 256,
+      "height": 96,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 256,
+      "frame_height": 96,
+      "sha256": "51d0e38c7e8200cc8c403d472bc1f0627ee71c18408716a561ce19a9e0fcb28a",
+      "usage": "Unlabelled key; active emission selected at runtime",
+      "binding": ""
+    },
+    {
+      "file": "button_amber.png",
+      "width": 256,
+      "height": 96,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 256,
+      "frame_height": 96,
+      "sha256": "184c86eb12191d68d9bf7741c8fea8af2ccd6f8e275d913586bdebe59b6feff9",
+      "usage": "Unlabelled key; active emission selected at runtime",
+      "binding": ""
+    },
+    {
+      "file": "button_cyan.png",
+      "width": 256,
+      "height": 96,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 256,
+      "frame_height": 96,
+      "sha256": "3a3e9ef02368e311c326930a771ef3db477109b13e33084be603595973283e24",
+      "usage": "Unlabelled key; active emission selected at runtime",
+      "binding": ""
+    },
+    {
+      "file": "led_off.png",
+      "width": 64,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 64,
+      "frame_height": 64,
+      "sha256": "6336711f27cdbca0ea5a30c417566b4df7a71d229728ef745bf067f1ef59199d",
+      "usage": "Independent physical indicator lens, no text",
+      "binding": ""
+    },
+    {
+      "file": "led_amber.png",
+      "width": 64,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 64,
+      "frame_height": 64,
+      "sha256": "eb40c4fc18bc803f34b3b16d4eb12c0089189a6d7410de96c766aa823a999a3c",
+      "usage": "Independent physical indicator lens, no text",
+      "binding": ""
+    },
+    {
+      "file": "led_cyan.png",
+      "width": 64,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 64,
+      "frame_height": 64,
+      "sha256": "71e49a3feaaaecdd7f0f1df74b68c7078fea48ba09b9ee317f13612798e99b2e",
+      "usage": "Independent physical indicator lens, no text",
+      "binding": ""
+    },
+    {
+      "file": "led_green.png",
+      "width": 64,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 64,
+      "frame_height": 64,
+      "sha256": "7da0dc3c1829c140dc1cfe8c8662a2b64dccbfa916700943bf1fc00e64ad0fee",
+      "usage": "Independent physical indicator lens, no text",
+      "binding": ""
+    },
+    {
+      "file": "led_red.png",
+      "width": 64,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 64,
+      "frame_height": 64,
+      "sha256": "d1d816298c3dd29f2894260081acc46c79c4d850be82c24d1685642a223dd0dd",
+      "usage": "Independent physical indicator lens, no text",
+      "binding": ""
+    },
+    {
+      "file": "icon_filter.png",
+      "width": 96,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 96,
+      "frame_height": 64,
+      "sha256": "d1ce496fe8daa699046fc034120e26cbd3b8db9884fced6aa416f87fd2f67fbc",
+      "usage": "Independent module icon, not a simulated audio display",
+      "binding": ""
+    },
+    {
+      "file": "icon_drive.png",
+      "width": 96,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 96,
+      "frame_height": 64,
+      "sha256": "a4ae16e680f85d50c5616962e0dfe9ed1465a7cb66eb2e0abdb0102f597654b9",
+      "usage": "Independent module icon, not a simulated audio display",
+      "binding": ""
+    },
+    {
+      "file": "icon_mod.png",
+      "width": 96,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 96,
+      "frame_height": 64,
+      "sha256": "7d127cac402c34ddf324adc423c524492a02d9eb66b6088480764908aaff243d",
+      "usage": "Independent module icon, not a simulated audio display",
+      "binding": ""
+    },
+    {
+      "file": "icon_lofi.png",
+      "width": 96,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 96,
+      "frame_height": 64,
+      "sha256": "f729cb979f9890032e097eff0f9ad926de365dbd566626750c2ac197342f0070",
+      "usage": "Independent module icon, not a simulated audio display",
+      "binding": ""
+    },
+    {
+      "file": "icon_routing.png",
+      "width": 96,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 96,
+      "frame_height": 64,
+      "sha256": "94a9542fce78ee6b3edb8b2f3cfc2de4e8e1decd3771270626e8e2d1bbb95517",
+      "usage": "Independent module icon, not a simulated audio display",
+      "binding": ""
+    },
+    {
+      "file": "icon_reverb.png",
+      "width": 96,
+      "height": 64,
+      "frames": 1,
+      "columns": 1,
+      "rows": 1,
+      "frame_width": 96,
+      "frame_height": 64,
+      "sha256": "94a9542fce78ee6b3edb8b2f3cfc2de4e8e1decd3771270626e8e2d1bbb95517",
+      "usage": "Independent module icon, not a simulated audio display",
+      "binding": ""
+    }
+  ],
+  "control_map": [
+    {
+      "tag": "A0C0",
+      "param_id": 1120,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C1",
+      "param_id": 1121,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C2",
+      "param_id": 1122,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C3",
+      "param_id": 1123,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C4",
+      "param_id": 1124,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C5",
+      "param_id": 1125,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "AHeadPan1",
+      "param_id": 1110,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C6",
+      "param_id": 1126,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C10",
+      "param_id": 1130,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "AHeadPan2",
+      "param_id": 1111,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C7",
+      "param_id": 1127,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C11",
+      "param_id": 1131,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "AHeadPan3",
+      "param_id": 1112,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C8",
+      "param_id": 1128,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C12",
+      "param_id": 1132,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "AHeadPan4",
+      "param_id": 1113,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C9",
+      "param_id": 1129,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A0C13",
+      "param_id": 1133,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A1C0",
+      "param_id": 1136,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A1C1",
+      "param_id": 1137,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A1C2",
+      "param_id": 1138,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A1C3",
+      "param_id": 1139,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A1C4",
+      "param_id": 1140,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A1C5",
+      "param_id": 1141,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A1C6",
+      "param_id": 1142,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A1C7",
+      "param_id": 1143,
+      "view": "LedThreeWaySwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A2C0",
+      "param_id": 1152,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A2C1",
+      "param_id": 1153,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A2C2",
+      "param_id": 1154,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A2C3",
+      "param_id": 1155,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A2C4",
+      "param_id": 1156,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A2C5",
+      "param_id": 1157,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A3C0",
+      "param_id": 1168,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A3C1",
+      "param_id": 1169,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A3C2",
+      "param_id": 1170,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A3C3",
+      "param_id": 1171,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A3C4",
+      "param_id": 1172,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A3C5",
+      "param_id": 1173,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A4C0",
+      "param_id": 1184,
+      "view": "LedThreeWaySwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A4C1",
+      "param_id": 1185,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A4C2",
+      "param_id": 1186,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A4C3",
+      "param_id": 1187,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A4C4",
+      "param_id": 1188,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A4C5",
+      "param_id": 1189,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A5C0",
+      "param_id": 1200,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A5C1",
+      "param_id": 1201,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A5C2",
+      "param_id": 1202,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A5C3",
+      "param_id": 1203,
+      "view": "LedThreeWaySwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A5C4",
+      "param_id": 1204,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A5C5",
+      "param_id": 1205,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A6C0",
+      "param_id": 1216,
+      "view": "LedThreeWaySwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A6C1",
+      "param_id": 1217,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A6C2",
+      "param_id": 1218,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A6C3",
+      "param_id": 1219,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A6C4",
+      "param_id": 1220,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A6C5",
+      "param_id": 1221,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C0",
+      "param_id": 1420,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C1",
+      "param_id": 1421,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C2",
+      "param_id": 1422,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C3",
+      "param_id": 1423,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C4",
+      "param_id": 1424,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C5",
+      "param_id": 1425,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BHeadPan1",
+      "param_id": 1410,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C6",
+      "param_id": 1426,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C10",
+      "param_id": 1430,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BHeadPan2",
+      "param_id": 1411,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C7",
+      "param_id": 1427,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C11",
+      "param_id": 1431,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BHeadPan3",
+      "param_id": 1412,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C8",
+      "param_id": 1428,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C12",
+      "param_id": 1432,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BHeadPan4",
+      "param_id": 1413,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C9",
+      "param_id": 1429,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B0C13",
+      "param_id": 1433,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B1C0",
+      "param_id": 1436,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B1C1",
+      "param_id": 1437,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B1C2",
+      "param_id": 1438,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B1C3",
+      "param_id": 1439,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B1C4",
+      "param_id": 1440,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B1C5",
+      "param_id": 1441,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B1C6",
+      "param_id": 1442,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B1C7",
+      "param_id": 1443,
+      "view": "LedThreeWaySwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B2C0",
+      "param_id": 1452,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B2C1",
+      "param_id": 1453,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B2C2",
+      "param_id": 1454,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B2C3",
+      "param_id": 1455,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B2C4",
+      "param_id": 1456,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B2C5",
+      "param_id": 1457,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B3C0",
+      "param_id": 1468,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B3C1",
+      "param_id": 1469,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B3C2",
+      "param_id": 1470,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B3C3",
+      "param_id": 1471,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B3C4",
+      "param_id": 1472,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B3C5",
+      "param_id": 1473,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B4C0",
+      "param_id": 1484,
+      "view": "LedThreeWaySwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B4C1",
+      "param_id": 1485,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B4C2",
+      "param_id": 1486,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B4C3",
+      "param_id": 1487,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B4C4",
+      "param_id": 1488,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B4C5",
+      "param_id": 1489,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B5C0",
+      "param_id": 1500,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B5C1",
+      "param_id": 1501,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B5C2",
+      "param_id": 1502,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B5C3",
+      "param_id": 1503,
+      "view": "LedThreeWaySwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B5C4",
+      "param_id": 1504,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B5C5",
+      "param_id": 1505,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B6C0",
+      "param_id": 1516,
+      "view": "LedThreeWaySwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B6C1",
+      "param_id": 1517,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B6C2",
+      "param_id": 1518,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B6C3",
+      "param_id": 1519,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B6C4",
+      "param_id": 1520,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B6C5",
+      "param_id": 1521,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C0",
+      "param_id": 1232,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C1",
+      "param_id": 1233,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C2",
+      "param_id": 1234,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C3",
+      "param_id": 1235,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C4",
+      "param_id": 1236,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C5",
+      "param_id": 1237,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C8",
+      "param_id": 1240,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C9",
+      "param_id": 1241,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C10",
+      "param_id": 1242,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C11",
+      "param_id": 1243,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C6",
+      "param_id": 1238,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A7C7",
+      "param_id": 1239,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A8C0",
+      "param_id": 1248,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A8C1",
+      "param_id": 1249,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A8C2",
+      "param_id": 1250,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A8C3",
+      "param_id": 1251,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A8C4",
+      "param_id": 1252,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A8C5",
+      "param_id": 1253,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A8C6",
+      "param_id": 1254,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A8C7",
+      "param_id": 1255,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C0",
+      "param_id": 1532,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C1",
+      "param_id": 1533,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C2",
+      "param_id": 1534,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C3",
+      "param_id": 1535,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C4",
+      "param_id": 1536,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C5",
+      "param_id": 1537,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C8",
+      "param_id": 1540,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C9",
+      "param_id": 1541,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C10",
+      "param_id": 1542,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C11",
+      "param_id": 1543,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C6",
+      "param_id": 1538,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B7C7",
+      "param_id": 1539,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B8C0",
+      "param_id": 1548,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B8C1",
+      "param_id": 1549,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B8C2",
+      "param_id": 1550,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B8C3",
+      "param_id": 1551,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B8C4",
+      "param_id": 1552,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B8C5",
+      "param_id": 1553,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B8C6",
+      "param_id": 1554,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B8C7",
+      "param_id": 1555,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A9C0",
+      "param_id": 1264,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A9C1",
+      "param_id": 1265,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A9C2",
+      "param_id": 1266,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A9C3",
+      "param_id": 1267,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A9C4",
+      "param_id": 1268,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A9C5",
+      "param_id": 1269,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A9C6",
+      "param_id": 1270,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A10C0",
+      "param_id": 1280,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A10C1",
+      "param_id": 1281,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A10C2",
+      "param_id": 1282,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A10C3",
+      "param_id": 1283,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A10C4",
+      "param_id": 1284,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A10C5",
+      "param_id": 1285,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A10C6",
+      "param_id": 1286,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A11C0",
+      "param_id": 1296,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A11C1",
+      "param_id": 1297,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A11C2",
+      "param_id": 1298,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A11C3",
+      "param_id": 1299,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A11C4",
+      "param_id": 1300,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A11C5",
+      "param_id": 1301,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "A11C6",
+      "param_id": 1302,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B9C0",
+      "param_id": 1564,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B9C1",
+      "param_id": 1565,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B9C2",
+      "param_id": 1566,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B9C3",
+      "param_id": 1567,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B9C4",
+      "param_id": 1568,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B9C5",
+      "param_id": 1569,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B9C6",
+      "param_id": 1570,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B10C0",
+      "param_id": 1580,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B10C1",
+      "param_id": 1581,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B10C2",
+      "param_id": 1582,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B10C3",
+      "param_id": 1583,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B10C4",
+      "param_id": 1584,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B10C5",
+      "param_id": 1585,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B10C6",
+      "param_id": 1586,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B11C0",
+      "param_id": 1596,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B11C1",
+      "param_id": 1597,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B11C2",
+      "param_id": 1598,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B11C3",
+      "param_id": 1599,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B11C4",
+      "param_id": 1600,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B11C5",
+      "param_id": 1601,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "B11C6",
+      "param_id": 1602,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "GuiPage0",
+      "param_id": 9200,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "GuiPage1",
+      "param_id": 9201,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "GuiPage2",
+      "param_id": 9202,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "GuiPage3",
+      "param_id": 9203,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "9101",
+      "param_id": 9101,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "9102",
+      "param_id": 9102,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "9103",
+      "param_id": 9103,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "9104",
+      "param_id": 9104,
+      "view": "ConsoleButton",
+      "assets": [
+        "button_off.png",
+        "button_amber.png",
+        "button_cyan.png"
+      ],
+      "audio_parameter": false
+    },
+    {
+      "tag": "AAlgo",
+      "param_id": 1100,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "AEnable",
+      "param_id": 1101,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ASync",
+      "param_id": 1102,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ADiv",
+      "param_id": 1103,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ATime",
+      "param_id": 1104,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "AFeedback",
+      "param_id": 1105,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ALevel",
+      "param_id": 1106,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "APan",
+      "param_id": 1107,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ADuck",
+      "param_id": 1108,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BAlgo",
+      "param_id": 1400,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BEnable",
+      "param_id": 1401,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BSync",
+      "param_id": 1402,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BDiv",
+      "param_id": 1403,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BTime",
+      "param_id": 1404,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BFeedback",
+      "param_id": 1405,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BLevel",
+      "param_id": 1406,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BPan",
+      "param_id": 1407,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "BDuck",
+      "param_id": 1408,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "InputPeak",
+      "param_id": 1060,
+      "view": "LedBarMeter",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "OutputPeak",
+      "param_id": 1059,
+      "view": "LedBarMeter",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx1Type",
+      "param_id": 1008,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx1Route",
+      "param_id": 1013,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx1Amount",
+      "param_id": 1009,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx1Rate",
+      "param_id": 1010,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx1Depth",
+      "param_id": 1011,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx1Drive",
+      "param_id": 1012,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx2Type",
+      "param_id": 1014,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx2Route",
+      "param_id": 1019,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx2Amount",
+      "param_id": 1015,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx2Rate",
+      "param_id": 1016,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx2Depth",
+      "param_id": 1017,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx2Drive",
+      "param_id": 1018,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx3Type",
+      "param_id": 1020,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx3Route",
+      "param_id": 1025,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx3Amount",
+      "param_id": 1021,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx3Rate",
+      "param_id": 1022,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx3Depth",
+      "param_id": 1023,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx3Drive",
+      "param_id": 1024,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx4Type",
+      "param_id": 1026,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx4Route",
+      "param_id": 1031,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx4Amount",
+      "param_id": 1027,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx4Rate",
+      "param_id": 1028,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx4Depth",
+      "param_id": 1029,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Fx4Drive",
+      "param_id": 1030,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbMode",
+      "param_id": 1057,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbIR",
+      "param_id": 1058,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbEnable",
+      "param_id": 1050,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbFreeze",
+      "param_id": 1056,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbWet",
+      "param_id": 1051,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbDecay",
+      "param_id": 1052,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbDamping",
+      "param_id": 1053,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbWidth",
+      "param_id": 1054,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "ReverbPreDelay",
+      "param_id": 1055,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Routing",
+      "param_id": 1003,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Spill",
+      "param_id": 1005,
+      "view": "LedToggleSwitch",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Bypass",
+      "param_id": 1004,
+      "view": "BypassButton",
+      "assets": [
+        "toggle.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "MachineCondition",
+      "param_id": 1007,
+      "view": "COptionMenu",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "InputTrim",
+      "param_id": 1001,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "Mix",
+      "param_id": 1000,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "WetPeak",
+      "param_id": 1061,
+      "view": "LedBarMeter",
+      "assets": [],
+      "audio_parameter": true
+    },
+    {
+      "tag": "EngineAActive",
+      "param_id": 1062,
+      "view": "SignalLED",
+      "assets": [
+        "led_off.png",
+        "led_amber.png",
+        "led_cyan.png",
+        "led_green.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "EngineBActive",
+      "param_id": 1063,
+      "view": "SignalLED",
+      "assets": [
+        "led_off.png",
+        "led_amber.png",
+        "led_cyan.png",
+        "led_green.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "EngineBothActive",
+      "param_id": 1064,
+      "view": "SignalLED",
+      "assets": [
+        "led_off.png",
+        "led_amber.png",
+        "led_cyan.png",
+        "led_green.png"
+      ],
+      "audio_parameter": true
+    },
+    {
+      "tag": "OutputTrim",
+      "param_id": 1002,
+      "view": "ChickenKnob",
+      "assets": [
+        "knob_192.png",
+        "knob_96.png",
+        "knob_shadow.png",
+        "scale_amber.png",
+        "scale_cyan.png",
+        "glow_amber.png",
+        "glow_cyan.png"
+      ],
+      "audio_parameter": true
+    }
+  ]
+}
