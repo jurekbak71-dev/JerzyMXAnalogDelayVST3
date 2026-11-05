@@ -50,7 +50,7 @@ assert len(meters)==3 and all(v.attrib.get("class")=="LedBarMeter" for v in mete
 for v in meters:
     x,y=map(int,v.attrib["origin"].split(", "))
     w,h=map(int,v.attrib["size"].split(", "))
-    assert 272<=x and x+w<=430, "LED bar escapes GLOBAL MIX panel or overlaps trim"
+    assert 378<=x and x+w<=536, "LED bar escapes GLOBAL MIX panel or overlaps trim"
     assert 690<=y and y+h<=782, "LED bar escapes footer vertically"
 assert [v.attrib["control-tag"] for v in meters]==list(meter_tags), "Meter order must be INPUT, WET, OUTPUT"
 for tag in ("EngineAActive","EngineBActive","EngineBothActive"):
