@@ -37,7 +37,7 @@ void checkFinder(IPlugView*view){
   if(result!=kResultTrue||id!=expected)std::cerr<<"Finder at "<<x<<","<<y<<" size "<<r.getWidth()<<"x"<<r.getHeight()<<" expected "<<expected<<" actual "<<id<<" result "<<result<<"\n";
   require(result==kResultTrue&&id==expected,"Scaled hit area mismatch");
  };
- find(325,738,kMXMixId);find(103,528,slotParam(0,kSlotHeadPan1));find(221,255,slotParam(0,kSlotTime));find(309,255,slotParam(0,kSlotFeedback));
+ find(191,741,kMXMixId);find(103,528,slotParam(0,kSlotHeadPan1));find(221,255,slotParam(0,kSlotTime));find(309,255,slotParam(0,kSlotFeedback));
 }
 int main(int argc,char**argv){try{
  require(argc==2,"Pass JerzyMXAnalogDelay2.vst3 path");std::cerr<<"mxgui: start\n";SetProcessDPIAware();CoInitializeEx(nullptr,COINIT_APARTMENTTHREADED);
@@ -52,7 +52,7 @@ int main(int argc,char**argv){try{
  std::cerr<<"mxgui: midi checked\n";auto view=owned(controller->createView(ViewType::kEditor));require(view,"createView failed");HostFrame frame;frame.window=CreateWindowExW(0,L"STATIC",L"MX GUI test",WS_POPUP,0,0,1280,790,nullptr,nullptr,GetModuleHandleW(nullptr),nullptr);require(frame.window,"Host window failed");
  std::cerr<<"mxgui: host hwnd ready\n";FUnknownPtr<IPlugViewContentScaleSupport> scale(view);require(scale!=nullptr,"No DPI support");std::cerr<<"mxgui: setting preattach dpi\n";require(scale->setContentScaleFactor(1.25f)==kResultTrue,"Pre-attach DPI failed");std::cerr<<"mxgui: preattach dpi ok\n";auto initial=sizeOf(view);require(initial.getWidth()==1600&&initial.getHeight()==988,"Wrong pre-attach scale");
  MoveWindow(frame.window,0,0,initial.getWidth(),initial.getHeight(),FALSE);view->setFrame(&frame);std::cerr<<"mxgui: attaching\n";require(view->attached(frame.window,kPlatformTypeHWND)==kResultTrue,"Attach failed");std::cerr<<"mxgui: attached\n";pump();checkFinder(view);std::cerr<<"mxgui: finder ok\n";
- std::cerr<<"mxgui: interaction start\n";setParam(controller,kMXMixId,0.82);pump();require(std::abs(controller->getParamNormalized(kMXMixId)-0.82)<.002,"VST3 parameter change did not reach controller");right(view,frame.window,325,738);require(std::abs(controller->getParamNormalized(kMXMixId)-0.35)<.002,"Right-click did not reset knob to default");
+ std::cerr<<"mxgui: interaction start\n";setParam(controller,kMXMixId,0.82);pump();require(std::abs(controller->getParamNormalized(kMXMixId)-0.82)<.002,"VST3 parameter change did not reach controller");right(view,frame.window,191,741);require(std::abs(controller->getParamNormalized(kMXMixId)-0.35)<.002,"Right-click did not reset knob to default");
  std::cerr<<"mxgui: right reset ok\n";double en=controller->getParamNormalized(slotParam(0,kSlotEnable));left(view,frame.window,476,146);require(controller->getParamNormalized(slotParam(0,kSlotEnable))!=en,"LED switch click failed");left(view,frame.window,201,225);
  std::cerr<<"mxgui: led ok\n";for(const auto& z: {std::pair<double,double>{914,59}, {958,59}, {1004,59}, {1050,59}}){left(view,frame.window,z.first,z.second);checkFinder(view);}
  // Navigation must reveal existing parameters and never automate UI-only tags.
@@ -64,7 +64,7 @@ int main(int argc,char**argv){try{
   if(tab==1)require(has(155,247,wetFxParam(0,kWetFxType)),"FX page binding missing");
   if(tab==2)require(!has(221,255,slotParam(0,kSlotTime)),"Hidden A/B controls remain hittable");
   if(tab==3)require(has(580,281,kMXRoutingId),"Routing page binding missing");
-  require(has(325,738,kMXMixId),"Persistent mix missing");
+  require(has(191,741,kMXMixId),"Persistent mix missing");
   require(renderProbe(view,("mxdelay2-render-tab-"+std::to_string(tab)+".png").c_str())==1,"Console page render failed");
  }
  left(view,frame.window,366,40);checkFinder(view);
