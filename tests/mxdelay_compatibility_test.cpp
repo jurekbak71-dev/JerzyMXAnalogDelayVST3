@@ -47,7 +47,7 @@ void stateChecks(){
         Stream again;check(writeMXState(again,restored)&&again.bytes==saved.bytes,"round trip bytes changed");
         for(size_t length=0;length<fixture.bytes.size();++length){
             Stream cut;cut.bytes.assign(fixture.bytes.begin(),fixture.bytes.begin()+length);
-            MXDelayParams q;check(!readMXState(cut,q),"truncated state accepted");
+            MXDelayParams q;q.mix=.873;q.reverb.wet=.613;check(!readMXState(cut,q),"truncated state accepted");check(q.mix==.873&&q.reverb.wet==.613,"truncated preset partially changed live state");
         }
     }
     for(int version:{0,8}){Stream bad;bad.writeInt32(version);MXDelayParams p;check(!readMXState(bad,p),"unknown version accepted");}
