@@ -98,6 +98,15 @@ public:
  pos=mp=0;phase=modphase=0;inputLP={};outputLP={};bodyLP={};feedbackLP={};dcX={};dcY={};modLP={};focusLP={};
  duckEnv=sagEnv=0;inputComp={};outputComp={};rng=0x71826ad;initial=true;
  }
+ void reset() {
+ for(auto& b:surface)std::fill(b.begin(),b.end(),0.f);
+ for(auto& b:modbuf)std::fill(b.begin(),b.end(),0.f);
+ for(auto& b:mechanicsBuffer)std::fill(b.begin(),b.end(),0.f);
+ for(auto& b:spaceBuffer)std::fill(b.begin(),b.end(),0.f);
+ spring.reset();mechanicsPos=spacePos=0;mechanicsLP={};headTone={};headLow={};spaceLP={};mechanicsFade=1;springFade=0;
+ pos=mp=0;phase=modphase=0;inputLP={};outputLP={};bodyLP={};feedbackLP={};dcX={};dcY={};modLP={};focusLP={};
+ duckEnv=sagEnv=0;inputComp={};outputComp={};rng=0x71826ad;initial=true;
+ }
  size_t memoryBytes() const {return (surface[0].capacity()+surface[1].capacity()+modbuf[0].capacity()+modbuf[1].capacity()+mechanicsBuffer[0].capacity()+mechanicsBuffer[1].capacity()+spaceBuffer[0].capacity()+spaceBuffer[1].capacity())*sizeof(float)+spring.memoryBytes();}
  Meter process(float* left,float* right,int samples,const Settings& settings,double bpm=120) {
  using namespace key;
