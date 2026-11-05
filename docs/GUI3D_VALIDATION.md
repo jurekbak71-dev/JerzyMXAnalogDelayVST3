@@ -1,29 +1,55 @@
-# GUI C material rework — validation
+# GUI C validation — current status, 2026-11-05
 
-Base: `8ea6a31`, branch `feat/gui-c-visual-rework-20261104`. Rendering resources and presentation changed; processor, DSP, state, ParamID and factory UIDs have not been edited by this rework.
+The GUI C material rework and the independent reverb continuation are on separate
+review branches. No environment publication or merge to main was performed.
 
-Local checks completed:
-- RGBA/PNG checks, per-file SHA-256, 101-frame knob and 17-frame mechanical strip dimensions, differing endpoint/centre frames, transparent corners, material-to-control mappings, four pages, transparent labels and algorithm hit-target separation: passed.
-- Existing static GUI geometry tests, including latest footer alignment and screw clearances: passed.
-- Portable Release DSP/state CTest: 2/2 passed (current imported engines and state tests).
-- Linux native VST3 compiled and Steinberg validator: 47 passed, 0 failed.
+Windows run [42028048253](https://github.com/jurekbak71-dev/JerzyMXAnalogDelayVST3/actions/runs/42028048253)
+at `0572a97` passed x64 compilation, CTest (DSP, compatibility, reverb, compiled
+VST3 host and native GUI), rendered-control checks and pluginval strictness 5.
+It produced an installation ZIP, material library and authentic native renders
+of all four pages and REVERB mode states. Later optimization/archive-validation
+changes are tracked in the current workflow and `docs/REVERB_VALIDATION.md`;
+consult `COMMIT.txt` in each downloaded installation package.
 
-Pending: final Windows CTest (including actual rendered states/pages, host automation and factory reset), pluginval strictness 5, installation bundle checks and artifact SHA-256. Results must be recorded after CI; not inferred from compilation.
+The material library contains 34 independently rendered RGBA assets, including
+101-frame knob atlases, 17-state toggles, panels, shadows and separate light
+layers. Byte-identical regeneration, SHA-256, atlas bounds <=4096 px, alpha,
+frame counts, control mappings, transparent dynamic text and geometry checks
+passed. The entire decoded library is approximately 37.5 MiB; runtime controls
+share a cache rather than allocating copies per knob. The native GUI tests
+capture VSTGUI itself, exercise host parameter updates, balanced right-click
+reset gestures, hit targets, page switches and scaling. These captures are not
+rendered mockups. Graphical realism and exact correspondence to the user's
+reference still require side-by-side visual acceptance.
 
-Limits carried by the actual current DSP: convolution is a short built-in synthetic FIR (512 taps), no external WAV/AIFF IR import. Source engines are adapters and require standalone sound/oversampling/precision comparison; this visual task does not certify their completeness. Standalone Filter is not an FX slot type; filtering remains in engine parameters. No false Filter control is added. New meters show existing input/wet/output telemetry, not invented independent A/B peaks.
+The original visual-only baseline had a 512-tap built-in FIR and no external IR
+loader. Task 2 now supplies actual partitioned WAV convolution, a fuller FDN and
+adjustable HYBRID. Read `REVERB_VALIDATION.md` for the audit, supported formats,
+new IDs/state, audio evidence and measured long-IR performance limitations.
+The three imported delay adapters remain preserved; these GUI/reverb tests do
+not certify their standalone sound/oversampling/precision equivalence. Existing
+input/wet/output meters display real telemetry; no independent A/B peak data is
+invented. Standalone Filter is not added as a fake FX slot type.
 
-FL Studio itself is not installed in this cloud Linux environment. Actual Windows/FL Studio listening, project save/reopen and physical monitor DPI remain manual acceptance checks. The supplied artwork is a reference, not an authentic plugin screenshot. Only renders produced by the native test host are labelled as plugin renders. A valid 3D-looking PNG is not proof of photorealistic fidelity.
+FL Studio is not installed in this Linux environment. Actual FL Studio project
+save/reopen, playback, tempo, automation, Windows file selection and physical
+monitor DPI are manual acceptance checks. Linux X11 has a separately diagnosed
+upstream runloop initialization issue; this deliverable targets Windows x64.
+No SDK source patches were made.
 
-Linux X11 GUI still has the separately diagnosed upstream runloop initialization issue documented in the previous report; this task targets Windows x64. No SDK source patches were made. No environment publication and no merge to main.
+## Earlier failures and remaining access restriction
 
-## Final local evidence and external blockers
+Windows runs through `6610780` failed before the user's quoted-resource-copy fix
+`41587a1` was integrated. A later CI failure was a PowerShell invocation issue:
+pluginval is a GUI-subsystem executable, so direct invocation could leave its
+exit code unset. Waiting explicitly with Start-Process resolved that failure;
+the successful run above includes actual pluginval validation.
 
-The completed local material library contains 34 RGBA assets. Byte-identical regeneration, per-file SHA-256, atlas bounds (<=4096 px), frame counts, transparent corners, control mapping, label transparency and static geometry checks passed. All resource PNGs in the built Linux VST3 bundle match the source manifest. Portable Release CTest remains 2/2, native Steinberg validator 47/47. The decoded *entire* library is approximately 37.5 MiB; the GUI shared cache loads a subset, rather than duplicating it per control.
-
-Commits through `6610780` were pushed to the requested branch. Windows run [42019521683](https://github.com/jurekbak71-dev/JerzyMXAnalogDelayVST3/actions/runs/42019521683) failed; the public page reports a build failure, and the detailed runner log cannot currently be read. It must not be presented as a passing Windows build. Later local corrections include physical readonly indicator lenses, screenshot pixel verification and inclusion of SDK/VSTGUI notices in packaging, but require a new remote CI run.
-
-Two confirmed access blockers prevent completion:
-1. GitHub Actions artifact download is denied at `productionresultssa13.blob.core.windows.net`; full logs also use `results-receiver.actions.githubusercontent.com`. These domain additions were saved in the environment draft without publishing. Actual screenshots cannot yet be downloaded for side-by-side visual acceptance.
-2. Existing platform GitHub authentication subsequently stopped working: API returns `401 Bad credentials`, and native Git cannot authenticate. No replacement token was requested in chat, no injected credentials were extracted or changed. The platform connection must be repaired before pushing remaining commits and querying CI.
-
-Therefore the requested verified Windows installation package, successful pluginval report and final authentic visual comparison are **not yet delivered**. A source/library ZIP is not a substitute for the requested tested Windows VST3. FL Studio itself remains an unrun manual acceptance check. No merge to main or environment publication was performed.
+The earlier GitHub authentication outage is resolved: commits, PR #16 and CI
+requests now work. Artifact downloads remain denied by this environment's
+network policy at `productionresultssa13.blob.core.windows.net`; full logs use
+`results-receiver.actions.githubusercontent.com`. Host additions were saved in
+the configuration draft without publishing. GitHub Actions artifact links are
+available to the user, but local visual inspection of those Windows PNGs is not
+claimed. Artifact existence, required checks and runner-side package verification
+are recorded separately from visual acceptance.

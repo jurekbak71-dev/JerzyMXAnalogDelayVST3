@@ -17,7 +17,7 @@ Verified limitations:
 - Layout JSON files list names, not executable geometry, ParamID bindings, event handlers or working DSP.
 - V2 adds generators but does not automatically integrate any graphics. `build_mx_assets.py` assumes output directories already exist, and uses a Linux absolute DejaVu font path. Dependencies are not pinned; ZIP timestamps are not deterministic.
 - The supplied manifest does not hash each file or fully describe all control bindings; there are no runtime bundle tests.
-- Supplied FDN/IR/Hybrid layout labels do not prove implementation. Current repository *does* have an FDN and a short synthetic FIR/Hybrid; external WAV/AIFF import is absent.
+- Supplied FDN/IR/Hybrid layout labels do not prove implementation. The inspected visual-task baseline *did* have an FDN and a short synthetic FIR/Hybrid; external WAV/AIFF import was absent. The subsequent Task 2 WAV implementation is audited separately in `REVERB_VALIDATION.md`; AIFF remains unsupported.
 
 The two supplied generators are retained unchanged under `scripts/supplied_v2/` as source provenance. They are not invoked by the product build. Their font/path assumptions are not silently treated as portable.
 
