@@ -56,11 +56,22 @@ jobs:
           if ((Get-FileHash pluginval.zip -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c08e61ce3b96db41636f8ec7e76f4c7e2c13ebdac7fa1b5a1f52b4f32ec715ab') { throw 'pluginval checksum mismatch' }
           Expand-Archive pluginval.zip -DestinationPath pluginval
           $plugin = Get-ChildItem build -Recurse -Directory -Filter 'MX Delay 2.vst3' | Select-Object -First 1
+          if (-not $plugin) { throw "Cannot locate MX Delay 2.vst3 for pluginval" }
+          Write-Output "Validating VST3: $($plugin.FullName)"
+          New-Item -ItemType Directory -Force build/pluginval-logs | Out-Null
+          # Native pluginval may exit with no stdout when a child VST3 host crashes.
+          # Preserve the exit code and dump diagnostic files before failing CI.
           & ./pluginval/pluginval.exe --strictness-level 5 --random-seed 1971 --sample-rates 44100,48000,96000 --block-sizes 64,128,257,1024 --output-dir build/pluginval-logs --validate $plugin.FullName *> build/pluginval-console.txt
           $valExit = $LASTEXITCODE
+          $console = if (Test-Path build/pluginval-console.txt) { Get-Content build/pluginval-console.txt -Raw } else { '' }
+          if ($console) { Write-Output $console }
+          $reports = @(Get-ChildItem build/pluginval-logs -Recurse -File -ErrorAction SilentlyContinue)
+          foreach ($report in $reports) {
+            Write-Output "pluginval report: $($report.FullName)"
+            Get-Content $report.FullName -Tail 120 -ErrorAction SilentlyContinue | Write-Output
+          }
           if ($valExit -ne 0) {
-            $message = (Get-Content build/pluginval-console.txt -Raw).Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
-            Write-Output "::error title=pluginval::$message"
+            Write-Output "::error title=pluginval::Validator exited with code $valExit; reports: $($reports.Count)"
             throw "pluginval failed: $valExit"
           }
       - name: Package
