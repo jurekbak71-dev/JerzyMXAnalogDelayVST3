@@ -452,7 +452,8 @@ public:
     }
     void reset(){for(auto& x:s)x.reset();for(auto& fx:wetFx)fx.reset();reverb.reset();convolution.reset();for(auto& engine:originals)engine.reset();}
 
-    template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak){
+    struct MeterPeaks {double input=0.0,wet=0.0,output=0.0;};
+    template<class Sample> void process(Sample** in,Sample** out,int channels,int n,const MXDelayParams& p,double bpm,double& peak,MeterPeaks* meters=nullptr){
         const double inGain=gainFromNorm(p.inputTrim,-18,18);
         const double outGain=gainFromNorm(p.outputTrim,-18,12);
         const double mix=std::clamp(p.mix,0.0,1.0);
@@ -467,6 +468,7 @@ public:
             const T rawL=(T)(in&&in[0]?in[0][i]:0);
             const T rawR=(channels>1&&in&&in[1])?(T)in[1][i]:rawL;
 
+            if(meters)meters->input=std::max({meters->input,std::abs(double(rawL)),std::abs(double(rawR))});
             if(bypass&&!trails){
                 if(out&&out[0])out[0][i]=(Sample)rawL;
                 if(channels>1&&out&&out[1])out[1][i]=(Sample)rawR;
@@ -506,6 +508,7 @@ public:
             }
 
             for(int fx=0;fx<4;++fx)if(p.fx[fx].route>=.5)wet=wetFx[fx].process(wet,p.fx[fx]);
+            if(meters)meters->wet=std::max({meters->wet,std::abs(double(wet.l)),std::abs(double(wet.r))});
             T yL{},yR{};
             if(bypass&&trails){
                 yL=(T)(double(rawL)+wetG*double(wet.l)*outGain);
@@ -538,6 +541,7 @@ public:
             if(out&&out[0])out[0][i]=(Sample)yL;
             if(channels>1&&out&&out[1])out[1][i]=(Sample)yR;
             peak=std::max({peak,std::abs((double)yL),std::abs((double)yR)});
+            if(meters)meters->output=std::max(meters->output,peak);
         }
     }
 };
