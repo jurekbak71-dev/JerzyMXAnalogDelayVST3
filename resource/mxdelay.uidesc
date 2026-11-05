@@ -805,7 +805,11 @@
 <view class="CViewContainer" origin="0, 148" size="1280, 534" transparent="true" gui-c-page="2" visible="false">
 <view class="HardwarePanel" origin="8, 0" size="1264, 534" mouse-enabled="false"/>
 <view class="CTextLabel" origin="36, 28" size="1180, 32" title="REVERB / ALGORITHMIC FDN" font="Title" font-color="Amber" transparent="true" mouse-enabled="false"/>
-<view class="CTextLabel" origin="36, 70" size="1180, 22" title="Independent stereo output reverb - after delays and FX. Convolution IR and hybrid are not yet implemented." font="Label" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="36, 70" size="1180, 22" title="Independent stereo reverb: algorithmic FDN, built-in FIR convolution, or hybrid. External IR loading is pending." font="Label" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="CTextLabel" origin="470, 118" size="190, 22" title="REVERB MODE" font="Label" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="COptionMenu" origin="470, 153" size="190, 28" control-tag="ReverbMode" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Amber" frame-width="1"/>
+<view class="CTextLabel" origin="715, 118" size="190, 22" title="BUILT-IN IR PROFILE" font="Label" font-color="Cream" transparent="true" mouse-enabled="false"/>
+<view class="COptionMenu" origin="715, 153" size="190, 28" control-tag="ReverbIR" font="Label" font-color="Cream" back-color="ValueBack" frame-color="Amber" frame-width="1"/>
 <view class="CTextLabel" origin="44, 122" size="160, 22" title="REVERB ON" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 <view class="LedToggleSwitch" origin="64, 153" size="52, 52" control-tag="ReverbEnable"/>
 <view class="CTextLabel" origin="230, 122" size="160, 22" title="FREEZE" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
@@ -862,6 +866,8 @@
 <view class="CTextLabel" origin="810, 702" size="240, 22" title="REVERB" font="Section" font-color="Amber" transparent="true" mouse-enabled="false"/>
 <view class="CTextLabel" origin="810, 737" size="240, 22" title="ALGORITHMIC / IR / HYBRID — PLANNED" font="Section" font-color="Cream" transparent="true" mouse-enabled="false"/>
 </template><control-tags>
+<control-tag name="ReverbMode" tag="1057"/>
+<control-tag name="ReverbIR" tag="1058"/>
 <control-tag name="A9C0" tag="1264"/>
 <control-tag name="A9C1" tag="1265"/>
 <control-tag name="A9C2" tag="1266"/>
